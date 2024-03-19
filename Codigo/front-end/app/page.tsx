@@ -11,12 +11,12 @@ export default function Home() {
         <Image src='/logo.jpg' width={150} height={0} alt='logo' ></Image>
         <div>
           <h2 className="font-bold text-3xl">Log in.</h2>
-          <p className="lg:max-w-[80%]">Lorem ipsum dolor sit amet, consectetur adipiscing elit </p>
+          <p className="lg:max-w-[80%] mb-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit </p>
           <Label htmlFor="email">Email</Label>
           <Input placeholder="exemplo@email.com" id="email" type="email"/>
           <Label htmlFor="password">Senha</Label>
           <Input placeholder="mínimo de 8 caracteres" id="password" type="password"/>
-          <Button className="w-full mt-9">Login</Button>
+          <Link href='/admin'><Button className="w-full mt-9">Login</Button></Link>
           <p className="text-center mt-12">Não possui uma conta? <span className="text-primary font-semibold">Cadastre-se</span></p>
         </div>
       </div>

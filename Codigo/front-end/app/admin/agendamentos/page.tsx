@@ -1,8 +1,11 @@
+import TopMenu from '@/components/topMenu'
 import React from 'react'
 
 const Agendamentos = () => {
   return (
-    <div>Agendamentos</div>
+    <div>
+      <TopMenu title='Agendamentos'/>
+    </div>
   )
 }
 

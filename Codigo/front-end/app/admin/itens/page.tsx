@@ -1,8 +1,11 @@
+import TopMenu from '@/components/topMenu'
 import React from 'react'
 
 const Equipamentos = () => {
   return (
-    <h1 className='text-black text-2xl font-semibold'>Equipamentos</h1>
+    <div>
+      <TopMenu title='Itens' />
+    </div>
   )
 }
 
