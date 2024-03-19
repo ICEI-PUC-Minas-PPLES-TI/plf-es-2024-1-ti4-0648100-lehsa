@@ -5,6 +5,7 @@ import com.gerenciadorlehsa.entity.enums.ProfileEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
@@ -30,18 +31,20 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "full_name", length = 45, nullable = false)
+    @Column(name = "full_name", length = 45)
     @NotBlank
     @Size(min = 5, max = 45)
     private String fullName;
 
 
-    @Column(name = "email", length = 45, nullable = false, unique = true)
-    @NotBlank
-    @Email(message = "E-mail inválido")
+    @Column(name = "email", length = 45, unique = true)
+    @NotBlank(message = "O e-mail é obrigatório")
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",
+            flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "email deve ser um endereço de email válido")
     private String email;
 
-    @Column(name = "password", length = 100, nullable = false)
+    @Column(name = "password", length = 100)
     @NotBlank
     @Size(min = 6)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
