@@ -5,8 +5,8 @@ import React from 'react'
 
 const Equipamentos = () => {
   return (
-    <div>      
-      <Link href='/admin/itens/cadastro'><Button>+ Novo Item</Button></Link>
+    <div>
+      <Link href='/admin/itens/cadastro' className='pl-60'><Button>+ Novo Item</Button></Link>
       <ItensCard />
     </div>
   )
