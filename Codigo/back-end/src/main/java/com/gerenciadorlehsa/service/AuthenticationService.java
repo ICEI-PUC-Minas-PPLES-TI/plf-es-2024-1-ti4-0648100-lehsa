@@ -29,7 +29,7 @@ public class AuthenticationService {
 
     static public void addJWTToken(HttpServletResponse response, Authentication authentication) {
 
-        //mapa de permissões
+        // mapa de permissões
         Map<String, Object> claims = new HashMap<> ();
 
         claims.put (AUTHORITIES, authentication.getAuthorities ()

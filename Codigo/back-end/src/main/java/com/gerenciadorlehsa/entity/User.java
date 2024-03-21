@@ -60,7 +60,8 @@ public class User implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "usuario_id"),
     inverseJoinColumns = @JoinColumn(name = "role_id"),
-    uniqueConstraints = @UniqueConstraint (columnNames = {"usuario_id", "role_id"}))
+    uniqueConstraints = @UniqueConstraint (columnNames = {"usuario_id", "role_id"})) //um usuário não terá a mesma
+    // role duas vezes
     private List<Role> roles;
 
 

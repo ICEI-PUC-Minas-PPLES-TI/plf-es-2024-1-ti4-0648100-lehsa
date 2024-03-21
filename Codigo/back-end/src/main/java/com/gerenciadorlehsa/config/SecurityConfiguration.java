@@ -35,7 +35,7 @@ public class SecurityConfiguration{
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager ()
+        return authenticationConfiguration.getAuthenticationManager ();
     }
 
 
@@ -64,4 +64,6 @@ public class SecurityConfiguration{
 
 }
 
-// A porta /login é aberta para todos
+// permitAll() - a rota é disponível para o público
+// hasAuthority - a rota é acessada somente para quem tem alguma autoridade especificada no parâmetro do método
+// addFilterBefore - adicionar filtros
