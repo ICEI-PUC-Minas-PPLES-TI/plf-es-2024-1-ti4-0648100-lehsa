@@ -9,9 +9,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
-
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,26 +36,36 @@ public class User implements Serializable {
     @Size(min = 5, max = 45)
     private String fullName;
 
+    @Column(unique = true, length = 50)
+    private String username;
 
-    @Column(name = "email", length = 45, unique = true)
+    @Column(name = "password", length = 100)
+    @NotBlank(message = "A senha é obrigatória")
+    @Size(min = 6)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
+
+    @Column(length = 45, unique = true)
     @NotBlank(message = "O e-mail é obrigatório")
     @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",
             flags = Pattern.Flag.CASE_INSENSITIVE,
             message = "email deve ser um endereço de email válido")
     private String email;
 
-    @Column(name = "password", length = 100)
-    @NotBlank
-    @Size(min = 6)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
 
     @NotBlank(message = "CPF é obrigatório")
     @CPF
-    @Column(name = "cpf")
     private String cpf;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "usuario_id"),
+    inverseJoinColumns = @JoinColumn(name = "role_id"),
+    uniqueConstraints = @UniqueConstraint (columnNames = {"usuario_id", "role_id"}))
+    private List<Role> roles;
+
+
+
+/*    @ElementCollection(fetch = FetchType.EAGER)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @CollectionTable(name = "user_profile")
     @Column(name = "profile", nullable = false)
@@ -69,7 +79,8 @@ public class User implements Serializable {
     public void addProfile(ProfileEnum usuarioEnum) {
 
         this.profiles.add(usuarioEnum.getCode());
-    }
+    }*/
+
 
 
 }
