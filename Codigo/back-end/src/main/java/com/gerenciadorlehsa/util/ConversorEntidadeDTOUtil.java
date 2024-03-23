@@ -26,7 +26,7 @@ public class ConversorEntidadeDTOUtil {
         return UsuarioDTO.builder()
                 .id(usuario.getId())
                 .perfilUsuario(usuario.getPerfilUsuario())
-                .nome(usuario.getFullName ())
+                .nome(usuario.getNome ())
                 .cpf(usuario.getCpf())
                 .email(usuario.getEmail())
                 .links(singletonList(linkTo(UsuarioControllerImpl.class).slash(usuario.getId()).withSelfRel()))

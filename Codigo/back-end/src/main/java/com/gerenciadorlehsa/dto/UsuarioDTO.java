@@ -13,7 +13,7 @@ import java.util.UUID;
 public record UsuarioDTO(
         UUID id,
         @JsonProperty("perfil_usuario") Integer perfilUsuario,
-        String fullName,
+        String nome,
         String cpf,
         String email,
         String telefone,
