@@ -22,14 +22,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
-
 import java.io.IOException;
-
+import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_USUARIO_SENHA;
+import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_VALIDACAO;
+import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.CONTENT_TYPE;
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.INTERCEPTADOR_EXCECOES;
 import static java.lang.String.format;
-import static org.spring.autenticacaojwt.util.constantes.ConstantesErroValidadorUtil.MSG_ERRO_USUARIO_SENHA;
-import static org.spring.autenticacaojwt.util.constantes.ConstantesErroValidadorUtil.MSG_ERRO_VALIDACAO;
-import static org.spring.autenticacaojwt.util.constantes.ConstantesRequisicaoUtil.CONTENT_TYPE;
-import static org.spring.autenticacaojwt.util.constantes.ConstantesTopicosUtil.INTERCEPTADOR_EXCECOES;
 
 @Slf4j(topic = INTERCEPTADOR_EXCECOES)
 @Component

@@ -29,7 +29,7 @@ public interface UsuarioRepository extends JpaRepository<User, UUID> {
      * @return senha do usuário
      */
     @Transactional(readOnly = true)
-    @Query("SELECT u.senha FROM Usuarios u WHERE u.id = :id")
+    @Query("SELECT u.password FROM User u WHERE u.id = :id")
     String buscarSenhaUsuarioPorId(UUID id);
 
     /**
@@ -40,6 +40,6 @@ public interface UsuarioRepository extends JpaRepository<User, UUID> {
      */
     @Modifying
     @Transactional
-    @Query("UPDATE Usuario u SET u.senha = :senha WHERE u.id = :id")
+    @Query("UPDATE User u SET u.password = :senha WHERE u.id = :id")
     void atualizarSenhaUsuario(String senha, UUID id);
 }

@@ -1,10 +1,8 @@
 package com.gerenciadorlehsa.exceptions;
 
 import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static java.util.Objects.isNull;
 
 @Data

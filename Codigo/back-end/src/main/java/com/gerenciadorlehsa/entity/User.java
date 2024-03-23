@@ -17,7 +17,7 @@ import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.*;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "TB_USUARIO")
 @Data
 @Getter
 @Setter
