@@ -3,7 +3,6 @@ package com.gerenciadorlehsa;
 import com.gerenciadorlehsa.entity.Role;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.permissions.PermissionEnum;
-import com.gerenciadorlehsa.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
