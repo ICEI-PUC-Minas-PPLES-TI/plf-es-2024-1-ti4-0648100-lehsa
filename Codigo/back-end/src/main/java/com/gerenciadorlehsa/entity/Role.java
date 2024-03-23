@@ -24,6 +24,6 @@ public class Role implements Serializable {
     private PermissionEnum nome;
 
     @ManyToMany(mappedBy = "roles")
-    @JsonBackReference
+    @JsonBackReference //evitar loop infinito de acesso de permissão
     private List<User> users;
 }

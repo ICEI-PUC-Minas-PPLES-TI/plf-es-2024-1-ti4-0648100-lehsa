@@ -3,7 +3,6 @@ package com.gerenciadorlehsa.config;
 import com.gerenciadorlehsa.filter.AuthenticationFilter;
 import com.gerenciadorlehsa.filter.LoginFilter;
 import com.gerenciadorlehsa.permissions.PermissionEnum;
-import com.gerenciadorlehsa.service.AuthenticatedUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,14 +21,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfiguration{
 
-    @Autowired
-    private AuthenticatedUserService authenticatedUserService;
 
     @Autowired
     private AuthenticationConfiguration authenticationConfiguration;
 
+    private static final String[] PUBLIC_MATCHERS_POST = {
+            "/usuario", "/login"
+    };
+
+    public static final String[] CAMINHOS_PUBLICOS = {"/"};
+
+
+
     @Bean //Criptografa o password do usuário
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder ();
     }
 
@@ -43,20 +49,21 @@ public class SecurityConfiguration{
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 
         http.csrf (AbstractHttpConfigurer :: disable)
-                .authorizeHttpRequests (auth -> {
+                .authorizeHttpRequests (auth ->
+                        auth.requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                                .requestMatchers (CAMINHOS_PUBLICOS).permitAll ()
+                       .requestMatchers (HttpMethod.GET, "/teste-api").permitAll ()
+                        .requestMatchers (HttpMethod.GET, "/teste-api-bem-vindo").hasAuthority (PermissionEnum.ADMIN.toString ())
+                        .requestMatchers (HttpMethod.GET, "/usuario").hasAuthority (PermissionEnum.ADMIN.toString ())
+                        .anyRequest ()
+                        .authenticated ());
 
-                    auth.requestMatchers ("/login").permitAll ()
-                           .requestMatchers (HttpMethod.GET, "/teste-api").permitAll ()
-                            .requestMatchers (HttpMethod.GET, "/teste-api-bem-vindo").hasAuthority (PermissionEnum.ADMIN.toString ())
-                            .requestMatchers (HttpMethod.GET, "/usuario").hasAuthority (PermissionEnum.ADMIN.toString ())
-                            .anyRequest ()
-                            .authenticated ();
-                });
 
         http.addFilterBefore (new LoginFilter ("/login", authenticationConfiguration.getAuthenticationManager ()),
                 UsernamePasswordAuthenticationFilter.class);
 
         http.addFilterBefore (new AuthenticationFilter (), UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build ();
     }
@@ -67,3 +74,4 @@ public class SecurityConfiguration{
 // permitAll() - a rota é disponível para o público
 // hasAuthority - a rota é acessada somente para quem tem alguma autoridade especificada no parâmetro do método
 // addFilterBefore - adicionar filtros
+// /login é o caminho para entrar no sistema
