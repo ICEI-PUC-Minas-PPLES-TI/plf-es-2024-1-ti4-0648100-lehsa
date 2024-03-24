@@ -15,6 +15,8 @@ import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,6 +25,7 @@ import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirResp
 import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDTO;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.USUARIO_CONTROLLER;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @Slf4j(topic = USUARIO_CONTROLLER)
@@ -73,7 +76,8 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
     public ResponseEntity<Map<String, Object>> criar(@Valid @RequestBody User usuario) {
         log.info(">>> criar: recebendo requisição para criar usuário");
         User usuarioCriado = operacoesCRUDService.criar(usuario);
-        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_USUARIO_CRIADO, usuarioCriado.getId())));
+
+        return ResponseEntity.created (URI.create("/usuario/" + usuarioCriado.getId())).body (construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(CREATED.value(), MSG_USUARIO_CRIADO, usuarioCriado.getId())));
     }
 
     /**
