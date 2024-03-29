@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_SENHA;
 
 @Entity
 @Table(name = Item.NOME_TABELA)
@@ -26,8 +25,8 @@ public class Item {
     @Column(name = "ID", unique = true, nullable = false, updatable = false)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_de_item", nullable = false)
+    @Enumerated(EnumType.STRING)
     private TipoItem tipoItem;
 
     @Column(name = "quantidade", nullable = false)

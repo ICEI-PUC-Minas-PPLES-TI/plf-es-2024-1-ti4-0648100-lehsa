@@ -10,6 +10,8 @@ public class ConstantesTopicosUtil {
 
     public static final String USUARIO_SERVICE = "USUARIO_SERVICE";
 
+    public static final String ITEM_SERVICE = "ITEM_SERVICE";
+
     public static final String ENDERECO_SERVICE = "ENDERECO_SERVICE";
 
     public static final String VALIDADOR_AUTORIZACAO_REQUISICAO_SERVICE = "VALIDADOR_AUTORIZACAO_REQUISICAO_SERVICE";
