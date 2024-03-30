@@ -22,6 +22,8 @@ public class ConstantesTopicosUtil {
 
     public static final String USUARIO_CONTROLLER = "USUARIO_CONTROLLER";
 
+    public static final String ITEM_CONTROLLER = "ITEM_CONTROLLER";
+
     public static final String ENDERECO_CONTROLLER = "ENDERECO_CONTROLLER";
 
     public static final String INDICADOR_SAUDE_SISTEMA_COMP = "INDICADOR_SAUDE_SISTEMA_COMP";
