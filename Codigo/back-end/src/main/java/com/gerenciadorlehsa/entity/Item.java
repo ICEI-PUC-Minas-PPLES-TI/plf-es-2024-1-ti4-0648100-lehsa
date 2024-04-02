@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.UUID;
+
 
 @Entity
 @Table(name = Item.NOME_TABELA)
@@ -21,9 +23,9 @@ public class Item {
     public static final String NOME_TABELA = "item";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", unique = true, nullable = false, updatable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "tipo_de_item", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -38,7 +40,7 @@ public class Item {
     private float valorUnitario;
 
     @Column(name = "nome", length = 64, nullable = false)
-    @Size(min = 3, max = 64, message = "Mensagem ainda a definir")
+    @Size(min = 3, max = 64, message = "Nome deve ter entre 3 a 64 caracteres")
     private String nome;
 
     @Column(name = "emprestavel", nullable = false)

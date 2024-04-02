@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.repository.ItemRepository;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ITEM_SERVICE;
@@ -24,7 +26,7 @@ public class ItemService {
     @Autowired
     private ItemRepository itemRepository;
 
-    public Item encontrarPorId(@NotNull Long id) {
+    public Item encontrarPorId(@NotNull UUID id) {
         log.info(">>> encontrarPorId: encontrando item por id");
         return this.itemRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(format("item não encontrado, id: %s", id)));
@@ -56,7 +58,7 @@ public class ItemService {
         return nItem;
     }
 
-    public void deletar (@NotNull Long id) {
+    public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         encontrarPorId(id);
         try {
@@ -65,5 +67,19 @@ public class ItemService {
         } catch (Exception e) {
             throw new DeletarEntidadeException(format("existem entidades relacionadas: %s", e));
         }
+    }
+
+    public List<Item> encontrarPorTipo (TipoItem tipo) {
+        log.info(">>> encontrarPorTipo: encontrando itens com o tipo especificado");
+        return this.itemRepository.findByTipoItem(tipo)
+                .stream()
+                .toList();
+    }
+
+    public List<Item> encontrarPorNome (String nome) {
+        log.info(">>> encontrarPorNome: encontrando itens com o nome especificado");
+        return this.itemRepository.findByNome(nome)
+                .stream()
+                .toList();
     }
 }
