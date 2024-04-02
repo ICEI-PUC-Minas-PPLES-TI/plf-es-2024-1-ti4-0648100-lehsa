@@ -10,7 +10,7 @@ const adminLayout = ({ children }: Props) => {
   return (
     <div className='flex'>
         <NavBar />
-        <div className='p-6 grow h-screen'>{ children }</div>
+        <div className='p-6 grow h-screen overflow-y-auto'>{ children }</div>
     </div>
   )
 }

@@ -75,7 +75,12 @@ public class SegurancaConfig {
         final CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         configuration.setAllowedMethods(METODOS_PERMITIDOS_CORS);
+        configuration.addAllowedOrigin("http://localhost:3000/");
         source.registerCorsConfiguration(CONFIGURACAO_CORS, configuration);
+
+
         return source;
     }
+
+
 }

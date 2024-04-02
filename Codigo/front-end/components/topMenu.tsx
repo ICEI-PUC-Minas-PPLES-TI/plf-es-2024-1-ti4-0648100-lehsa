@@ -8,7 +8,7 @@ type Props = {
 const TopMenu = ( {title}: Props ) => {
   return (
     <div className='flex w-full justify-between items-center'>
-        <h1 className='text-black text-3xl font-semibold pl-60'>{title}</h1>
+        <h1 className='text-black text-3xl font-semibold'>{title}</h1>
         <div className='flex gap-5'>
             <Image src='/icons/notification.svg' width={46} height={0} alt='notification'></Image>
             <Image src='/icons/setting.svg' width={46} height={0} alt='setting'></Image>
