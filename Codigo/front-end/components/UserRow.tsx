@@ -12,11 +12,11 @@ function createData(
 
 const users = [
   createData(1, "User 1", "user1@email.com", 11111111, "instituicao 1"),
-  createData(2, "User 2", "user1@email.com", 22222222, "instituicao 2"),
-  createData(3, "User 3", "user1@email.com", 33333333, "instituicao 3"),
-  createData(4, "User 4", "user1@email.com", 44444444, "instituicao 4"),
-  createData(5, "User 5", "user1@email.com", 55555555, "instituicao 5"),
-  createData(6, "User 6", "user1@email.com", 66666666, "instituicao 6"),
+  createData(2, "User 2", "user2@email.com", 22222222, "instituicao 2"),
+  createData(3, "User 3", "user3@email.com", 33333333, "instituicao 3"),
+  createData(4, "User 4", "user4@email.com", 44444444, "instituicao 4"),
+  createData(5, "User 5", "user5@email.com", 55555555, "instituicao 5"),
+  createData(6, "User 6", "user6@email.com", 66666666, "instituicao 6"),
 ];
 
 const UserRow = () => {

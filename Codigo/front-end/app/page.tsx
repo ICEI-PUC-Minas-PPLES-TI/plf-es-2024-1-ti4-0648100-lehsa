@@ -17,7 +17,7 @@ export default function Home() {
           <Label htmlFor="password">Senha</Label>
           <Input placeholder="mínimo de 8 caracteres" id="password" type="password"/>
           <Link href='/admin'><Button className="w-full mt-9">Login</Button></Link>
-          <p className="text-center mt-12">Não possui uma conta? <span className="text-primary font-semibold">Cadastre-se</span></p>
+          <p className="text-center mt-12">Não possui uma conta? <Link href='/user/cadastrar'><button className="text-primary font-semibold cursor-pointer" >Cadastre-se</button></Link></p>
         </div>
       </div>
       
