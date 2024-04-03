@@ -47,7 +47,7 @@ public class ItemController {
     }
 
     @GetMapping("/tipo/{tipo}")
-    public ResponseEntity<List<ItemDTO>> encontrarPorTipo (@PathVariable TipoItem tipo) {
+    public ResponseEntity<List<ItemDTO>> encontrarPorTipo (@PathVariable String tipo) {
         log.info(">>> encontrarPorTipo: recebendo requisição para encontrar itens por tipo");
         List<Item> itens = this.itemService.encontrarPorTipo(tipo);
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());

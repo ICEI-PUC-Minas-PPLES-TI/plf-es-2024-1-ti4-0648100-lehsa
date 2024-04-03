@@ -4,6 +4,7 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
+import com.gerenciadorlehsa.exceptions.lancaveis.TipoItemNaoEncontradoException;
 import com.gerenciadorlehsa.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
@@ -69,11 +70,17 @@ public class ItemService {
         }
     }
 
-    public List<Item> encontrarPorTipo (@NotNull TipoItem tipo) {
+    public List<Item> encontrarPorTipo (@NotNull String tipo) {
         log.info(">>> encontrarPorTipo: encontrando itens com o tipo especificado");
-        return this.itemRepository.findByTipoItem(tipo)
-                .stream()
-                .toList();
+        tipo = tipo.toUpperCase();
+        try {
+            TipoItem enumTipo = Enum.valueOf(TipoItem.class, tipo);
+            return this.itemRepository.findByTipoItem(enumTipo)
+                    .stream()
+                    .toList();
+        } catch (IllegalArgumentException e) {
+            throw  new TipoItemNaoEncontradoException(format("não existe o tipo passado: " + tipo));
+        }
     }
 
     public List<Item> encontrarPorNome (@NotNull String nome) {
