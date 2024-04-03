@@ -157,12 +157,12 @@ const CadastroForm = () => {
       ) : complete1 && complete2 ? (
         <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
           <ThreeIcon color={"#03B0F0"}/>
-          <h1 className="title">Contato</h1>
+          <h1 className="title">Login</h1>
         </div>
       ) : (
         <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
           <ThreeIcon color={"#444444"}/>
-          <h1 className="title">Contato</h1>
+          <h1 className="title">Login</h1>
         </div>
       )}
     </section>
