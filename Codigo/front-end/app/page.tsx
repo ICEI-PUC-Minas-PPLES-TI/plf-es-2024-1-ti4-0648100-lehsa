@@ -20,14 +20,17 @@ export default function Home() {
 
     const response = await fetch('http://localhost:8080/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Host': 'http://localhost:3000/'
+      },
       body: JSON.stringify({ email, password }),
     })
 
     if (response.ok) {
-      router.push('/dashboard')
+      router.push('/admin')
     } else {
-      window.alert("erro mano");
+      window.alert("Falha no login");
     }
   }
 
