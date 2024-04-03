@@ -2,6 +2,10 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import OneIcon from "@/assets/OneIcon";
+import TwoIcon from "@/assets/TwoIcon";
+import ThreeIcon from "@/assets/ThreeIcon";
 
 const CadastroForm = () => {
   const [complete1, setComplete1] = useState(false);
@@ -21,77 +25,145 @@ const CadastroForm = () => {
   };
 
   return (
-    <section className="">
+    <section className="flex flex-col gap-2 items-center">
       {complete1 ? (
-        <h1 className="title">1 Informacoes basicas</h1>
+        <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
+          <OneIcon color={"#03B0F0"} />
+          <h1 className="title">Informações básicas</h1>
+        </div>
       ) : (
-        <div>
-          <h1 className="title">1 Informacoes basicas</h1>
-          <form>
-            <Label htmlFor="firstName">Primeiro nome</Label>
-            <Input id="firstName" type="string" />
+        <div className="bg-white w-full px-10 py-5 rounded-xl">
+          <div className="flex gap-4 w-full py-3">
+            <OneIcon color={"#444"} />
+            <h1 className="title">Informações básicas</h1>
+          </div>
 
-            <Label htmlFor="lastName">Sobrenome</Label>
-            <Input id="lastName" type="string" />
+          <form className="flex flex-col gap-2 items-center">
+            <div className="w-full">
+              <Label htmlFor="firstName">Primeiro nome</Label>
+              <Input id="firstName" type="string" />
+            </div>
 
-            <Label htmlFor="cpf">CPF</Label>
-            <Input placeholder="xxx.xxx.xxx-xx" id="cpf" type="cpf" />
+            <div className="w-full">
+              <Label htmlFor="lastName">Sobrenome</Label>
+              <Input id="lastName" type="string" />
+            </div>
 
-            <Label htmlFor="institution">Instituicao</Label>
-            <Input id="institution" type="string" />
+            <div className="w-full">
+              <Label htmlFor="cpf">CPF</Label>
+              <Input placeholder="xxx.xxx.xxx-xx" id="cpf" type="cpf" />
+            </div>
 
-            <Label htmlFor="birthDate">Data de nascimento</Label>
-            <Input id="birthDate" type="date" />
-            <button type="button" onClick={handleClick1}>
+            <div className="w-full">
+              <Label htmlFor="institution">Instituição</Label>
+              <Input id="institution" type="string" />
+            </div>
+
+            <div className="w-full">
+              <Label htmlFor="birthDate">Data de nascimento</Label>
+              <Input id="birthDate" type="date" />
+            </div>
+            <Button
+              className="mt-3 w-[12rem]"
+              type="button"
+              onClick={handleClick1}
+            >
               Proximo
-            </button>
+            </Button>
           </form>
         </div>
       )}
 
       {complete1 && !complete2 ? (
-        <div>
-          <h1 className="title">2 Contato</h1>
-          <form>
-            <Label htmlFor="phone">Celular</Label>
-            <Input id="phone" type="number" />
+        <div className="bg-white w-full px-10 py-5 rounded-xl">
+          <div className="flex gap-4 w-full py-3">
+            <TwoIcon color={"#444444"}/>
+            <h1 className="title">Contato</h1>
+          </div>
 
-            <Label htmlFor="cep">CEP</Label>
-            <Input id="cep" type="number" />
+          <form className="flex flex-col gap-2 items-center">
+            <div className="w-full">
+              <Label htmlFor="phone">Celular</Label>
+              <Input id="phone" type="number" />
+            </div>
 
-            <Label htmlFor="state">Estado</Label>
-            <Input id="state" type="text" />
+            <div className="w-full">
+              <Label htmlFor="cep">CEP</Label>
+              <Input id="cep" type="number" />
+            </div>
 
-            <Label htmlFor="city">Cidade</Label>
-            <Input id="city" type="text" />
-            <button type="button" onClick={handleClick2}>
+            <div className="w-full">
+              <Label htmlFor="state">Estado</Label>
+              <Input id="state" type="text" />
+            </div>
+
+            <div className="w-full">
+              <Label htmlFor="city">Cidade</Label>
+              <Input id="city" type="text" />
+            </div>
+            <Button
+              className="mt-3 w-[12rem]"
+              type="button"
+              onClick={handleClick2}
+            >
               Proximo
-            </button>
+            </Button>
           </form>
         </div>
+      ) : complete1 && complete2 ? (
+        <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
+          <TwoIcon color={"#03B0F0"}/>
+          <h1 className="title">Contato</h1>
+        </div>
       ) : (
-        <h1>2 Contato</h1>
+        <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
+          <TwoIcon color={"#444444"}/>
+          <h1 className="title">Contato</h1>
+        </div>
       )}
 
       {complete2 && !complete3 ? (
-        <div>
-          <h1 className="title">3 Login</h1>
-          <form>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="text" />
+        <div className="bg-white w-full px-10 py-5 rounded-xl">
+          <div className="flex gap-4 w-full py-3">
+            <ThreeIcon color={"#444444"}/>
+            <h1 className="title">Login</h1>
+          </div>
 
-            <Label htmlFor="password">Senha</Label>
-            <Input id="password" type="number" />
+          <form className="flex flex-col gap-2 items-center">
+            <div className="w-full">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="text" />
+            </div>
 
-            <Label htmlFor="password">Confirmar Senha</Label>
-            <Input id="password" type="text" />
-            <button type="button" onClick={handleClick3}>
+            <div className="w-full">
+              <Label htmlFor="password">Senha</Label>
+              <Input id="password" type="text" />
+            </div>
+
+            <div className="w-full">
+              <Label htmlFor="password">Confirmar Senha</Label>
+              <Input id="password" type="text" />
+            </div>
+
+            <Button
+              className="mt-3 w-[12rem]"
+              type="button"
+              onClick={handleClick3}
+            >
               Concluir Cadastro
-            </button>
+            </Button>
           </form>
         </div>
+      ) : complete1 && complete2 ? (
+        <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
+          <ThreeIcon color={"#03B0F0"}/>
+          <h1 className="title">Contato</h1>
+        </div>
       ) : (
-        <h1>3 Login</h1>
+        <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
+          <ThreeIcon color={"#444444"}/>
+          <h1 className="title">Contato</h1>
+        </div>
       )}
     </section>
   );
