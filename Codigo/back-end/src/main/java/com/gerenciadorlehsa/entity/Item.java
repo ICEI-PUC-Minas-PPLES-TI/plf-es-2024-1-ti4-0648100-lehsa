@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
@@ -28,6 +29,7 @@ public class Item {
     private UUID id;
 
     @Column(name = "tipo_de_item", nullable = false)
+    @JsonProperty("tipo_item")
     @Enumerated(EnumType.STRING)
     private TipoItem tipoItem;
 
@@ -36,6 +38,7 @@ public class Item {
     private int quantidade;
 
     @Column(name = "valor_unitario", nullable = false)
+    @JsonProperty("valor_unitario")
     @DecimalMin(value = "0.0", inclusive = false)
     private float valorUnitario;
 
