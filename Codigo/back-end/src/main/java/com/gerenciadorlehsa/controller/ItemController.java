@@ -1,8 +1,10 @@
 package com.gerenciadorlehsa.controller;
 
+import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.service.ItemService;
+import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import java.util.UUID;
 
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.ENDPOINT_ITEM;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ITEM_CONTROLLER;
+import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDTO;
 
 
 @Slf4j(topic = ITEM_CONTROLLER)
@@ -30,31 +33,31 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Item> encontrarPorId (@PathVariable UUID id) {
+    public ResponseEntity<ItemDTO> encontrarPorId (@PathVariable UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar item por id");
         Item item = this.itemService.encontrarPorId(id);
-        return ResponseEntity.ok().body(item);
+        return ResponseEntity.ok().body(converterParaDTO(item));
     }
 
     @GetMapping
-    public ResponseEntity<List<Item>> listarTodos () {
+    public ResponseEntity<List<ItemDTO>> listarTodos () {
         log.info(">>> listarTodos: recebendo requisição para listar todos itens");
         List<Item> itens = this.itemService.listarTodos();
-        return ResponseEntity.ok().body(itens.stream().toList());
+        return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
     @GetMapping("/tipo/{tipo}")
-    public ResponseEntity<List<Item>> encontrarPorTipo (@PathVariable TipoItem tipo) {
+    public ResponseEntity<List<ItemDTO>> encontrarPorTipo (@PathVariable TipoItem tipo) {
         log.info(">>> encontrarPorTipo: recebendo requisição para encontrar itens por tipo");
         List<Item> itens = this.itemService.encontrarPorTipo(tipo);
-        return ResponseEntity.ok().body(itens);
+        return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
     @GetMapping("/nome/{nome}")
-    public ResponseEntity<List<Item>> encontrarPorNome (@PathVariable String nome) {
+    public ResponseEntity<List<ItemDTO>> encontrarPorNome (@PathVariable String nome) {
         log.info(">>> encontrarPorNome: recebendo requisição para encontrar itens por nome");
         List<Item> itens = this.itemService.encontrarPorNome(nome);
-        return ResponseEntity.ok().body(itens);
+        return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
     @PostMapping
