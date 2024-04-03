@@ -69,14 +69,14 @@ public class ItemService {
         }
     }
 
-    public List<Item> encontrarPorTipo (TipoItem tipo) {
+    public List<Item> encontrarPorTipo (@NotNull TipoItem tipo) {
         log.info(">>> encontrarPorTipo: encontrando itens com o tipo especificado");
         return this.itemRepository.findByTipoItem(tipo)
                 .stream()
                 .toList();
     }
 
-    public List<Item> encontrarPorNome (String nome) {
+    public List<Item> encontrarPorNome (@NotNull String nome) {
         log.info(">>> encontrarPorNome: encontrando itens com o nome especificado");
         return this.itemRepository.findByNome(nome)
                 .stream()
