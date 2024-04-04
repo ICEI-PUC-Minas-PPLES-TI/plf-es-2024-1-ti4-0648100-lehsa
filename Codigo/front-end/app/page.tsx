@@ -45,6 +45,7 @@ export default function Home() {
         <div>
           <h2 className="font-bold text-3xl">Log in.</h2>
           <p className="lg:max-w-[80%] mb-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit </p>
+
           <form onSubmit={handleSubmit}>
             <Label htmlFor="email">Email</Label>
             <Input placeholder="exemplo@email.com" name="email" type="email" />
@@ -53,6 +54,7 @@ export default function Home() {
             <Button type="submit"  className="w-full mt-9">Login</Button>
           </form>
           <p className="text-center mt-12">Não possui uma conta? <span className="text-primary font-semibold">Cadastre-se</span></p>
+
         </div>
       </div>
 

@@ -40,7 +40,7 @@ public class ConstantesRequisicaoUtil {
 
             "\n}";
 
-    public static final String[] PROPRIEDADES_IGNORADAS = new String[]{"id", "senha", "perfilUsuario", "endereco", "dataCriacao", "dataUltimaModificacao"};
+    public static final String[] PROPRIEDADES_IGNORADAS = new String[]{"id", "password", "perfilUsuario"};
 
     public static final List<String> CHAVES_ENDERECO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_endereco"));
 
