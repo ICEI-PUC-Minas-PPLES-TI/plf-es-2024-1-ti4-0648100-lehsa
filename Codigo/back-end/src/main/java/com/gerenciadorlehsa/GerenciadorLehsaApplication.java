@@ -8,6 +8,7 @@ public class GerenciadorLehsaApplication{
 	public static void main(String[] args) {
 
 		SpringApplication.run(GerenciadorLehsaApplication.class, args);
+
 	}
 
 }

@@ -1,4 +1,4 @@
-import ItensCard from '@/components/ItemCard'
+import ItensCard from '@/components/ItensCard'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import React from 'react'
@@ -8,7 +8,7 @@ import FilterSelect from "@/components/FilterSelect";
 const Equipamentos = () => {
   return (
     <div>
-        <div className='pl-72 flex flex-1 justify-between my-5'>
+        <div className=' flex flex-1 justify-between my-5'>
             <SearchBar />
             <div className='flex justify-items-end space-x-5'>
                 <FilterSelect />

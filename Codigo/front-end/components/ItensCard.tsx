@@ -17,7 +17,7 @@ type Props = {
 
 const ItensCard = () => {
     return (
-        <div className="grid grid-cols-4 gap-4 pl-60">
+        <div className="grid grid-cols-4 gap-4">
             {items.map((item: Props) => (
                 <Card
                     key="1"
