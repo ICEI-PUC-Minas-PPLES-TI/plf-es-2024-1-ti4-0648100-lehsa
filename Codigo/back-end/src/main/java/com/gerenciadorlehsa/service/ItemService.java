@@ -35,9 +35,7 @@ public class ItemService {
 
     public List<Item> listarTodos() {
         log.info(">>> listarTodos: listando todos itens");
-        return this.itemRepository.findAll()
-                .stream()
-                .toList();
+        return this.itemRepository.findAll();
     }
 
     @Transactional
@@ -75,9 +73,7 @@ public class ItemService {
         tipo = tipo.toUpperCase();
         try {
             TipoItem enumTipo = Enum.valueOf(TipoItem.class, tipo);
-            return this.itemRepository.findByTipoItem(enumTipo)
-                    .stream()
-                    .toList();
+            return this.itemRepository.findByTipoItem(enumTipo);
         } catch (IllegalArgumentException e) {
             throw  new TipoItemNaoEncontradoException(format("não existe o tipo passado: " + tipo));
         }
@@ -85,8 +81,6 @@ public class ItemService {
 
     public List<Item> encontrarPorNome (@NotNull String nome) {
         log.info(">>> encontrarPorNome: encontrando itens com o nome especificado");
-        return this.itemRepository.findByNome(nome)
-                .stream()
-                .toList();
+        return this.itemRepository.findByNome(nome);
     }
 }
