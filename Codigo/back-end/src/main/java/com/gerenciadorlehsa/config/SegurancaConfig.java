@@ -64,7 +64,7 @@ public class SegurancaConfig {
     CorsConfigurationSource corsConfigurationSource() {
         log.info(">>> corsConfigurationSource: iniciando configuração de Cors");
         final CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Exemplo de múltiplas origens
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true); // Permitir credenciais
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

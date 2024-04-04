@@ -36,9 +36,8 @@ public class ConstantesRequisicaoUtil {
     public static final String CHARACTER_ENCODING = "UTF-8";
 
     public static final String CORPO_RESPOSTA_REQUISICAO = "{" +
-            "\n\"token\": \"" + TIPO_TOKEN + " %s\"," +
-            "\n\"usuario\": \"%s\"" + "," +
-            "\n\"hora\": \"%s\"" + "," +
+            "\n\"token\": \"" + "%s\"" +
+
             "\n}";
 
     public static final String[] PROPRIEDADES_IGNORADAS = new String[]{"id", "senha", "perfilUsuario", "endereco", "dataCriacao", "dataUltimaModificacao"};
