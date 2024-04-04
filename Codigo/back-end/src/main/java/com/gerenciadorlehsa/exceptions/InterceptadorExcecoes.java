@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
 import java.io.IOException;
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_USUARIO_SENHA;
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_VALIDACAO;
@@ -188,6 +190,22 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         String msgErro = e.getMessage();
         log.error(format("[ERRO] TipoItemNaoEncontradoException: tipo de item não encontrado: %s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.NOT_FOUND, request);
+    }
+
+    /**
+     * Captura exceções do tipo NoResoureceFoundException
+     *
+     * @param e       exceção do tipo NoResoureceFoundException
+     * @param request requisição
+     * @return tratamento da exceção (log e resposta requisição)
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Object> capturarNoResoureceFoundException(@NotNull NoResourceFoundException e, WebRequest request) {
+        String msgErro = e.getMessage().split("resource", 2)[1];
+        msgErro = "o recurso acessado não existe:" + msgErro;
+        log.error(format("[ERRO] %s: %s", e.getClass().getSimpleName(),msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
 
     /**
