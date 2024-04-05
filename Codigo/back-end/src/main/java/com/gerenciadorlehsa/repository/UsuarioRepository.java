@@ -23,6 +23,10 @@ public interface UsuarioRepository extends JpaRepository<User, UUID> {
     @Transactional(readOnly = true)
     Optional<User> findByEmail(String email);
 
+
+    boolean existsByEmail(String email);
+
+
     /**
      * Busca a senha de um usuário a partir do seu id
      * @param id id do usuário

@@ -61,6 +61,13 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(format("usuário não encontrado, email: %s", email)));
     }
 
+
+    @Override
+    public boolean existEmail(String email) {
+        return usuarioRepository.existsByEmail (email);
+    }
+
+
     /**
      * Lista todos os usuários criados
      *

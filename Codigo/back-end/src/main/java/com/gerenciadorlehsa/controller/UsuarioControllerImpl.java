@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.controller;
 
+import com.gerenciadorlehsa.components.JWTComp;
 import com.gerenciadorlehsa.entity.User;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import com.gerenciadorlehsa.dto.SenhaDTO;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +39,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
 
     private final OperacoesCRUDService<User> operacoesCRUDService;
     private final UsuarioService usuarioService;
+    private JWTComp jwtComp;
 
     /**
      * Encontra um usuário a partir do seu id
@@ -125,4 +128,25 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
         usuarioService.atualizarSenha(id, senhaDTO);
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_USUARIO_SENHA, id)));
     }
+
+
+    /**
+     * Verifica se o token é válido
+     * @param token objeto String passado como parâmetro da requisição
+     * @return mensagem de validação ou bad request caso o token seja inválido
+     */
+    @GetMapping("/verificar-token")
+    public ResponseEntity<?> verificarToken(@RequestParam("token") String token) {
+        log.info("Verificando se o token é de um usuário cadastrado");
+
+        if (jwtComp.tokenValido(token)) {
+            return usuarioService.existEmail (jwtComp.getEmailUsuario(token)) ? ResponseEntity.ok("O token pertence a" +
+                    " um usuário cadastrado.") : ResponseEntity.badRequest().body("O token não pertence a um usuário " +
+                    "cadastrado.");
+        } else {
+            return ResponseEntity.badRequest().body("Token inválido.");
+        }
+    }
+
+
 }

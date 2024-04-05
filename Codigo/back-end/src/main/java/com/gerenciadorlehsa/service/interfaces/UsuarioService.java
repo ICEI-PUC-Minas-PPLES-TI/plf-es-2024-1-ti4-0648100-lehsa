@@ -12,4 +12,6 @@ public interface UsuarioService {
 
     User encontrarPorEmail(@NotNull String email);
     void atualizarSenha(@NotNull UUID id, @NotNull SenhaDTO senhaDTO);
+
+    boolean existEmail(String email);
 }
