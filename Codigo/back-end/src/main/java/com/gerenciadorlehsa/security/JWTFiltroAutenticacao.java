@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gerenciadorlehsa.entity.enums.PerfilUsuario;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -72,7 +73,8 @@ public class JWTFiltroAutenticacao extends UsernamePasswordAuthenticationFilter 
         log.info(">>> successfulAuthentication: autenticação realizada com sucesso");
         UsuarioDetails usuarioDetails = (UsuarioDetails) authentication.getPrincipal();
         String emailUsuario = usuarioDetails.getUsername();
-        String token = this.jwtComp.gerarToken(emailUsuario);
+        PerfilUsuario roleUsuario = usuarioDetails.getPerfilUsuario();
+        String token = this.jwtComp.gerarToken(emailUsuario, String.valueOf(roleUsuario).toLowerCase());
         response.addHeader(HEADER_AUTORIZACAO, format(VALOR_HEADER_AUTORIZACAO, token));
         response.setContentType(CONTENT_TYPE);
         response.setCharacterEncoding(CHARACTER_ENCODING);

@@ -31,12 +31,13 @@ public class JWTComp {
      * @param email email do usuário
      * @return token gerado
      */
-    public String gerarToken(String email) {
+    public String gerarToken(String email, String role) {
         log.info(">>> gerarToken: gerando token de autenticação");
         SecretKey chave = gerarChaveSegredo();
         return Jwts.builder()
                 .setSubject(email)
-                .setExpiration(new Date(currentTimeMillis() + tempoExpiracao))
+                .claim("role", role) // Adiciona a role ao payload
+                .setExpiration(new Date(System.currentTimeMillis() + tempoExpiracao))
                 .signWith(chave)
                 .compact();
     }
