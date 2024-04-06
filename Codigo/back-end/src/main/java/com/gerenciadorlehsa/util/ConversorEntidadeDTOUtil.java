@@ -50,7 +50,7 @@ public class ConversorEntidadeDTOUtil {
                 .tipoItem(item.getTipoItem().name())
                 .nome(item.getNome())
                 .valorUnitario(item.getValorUnitario())
-                .emprestavel(item.isEmprestavel())
+                .emprestavel(item.getEmprestavel())
                 .quantidade(item.getQuantidade())
                 .build();
     }

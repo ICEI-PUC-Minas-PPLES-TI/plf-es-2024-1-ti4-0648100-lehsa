@@ -2,13 +2,11 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -72,7 +70,7 @@ public class ItemController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> atualizar (@PathVariable UUID id,
-                                           @Valid @RequestBody @NotNull Item item) {
+                                           @Valid @RequestBody Item item) {
         log.info(">>> atualizar: recebendo requisição para atualizar item");
         item.setId(id);
         this.itemService.atualizar(item);

@@ -35,17 +35,17 @@ public class Item {
 
     @Column(name = "quantidade", nullable = false)
     @Min(0)
-    private int quantidade;
+    private Integer quantidade;
 
     @Column(name = "valor_unitario", nullable = false)
     @JsonProperty("valor_unitario")
     @DecimalMin(value = "0.0", inclusive = false)
-    private float valorUnitario;
+    private Float valorUnitario;
 
     @Column(name = "nome", length = 64, nullable = false)
     @Size(min = 3, max = 64, message = "Nome deve ter entre 3 a 64 caracteres")
     private String nome;
 
     @Column(name = "emprestavel", nullable = false)
-    private boolean emprestavel;
+    private Boolean emprestavel;
 }
