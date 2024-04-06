@@ -17,9 +17,13 @@ type Props = {
     quantidade: number;
     tipo_item: string;
 };
-const ItensCard = () => {
 
-    const [items, setItems] = useState([]);
+interface ItensCardProps {
+    searchTerm: string;
+}
+const ItensCard = ({ searchTerm } : ItensCardProps) => {
+
+    const [items, setItems] = useState<Props[]>([]);
 
     useEffect(() => {
         fetch("http://localhost:8080/item", {
@@ -34,9 +38,14 @@ const ItensCard = () => {
             .catch(error => console.error('Error fetching items:', error));
     }, []);
 
+    const filteredItems = items.filter(item =>
+        item.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+
     return (
         <div className="grid grid-cols-4 gap-4 pl-60">
-            {items.map((item: Props) => (
+            {filteredItems.map((item: Props) => (
                 <Link key={item.id} href={`/admin/itens/${item.id}`}>
                 <Card
 
