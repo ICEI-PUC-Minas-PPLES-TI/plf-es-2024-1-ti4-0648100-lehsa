@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, {useEffect, useState} from "react";
 import { Separator } from "@/components/ui/separator";
 import {EditIcon, TrashIcon} from "lucide-react";
+import Link from "next/link";
 
 type Props = {
     id: number;
@@ -56,7 +57,7 @@ export default function ItemDetails() {
     if (!item) return <div>Loading...</div>;
 
     return (
-        <div className="grid md:grid-cols-2 items-start px-4 gap-6 lg:gap-12 py-6 ml-80">
+        <div className="grid items-start px-4 gap-6 lg:gap-12 py-6 ml-80 mr-60 bg-card rounded-2xl">
             <div className="grid gap-4 items-start w-full md:w-auto">
                 <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-x-6">
                     <div className="grid gap-4">
@@ -72,6 +73,10 @@ export default function ItemDetails() {
                         <h1 className="font-bold text-2xl sm:text-3xl">{item.nome}</h1>
                         <h2 className="font-bold text-xl">Valor do item</h2>
                         <p className="text-xl">R${item.valor}</p>
+                        <div className="flex flex-row gap-4">
+                            <Link href={`/admin/itens/editar/${item.id}`}> <EditIcon className="text-yellow-600"/> </Link>
+                            <TrashIcon className="text-red-800"/>
+                        </div>
                     </div>
                 </div>
                 <Separator className="border-gray-200 dark:border-gray-800"/>
@@ -89,11 +94,6 @@ export default function ItemDetails() {
                         <p className="text-md text-gray-500 dark:text-gray-400">{item.emprestavel ? "Sim" : "Não"}</p>
                     </li>
                 </ul>
-            </div>
-
-            <div className="flex gap-4">
-                <EditIcon className="text-yellow-600"/>
-                <TrashIcon className="text-red-800"/>
             </div>
         </div>
     )

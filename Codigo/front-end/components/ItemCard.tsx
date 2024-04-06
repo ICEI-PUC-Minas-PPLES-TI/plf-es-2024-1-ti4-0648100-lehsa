@@ -8,7 +8,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import items from "../app/data.js";
 import Link from "next/link";
 
 type Props = {
