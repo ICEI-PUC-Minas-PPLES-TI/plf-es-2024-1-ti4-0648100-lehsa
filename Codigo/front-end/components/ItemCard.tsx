@@ -15,19 +15,9 @@ type Props = {
     img: string;
     nome: string;
     quantidade: number;
-    categoria: string;
+    tipo_item: string;
 };
-
-type CategoryMappings = {
-    [key: string]: string; // Isso indica que as chaves e valores são strings
-};
-
 const ItensCard = () => {
-
-    const categoryMappings: CategoryMappings = {
-        'EQUIPAMENTO': 'Equipamento'
-        // Adicione mais mapeamentos conforme necessário
-    };
 
     const [items, setItems] = useState([]);
 
@@ -68,8 +58,7 @@ const ItensCard = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 items-center gap-4 text-sm">
-                            <div className="font-medium">Categoria</div>
-                            <div className="text-right">{categoryMappings[item.categoria]}</div>
+                            <div className="font-medium">{item.tipo_item}</div>
                             <div className="col-span-2 border-t border-gray-200 dark:border-gray-800"/>
                             <div className="font-medium">Quantidade</div>
                             <div className="text-right">{item.quantidade}</div>

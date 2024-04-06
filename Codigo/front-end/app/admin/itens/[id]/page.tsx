@@ -11,8 +11,8 @@ type Props = {
     img: string;
     nome: string;
     quantidade: number;
-    categoria: string;
-    valor: number;
+    tipo_item: string;
+    valor_unitario: number;
     emprestavel: boolean;
 };
 const fetchItem = async (id: string | string[]) => {
@@ -49,6 +49,7 @@ export default function ItemDetails() {
 
             const data = await fetchItem(id);
             if (data) setItem(data);
+            console.log(data)
         };
 
         fetchItemData();
@@ -72,7 +73,7 @@ export default function ItemDetails() {
                     <div className="grid gap-4">
                         <h1 className="font-bold text-2xl sm:text-3xl">{item.nome}</h1>
                         <h2 className="font-bold text-xl">Valor do item</h2>
-                        <p className="text-xl">R${item.valor}</p>
+                        <p className="text-xl">R${item.valor_unitario}</p>
                         <div className="flex flex-row gap-4">
                             <Link href={`/admin/itens/editar/${item.id}`}> <EditIcon className="text-yellow-600"/> </Link>
                             <TrashIcon className="text-red-800"/>
@@ -83,7 +84,7 @@ export default function ItemDetails() {
                 <ul className="grid gap-4">
                     <li className="space-y-2">
                         <h2 className="text-lg font-semibold">Tipo do item</h2>
-                        <p className="text-md text-gray-500 dark:text-gray-400">{item.categoria}</p>
+                        <p className="text-md text-gray-500 dark:text-gray-400">{item.tipo_item}</p>
                     </li>
                     <li className="space-y-2">
                         <h2 className="text-lg font-semibold">Quantidade</h2>
