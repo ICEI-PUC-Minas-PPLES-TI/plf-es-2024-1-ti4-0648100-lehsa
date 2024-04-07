@@ -36,6 +36,28 @@ const fetchItem = async (id: string | string[]) => {
     }
 };
 
+const deleteItem = async (id: string | string[]) => {
+    try {
+        const response = await fetch(`http://localhost:8080/item/${id}`, {
+            method: "DELETE",
+            headers: {
+                Authorization:
+                    "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI0OTg4MTd9.N9H9vM4ZCrX61COnZJ-7sK1tw3n0xz4PP3BRr8CEfFguYwqktjGp5B5aZ_hAO_MpcSY0rIzqV9lVNvAR3USkcQ",
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to delete item");
+        }
+
+        return true;
+    } catch (error) {
+        console.error("Failed to delete item:", error);
+        return false;
+    }
+};
+
 export default function ItemDetails() {
 
     const [item, setItem] = useState<Props | null>(null);
@@ -54,6 +76,16 @@ export default function ItemDetails() {
 
         fetchItemData();
     }, []);
+
+    const handleDelete = async () => {
+        const id = item?.id;
+        if (!id) return;
+
+        const deleted = await deleteItem(id);
+        if (deleted) {
+            window.history.back();
+        }
+    };
 
     if (!item) return <div>Loading...</div>;
 
@@ -76,7 +108,9 @@ export default function ItemDetails() {
                         <p className="text-xl">R${item.valor_unitario}</p>
                         <div className="flex flex-row gap-4">
                             <Link href={`/admin/itens/editar/${item.id}`}> <EditIcon className="text-yellow-600"/> </Link>
-                            <TrashIcon className="text-red-800"/>
+                            <TrashIcon className="text-red-800"
+                            onClick={handleDelete}
+                            style={{ cursor: "pointer" }}/>
                         </div>
                     </div>
                 </div>
