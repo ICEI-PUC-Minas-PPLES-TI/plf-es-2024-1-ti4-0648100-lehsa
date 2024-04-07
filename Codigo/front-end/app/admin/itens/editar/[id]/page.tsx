@@ -14,11 +14,6 @@ function getIdFromUrl(url: string) {
 
 const EditarItem = () => {
 
-    const [tipoSelecionado, setTipoSelecionado] = useState('');
-    const handleTipoSelecionado = (valor: string) => {
-        setTipoSelecionado(valor);
-    };
-
     const router = useRouter();
     const [item, setItem] = useState(null);
     const consultaId = getIdFromUrl(window.location.pathname);
@@ -30,7 +25,7 @@ const EditarItem = () => {
                 const response = await fetch(`http://localhost:8080/item/${consultaId}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI0OTg4MTd9.N9H9vM4ZCrX61COnZJ-7sK1tw3n0xz4PP3BRr8CEfFguYwqktjGp5B5aZ_hAO_MpcSY0rIzqV9lVNvAR3USkcQ`,
+                        'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI3MjgxOTN9.42cBdN7Fnd81t8oroFGRAyAbKWjPoWsvSGq5puDR0d5Gbkh2faWUaS09KHe64B-vi3ZhEEdZT_kq-i1QXrlXEA`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -67,14 +62,12 @@ const EditarItem = () => {
             const quantidade = formData.get('quantidade')
             const valor_unitario = formData.get('valor_unitario')
             const emprestavel = formData.get('emprestavel')
-            const tipo_item = tipoSelecionado
-            console.log(tipo_item)
-
+            const tipo_item = formData.get('tipo_item')
 
             const response = await fetch(`http://localhost:8080/item/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI0OTg4MTd9.N9H9vM4ZCrX61COnZJ-7sK1tw3n0xz4PP3BRr8CEfFguYwqktjGp5B5aZ_hAO_MpcSY0rIzqV9lVNvAR3USkcQ`,
+                    'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI3MjgxOTN9.42cBdN7Fnd81t8oroFGRAyAbKWjPoWsvSGq5puDR0d5Gbkh2faWUaS09KHe64B-vi3ZhEEdZT_kq-i1QXrlXEA`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({nome, quantidade, valor_unitario, emprestavel, tipo_item})
@@ -89,11 +82,6 @@ const EditarItem = () => {
             console.error("Failed to update item:", error);
         }
     };
-
-    const options = [
-        { label: 'EQUIPAMENTO', value: 'EQUIPAMENTO' },
-        { label: 'VIDRARIA', value: 'VIDRARIA' },
-    ];
 
     return (
         <div className='bg-white rounded-xl h-3/4 p-5 ml-60 w-4/12'>
@@ -110,18 +98,15 @@ const EditarItem = () => {
                 <Switch name='emprestavel' />
             </div>
             <Label htmlFor='tipo_item'>Categoria</Label>
-            <Select>
-                <SelectTrigger>
-                    <SelectValue placeholder='Tipo'/>
-                </SelectTrigger>
-                <SelectContent>
-                    {options.map((option, index) => (
-                        <SelectItem key={index} value={option.value} onClick={() => handleTipoSelecionado(option.value)}>
-                            {option.label}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+                <Select>
+                    <SelectTrigger>
+                        <SelectValue placeholder='Tipo'/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='EQUIPAMENTO'>Equipamento</SelectItem>
+                        <SelectItem value='VIDRARIA'>Vidraria</SelectItem>
+                    </SelectContent>
+                </Select>
             <Button type="submit" className="bg-green-500 hover:bg-green-600 my-20 float-right">Salvar</Button>
             </form>
         </div>
