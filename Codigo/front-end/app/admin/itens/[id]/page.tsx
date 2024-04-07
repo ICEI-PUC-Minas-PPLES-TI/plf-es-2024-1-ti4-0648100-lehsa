@@ -7,7 +7,7 @@ import {EditIcon, TrashIcon} from "lucide-react";
 import Link from "next/link";
 
 type Props = {
-    id: number;
+    id: string;
     img: string;
     nome: string;
     quantidade: number;
