@@ -44,36 +44,33 @@ const ItensCard = ({ searchTerm } : ItensCardProps) => {
 
 
     return (
-        <div className="grid grid-cols-4 gap-4 pl-60">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pl-60">
             {filteredItems.map((item: Props) => (
                 <Link key={item.id} href={`/admin/itens/${item.id}`}>
-                <Card
-
-                    className="rounded-lg overflow-hidden shadow-lg w-80 max-w-80 mx-auto hover:shadow-xl transition-all duration-200 mt-10 ml-10"
-                >
-                    <Image
-                        alt="item picture"
-                        className="object-cover w-full max-h-60"
-                        height="320"
-                        src="../images/placeholder.svg"
-                        style={{
-                            aspectRatio: "320/320",
-                            objectFit: "cover",
-                        }}
-                        width="320"
-                    />
-                    <CardHeader>
-                        <CardTitle>{item.nome}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 items-center gap-4 text-sm">
-                            <div className="font-medium">{item.tipo_item}</div>
-                            <div className="col-span-2 border-t border-gray-200 dark:border-gray-800"/>
-                            <div className="font-medium">Quantidade</div>
-                            <div className="text-right">{item.quantidade}</div>
-                        </div>
-                    </CardContent>
-                </Card>
+                    <Card className="rounded-lg overflow-hidden shadow-lg mx-auto hover:shadow-xl transition-all duration-200 mt-10">
+                        <Image
+                            alt="item picture"
+                            className="object-cover w-full max-h-60"
+                            height="320"
+                            src="../images/placeholder.svg"
+                            style={{
+                                aspectRatio: "320/320",
+                                objectFit: "cover",
+                            }}
+                            width="320"
+                        />
+                        <CardHeader>
+                            <CardTitle>{item.nome}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 items-center gap-4 text-sm">
+                                <div className="font-medium">{item.tipo_item}</div>
+                                <div className="col-span-2 border-t border-gray-200 dark:border-gray-800"/>
+                                <div className="font-medium">Quantidade</div>
+                                <div className="text-right">{item.quantidade}</div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </Link>
             ))}
         </div>
