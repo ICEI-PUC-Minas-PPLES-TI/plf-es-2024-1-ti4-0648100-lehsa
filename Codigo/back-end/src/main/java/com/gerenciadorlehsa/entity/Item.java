@@ -48,4 +48,7 @@ public class Item {
 
     @Column(name = "emprestavel", nullable = false)
     private Boolean emprestavel;
+
+    @Column(name = "caminho_img", nullable = false)
+    private String nomeImg;
 }
