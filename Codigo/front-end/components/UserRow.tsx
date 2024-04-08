@@ -12,18 +12,20 @@ interface User {
 
 function UserRow() {
   const [users, setUsers] = useState<User[]>([]);
+  const [token, setToken] = useState<string>("");
 
   useEffect(() => {
-    const token =
+    const authToken =
       "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MTI5MDc3NDR9._Cc-50MEOLi9vIFk2lNxS0hhL6QujjOQVyWpYqeCewwGSF9VuK2GOYMN74nYrP_GmqcPqXws6eaUnFMm4vk0Mw";
+    setToken(authToken);
 
     fetch(`http://localhost:8080/usuario`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${authToken}`,
         "Content-Type": "application/json",
       },
-    }) // Altere para o endpoint correto que lista todos os usuários
+    })
       .then((response) => response.json())
       .then((data: User[]) => {
         setUsers(data);
@@ -43,9 +45,24 @@ function UserRow() {
     }
   };
 
+  const deleteUser = (id: number) => {
+    fetch(`http://localhost:8080/usuario/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(() => {
+        setUsers(users.filter((user) => user.id !== id));
+      })
+      .catch((error) => {
+        console.error("Error deleting user:", error);
+      });
+  };
+
   return (
     <div className="mt-10 flex justify-center">
-      {/* Use flexbox to center the table */}
       <div className="table w-[80%] rounded-xl bg-white">
         <div className="table-header-group">
           <div className="table-row h-[2rem]">
@@ -54,6 +71,7 @@ function UserRow() {
             <div className="table-cell text-left pl-5">Celular</div>
             <div className="table-cell text-left pl-5">CPF</div>
             <div className="table-cell text-left pl-5">Tipo de perfil</div>
+            <div className="table-cell text-left pl-5">Ação</div>
           </div>
         </div>
 
@@ -80,7 +98,9 @@ function UserRow() {
             <li className="table-cell text-left h-[3rem] align-middle pl-5">
               <p>{renderProfileType(user.perfil_usuario)}</p>
             </li>
-            <hr />
+            <li className="table-cell text-left h-[3rem] align-middle pl-5 hover:text-red-500">
+              <button onClick={() => deleteUser(user.id)}>Deletar</button>
+            </li>
           </ul>
         ))}
       </div>
