@@ -3,7 +3,7 @@
 Este diretório mantém os artefatos do projeto com os seguintes diretórios: 
 
 * `/DERs`
-	* **diagrama-er-sprint2**: Diagrama de Entidade-Relacionamento da Sprint 2.
+	* *diagrama-er-sprint2**: Diagrama de Entidade-Relacionamento da Sprint 2.
 
 * `/apresentacoes`
 	* *apresentacao-sprint1**: Apresentação da sprint 1.
