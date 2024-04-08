@@ -12,10 +12,10 @@ import java.util.UUID;
 public record ItemDTO (
     UUID id,
     @JsonProperty("tipo_item")String tipoItem,
-    int quantidade,
-    @JsonProperty("valor_unitario")float valorUnitario,
+    Integer quantidade,
+    @JsonProperty("valor_unitario")Float valorUnitario,
     String nome,
-    boolean emprestavel
+    Boolean emprestavel
 ){
 }
 
