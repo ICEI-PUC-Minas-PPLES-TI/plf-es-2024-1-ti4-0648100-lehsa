@@ -10,4 +10,4 @@ Este diretório mantém todas as documetanções, com os seguintes diretórios:
  * `/relatorios`
    	* *relatorio-sprint1*: relatório da sprint 1.
  * `/termos`
-   	* *termo-de-confidencialidade e nao divulgacao-sprint1*: Termo de conficencialidade e não divulgação realizado na sprint 1.
+   	* *termo-de-confidencialidade-e-nao-divulgacao-sprint1*: Termo de conficencialidade e não divulgação realizado na sprint 1.
