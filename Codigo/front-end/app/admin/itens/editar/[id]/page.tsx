@@ -85,32 +85,42 @@ const EditarItem = () => {
     };
 
     return (
-        <div className='bg-white rounded-xl h-3/4 p-5 ml-60 w-4/12'>
-            <h3 className='text-xl font-semibold'>Atualizar</h3>
-            <form className="max-w-md" onSubmit={handleSubmit}>
-                <Label htmlFor='nome'>Nome</Label>
-                <Input placeholder='nome do item' name='nome' />
-                <Label htmlFor="quantidade">Quantidade</Label>
-                <Input placeholder='0' name='quantidade' type="number" />
-                <Label htmlFor="valor_unitario">Valor</Label>
-                <Input placeholder='R$ 000,00' name='valor_unitario' type="number" />
+        <div className='bg-white shadow-lg rounded-xl p-8 ml-auto mr-auto mt-10 w-full max-w-4xl'>
+            <h3 className='text-2xl font-semibold text-gray-800 mb-6'>Atualizar Item</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <Label htmlFor='emprestavel'>Emprestavel?</Label>
+                    <Label htmlFor='nome'>Nome</Label>
+                    <Input placeholder='Nome do item' name='nome' className="mt-1 block w-full"/>
+                </div>
+                <div>
+                    <Label htmlFor="quantidade">Quantidade</Label>
+                    <Input placeholder='0' name='quantidade' type="number" className="mt-1 block w-full"/>
+                </div>
+                <div>
+                    <Label htmlFor="valor_unitario">Valor Unitário</Label>
+                    <Input placeholder='R$ 000,00' name='valor_unitario' type="number" className="mt-1 block w-full"/>
+                </div>
+                <div>
+                    <Label htmlFor='emprestavel'>Emprestável?</Label>
                     <select value={itemEmprestavel} onChange={(e) => setItemEmprestavel(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 flex">
-                        <option value="">Tipo</option>
+                            className="mt-1 block w-full border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 rounded-md">
+                        <option value="">Selecione</option>
                         <option value="true">Sim</option>
                         <option value="false">Não</option>
                     </select>
                 </div>
-                <Label htmlFor='tipo_item'>Categoria</Label>
-                <select value={tipoItem} onChange={(e) => setTipoItem(e.target.value)}
-                        className="border border-gray-300 rounded-md p-2 flex">
-                    <option value="">Tipo</option>
-                    <option value="EQUIPAMENTO">Equipamento</option>
-                    <option value="VIDRARIA">Vidraria</option>
-                </select>
-                <Button type="submit" className="bg-green-500 hover:bg-green-600 my-20 float-right">Salvar</Button>
+                <div>
+                    <Label htmlFor='tipo_item'>Categoria</Label>
+                    <select value={tipoItem} onChange={(e) => setTipoItem(e.target.value)}
+                            className="mt-1 block w-full border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 rounded-md">
+                        <option value="">Selecione</option>
+                        <option value="EQUIPAMENTO">Equipamento</option>
+                        <option value="VIDRARIA">Vidraria</option>
+                    </select>
+                </div>
+                <Button type="submit" className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                    Salvar
+                </Button>
             </form>
         </div>
     )
