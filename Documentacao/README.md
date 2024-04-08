@@ -1,6 +1,6 @@
 # Documentação do projeto
 
-Este diretório mantém todas as documetanções, com os seguintes diretórios: 
+Este diretório mantém todas as documetanções, com os seguintes diretórios e exemplo de arquivos descritivos: 
 
 * `/atas`
 	* *ata-de-reuniao-sprint1*: ata de reunião da sprint 1.
