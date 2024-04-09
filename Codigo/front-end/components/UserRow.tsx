@@ -1,6 +1,7 @@
 "use client";
 import Cookie from "js-cookie";
 import React, { useState, useEffect } from "react";
+import { TrashIcon } from "lucide-react";
 
 interface User {
   id: number;
@@ -46,20 +47,24 @@ function UserRow() {
   };
 
   const deleteUser = (id: number) => {
-    fetch(`http://localhost:8080/usuario/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(() => {
-        setUsers(users.filter((user) => user.id !== id));
+    const confirmDelete = window.confirm("Quer mesmo deletar este usuário?");
+    if (confirmDelete) {
+      fetch(`http://localhost:8080/usuario/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       })
-      .catch((error) => {
-        console.error("Error deleting user:", error);
-      });
+        .then(() => {
+          setUsers(users.filter((user) => user.id !== id));
+        })
+        .catch((error) => {
+          console.error("Error deleting user:", error);
+        });
+    }
   };
+  
 
   return (
     <div className="mt-10 flex justify-center">
@@ -71,7 +76,7 @@ function UserRow() {
             <div className="table-cell text-left pl-5">Celular</div>
             <div className="table-cell text-left pl-5">CPF</div>
             <div className="table-cell text-left pl-5">Tipo de perfil</div>
-            <div className="table-cell text-left pl-5">Ação</div>
+            <div className="table-cell text-left pl-5"></div>
           </div>
         </div>
 
@@ -98,8 +103,13 @@ function UserRow() {
             <li className="table-cell text-left h-[3rem] align-middle pl-5">
               <p>{renderProfileType(user.perfil_usuario)}</p>
             </li>
-            <li className="table-cell text-left h-[3rem] align-middle pl-5 hover:text-red-500">
-              <button onClick={() => deleteUser(user.id)}>Deletar</button>
+            <li className="table-cell text-left h-[3rem] align-middle pl-5 ">
+              <button
+                className="transition ease-out hover:text-red-500 rounded-xl px-2"
+                onClick={() => deleteUser(user.id)}
+              >
+                <TrashIcon className="h-4 w-4"/>
+              </button>
             </li>
           </ul>
         ))}
