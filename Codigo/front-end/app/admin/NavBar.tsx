@@ -10,7 +10,7 @@ const NavBar = () => {
     const isActive = pathname.startsWith('/admin/itens');
     return (
         <aside className='bg-white h-screen space-y-10 w-60 py-6'>
-            <Image src='/logo.jpg' width={150} height={0} alt='logo' className='m-auto'></Image>
+            <Image src='/images/logo.jpg' width={150} height={0} alt='logo' className='m-auto'></Image>
             <div className='flex flex-col gap-2 pl-5'>
                 <Link href='/admin' className={`pl-6 py-2 rounded-l-full  ${pathname === '/admin' ? 'bg-primary text-white' : 'hover:bg-slate-100'}`}>Dashboard</Link>
                 <Link href='/admin/itens' className={`pl-6 py-2 rounded-l-full ${isActive ? 'bg-primary text-white' : 'hover:bg-slate-100'}`}>Itens</Link>

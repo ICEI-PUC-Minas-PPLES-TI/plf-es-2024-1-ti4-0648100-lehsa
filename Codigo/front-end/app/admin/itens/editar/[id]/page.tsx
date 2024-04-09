@@ -39,7 +39,7 @@ const EditarItem = () => {
 
                 const data = await response.json();
                 setItem(data);
-                Cookie.set("token", data.token, { expires: 7 });
+                //Cookie.set("token", data.token, { expires: 7 });
             } catch (error) {
                 console.error("Failed to fetch item:", error);
             }

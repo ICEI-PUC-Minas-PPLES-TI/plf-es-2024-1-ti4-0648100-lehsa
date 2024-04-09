@@ -32,9 +32,7 @@ export default function Home() {
   
       // Set the token in cookies
       Cookie.set("token", token, { expires: 7 });
-  
-      // Optionally, store the user ID if needed
-      Cookie.set("userId", userId, { expires: 7 });
+
   
       setUserId(userId); // Update state or context as needed
   
@@ -53,7 +51,7 @@ export default function Home() {
   return (
     <main className="flex h-screen">
       <div className="bg-white w-1/3 min-w-80 p-10 space-y-14">
-        <Image src="/logo.jpg" width={150} height={0} alt="logo"></Image>
+        <Image src="/images/logo.jpg" width={150} height={0} alt="logo"></Image>
         <div>
           <h2 className="font-bold text-3xl">Log in.</h2>
           <p className="lg:max-w-[80%] mb-6">
@@ -91,7 +89,7 @@ export default function Home() {
           Lorem ipsum dolor
         </h2>
         <Image
-          src="/login-image.png"
+          src="/images/login-image.png"
           width={250}
           height={0}
           alt="imagem"

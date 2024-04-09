@@ -38,7 +38,7 @@ const ItensCard = ({ searchTerm } : ItensCardProps) => {
             .then(response => response.json())
             .then(data => {
                 setItems(data)
-                Cookie.set("token", data.token, { expires: 7 });
+                //Cookie.set("token", data.token, { expires: 7 });
             })
             .catch(error => console.error('Error fetching items:', error));
     }, []);
