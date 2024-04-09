@@ -61,6 +61,32 @@ public class ConversorEntidadeDTOUtil {
                 .build();
     }
 
+    private byte[] getImage(String imageDirectory, String imageName) throws IOException {
+        Path imagePath = Path.of(imageDirectory, imageName);
+
+        if (Files.exists(imagePath)) {
+            byte[] imageBytes = Files.readAllBytes(imagePath);
+            return imageBytes;
+        } else {
+            return null; // Handle missing images
+        }
+    }
+
+
+/*
+    public static Item converterParaItem(@NotNull ItemDTO itemDTO){
+        log.info(">>> converterParaItem: convertendo DTO para Item");
+
+        Item novoItem = new Item();
+        novoItem.setId(null);
+        novoItem.setTipoItem(TipoItem.valueOf(itemDTO.tipoItem()));
+        novoItem.setNome(itemDTO.nome());
+        novoItem.setValorUnitario(itemDTO.valorUnitario());
+        novoItem.setEmprestavel(itemDTO.emprestavel());
+        novoItem.setQuantidade(itemDTO.quantidade());
+
+        return novoItem;
+    }
     public static ItemDTOResponse converterParaDTOResponse(@NotNull Item item) {
         log.info(format(">>> converterParaDTO: convertendo Item (id: %s) para DTO", item.getId()));
         try {
@@ -78,32 +104,5 @@ public class ConversorEntidadeDTOUtil {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    private byte[] getImage(String imageDirectory, String imageName) throws IOException {
-        Path imagePath = Path.of(imageDirectory, imageName);
-
-        if (Files.exists(imagePath)) {
-            byte[] imageBytes = Files.readAllBytes(imagePath);
-            return imageBytes;
-        } else {
-            return null; // Handle missing images
-        }
-    }
-
-
-
-    public static Item converterParaItem(@NotNull ItemDTO itemDTO){
-        log.info(">>> converterParaItem: convertendo DTO para Item");
-
-        Item novoItem = new Item();
-        novoItem.setId(null);
-        novoItem.setTipoItem(TipoItem.valueOf(itemDTO.tipoItem()));
-        novoItem.setNome(itemDTO.nome());
-        novoItem.setValorUnitario(itemDTO.valorUnitario());
-        novoItem.setEmprestavel(itemDTO.emprestavel());
-        novoItem.setQuantidade(itemDTO.quantidade());
-
-        return novoItem;
-    }
-
+*/
 }

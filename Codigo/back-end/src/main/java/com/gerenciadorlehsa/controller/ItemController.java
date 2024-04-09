@@ -1,7 +1,6 @@
 package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.dto.ItemDTO;
-import com.gerenciadorlehsa.dto.ItemDTOResponse;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
