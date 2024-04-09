@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.UUID;
+
 import static java.lang.String.format;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.JWT_FILTRO_AUTENTICACAO;
@@ -74,7 +76,8 @@ public class JWTFiltroAutenticacao extends UsernamePasswordAuthenticationFilter 
         UsuarioDetails usuarioDetails = (UsuarioDetails) authentication.getPrincipal();
         String emailUsuario = usuarioDetails.getUsername();
         PerfilUsuario roleUsuario = usuarioDetails.getPerfilUsuario();
-        String token = this.jwtComp.gerarToken(emailUsuario, String.valueOf(roleUsuario).toLowerCase());
+        UUID idUser = usuarioDetails.getId();
+        String token = this.jwtComp.gerarToken(emailUsuario, String.valueOf(roleUsuario).toLowerCase(), idUser);
         response.addHeader(HEADER_AUTORIZACAO, format(VALOR_HEADER_AUTORIZACAO, token));
         response.setContentType(CONTENT_TYPE);
         response.setCharacterEncoding(CHARACTER_ENCODING);

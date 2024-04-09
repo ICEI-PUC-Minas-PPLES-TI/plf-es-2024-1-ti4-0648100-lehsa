@@ -1,59 +1,142 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import TopMenu from "@/components/topMenu";
 import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
+import Cookie from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface User {
-  id: string; // assuming user ID is available
+  id: string;
   nome: string;
   email: string;
   telefone: string;
+  password: string;
+  cpf: string;
+  perfil_usuario: number;
 }
 
 const MinhaConta = () => {
-  const [token, setToken] = useState<string>("");
   const [userData, setUserData] = useState<User>({
     id: "",
     nome: "",
     email: "",
     telefone: "",
+    password: "",
+    cpf: "",
+    perfil_usuario: 0,
   });
+  const router = useRouter();
 
   useEffect(() => {
-    const authToken =
-      "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MTI5MDc3NDR9._Cc-50MEOLi9vIFk2lNxS0hhL6QujjOQVyWpYqeCewwGSF9VuK2GOYMN74nYrP_GmqcPqXws6eaUnFMm4vk0Mw";
-    setToken(authToken);
+    const authToken = Cookie.get("token");
 
-    // Assuming you have access to the current user's ID
-    const userId = "119563c0-fc95-4cf2-b9e1-e18a53df5707"; // Replace "user_id_here" with actual user ID
-    fetch(`http://localhost:8080/usuario/${userId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data: User) => {
-        setUserData(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
+    if (!authToken) {
+      // No token found, redirect to login
+      router.push("/login");
+      return;
+    }
+
+    // Decode token to get userId
+    const decodedToken = decodeToken(authToken);
+    if (!decodedToken || !decodedToken.userId) {
+      // Token is invalid or doesn't contain userId, redirect to login
+      router.push("/login");
+      return;
+    }
+
+    // Fetch user data using userId from the decoded token
+    fetchUserData(decodedToken.userId, authToken);
+  }, []); // Empty dependency array means this runs once on component mount
+
+  const fetchUserData = async (userId: string, authToken: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/usuario/${userId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
       });
-  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+      if (!response.ok) {
+        throw new Error("Error fetching user data");
+      }
+
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      // Optionally, handle user feedback or redirection here
+    }
+  };
+
+  const decodeToken = (token: string) => {
+    try {
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      return decodedToken;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return null;
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Add form submission logic here
+
+    const authToken = Cookie.get("token");
+    if (!authToken) {
+      // No token found, redirect to login
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const userDataToSend = {
+        nome: userData.nome,
+        email: userData.email,
+        password: userData.password, // assuming you have a password field in userData
+        telefone: userData.telefone,
+        cpf: userData.cpf,
+        perfil_usuario: userData.perfil_usuario,
+      };
+
+      const response = await fetch(
+        `http://localhost:8080/usuario/${userData.id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userDataToSend),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error updating user data");
+      }
+
+      console.log("User data updated successfully");
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      // Optionally, handle user feedback or redirection here
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserData({
+      ...userData,
+      [e.target.id]: e.target.value,
+    });
   };
 
   return (
     <div>
       <TopMenu title="Minha Conta" />
       <div className="flex flex-col gap-2 mt-10 items-center">
-        <div className="bg-white w-full px-10 py-5 rounded-xl">
+        <div className="bg-white w-[45rem] px-10 py-5 rounded-xl">
           <div className="flex gap-4 w-full py-3">
             <h1 className="title">Meus Dados</h1>
           </div>
@@ -63,24 +146,29 @@ const MinhaConta = () => {
             onSubmit={handleSubmit}
           >
             <div className="w-full">
-              <Label htmlFor="firstName">Nome</Label>
-              <Input id="nome" type="text" value={userData.nome} readOnly />
+              <Label htmlFor="nome">Nome</Label>
+              <Input
+                id="nome"
+                type="text"
+                value={userData.nome}
+                onChange={handleChange}
+              />
             </div>
 
             <div className="w-full">
-              <Label htmlFor="institution">Email</Label>
-              <Input id="email" type="text" value={userData.email} readOnly />
-            </div>
-
-            <div className="w-full">
-              <Label htmlFor="cpf">Celular</Label>
+              <Label htmlFor="telefone">Celular</Label>
               <Input
                 id="telefone"
                 type="text"
                 value={userData.telefone}
-                readOnly
+                onChange={handleChange}
               />
             </div>
+
+            {/* <div className="w-full">
+              <Label htmlFor="cpf">CPF</Label>
+              <Input id="cpf" type="text" value={userData.cpf} readOnly />
+            </div> */}
 
             <Button className="mt-3 w-[12rem]" type="submit">
               Salvar

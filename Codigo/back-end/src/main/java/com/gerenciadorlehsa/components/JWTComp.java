@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
+
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.JWT_COMP;
 import static io.jsonwebtoken.Jwts.parserBuilder;
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
@@ -31,12 +33,13 @@ public class JWTComp {
      * @param email email do usuário
      * @return token gerado
      */
-    public String gerarToken(String email, String role) {
+    public String gerarToken(String email, String role, UUID userId) {
         log.info(">>> gerarToken: gerando token de autenticação");
         SecretKey chave = gerarChaveSegredo();
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role) // Adiciona a role ao payload
+                .claim("userId", userId)
                 .setExpiration(new Date(System.currentTimeMillis() + tempoExpiracao))
                 .signWith(chave)
                 .compact();

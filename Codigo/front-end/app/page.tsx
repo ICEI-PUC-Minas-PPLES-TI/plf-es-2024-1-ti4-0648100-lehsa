@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import Cookie from "js-cookie";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Link } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
@@ -26,22 +25,29 @@ export default function Home() {
       },
       body: JSON.stringify({ email, password }),
     });
-    const data = await response.json();
-  
-    // Assuming the token payload includes the user ID as 'userId'
-    const { token, userId } = data;
-  
-    Cookie.set("token", token, { expires: 7 });
   
     if (response.ok) {
-      // Store user ID in state or context
-      setUserId(userId);
+      const data = await response.json();
+      const { token, userId } = data; // Destructure both token and userId from the response
   
+      // Set the token in cookies
+      Cookie.set("token", token, { expires: 7 });
+  
+      // Optionally, store the user ID if needed
+      Cookie.set("userId", userId, { expires: 7 });
+  
+      setUserId(userId); // Update state or context as needed
+  
+      // Redirect to admin page
       router.push("/admin");
     } else {
-      window.alert("Falha no login");
+      window.alert("Login failed");
     }
   }
+  
+  
+  
+  
   
 
   return (

@@ -1,4 +1,5 @@
 "use client";
+import Cookie from "js-cookie";
 import React, { useState, useEffect } from "react";
 
 interface User {
@@ -15,8 +16,7 @@ function UserRow() {
   const [token, setToken] = useState<string>("");
 
   useEffect(() => {
-    const authToken =
-      "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MTI5MDc3NDR9._Cc-50MEOLi9vIFk2lNxS0hhL6QujjOQVyWpYqeCewwGSF9VuK2GOYMN74nYrP_GmqcPqXws6eaUnFMm4vk0Mw";
+    const authToken = Cookie.get("token") ?? "";
     setToken(authToken);
 
     fetch(`http://localhost:8080/usuario`, {
