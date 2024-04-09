@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
+import Cookie from "js-cookie";
 
 function getIdFromUrl(url: string) {
     const segments = url.split('/');
@@ -23,11 +24,12 @@ const EditarItem = () => {
         const fetchItemData = async () => {
             console.log(consultaId)
             try {
+                const token = Cookie.get("token");
                 const response = await fetch(`http://localhost:8080/item/${consultaId}`, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI3MjgxOTN9.42cBdN7Fnd81t8oroFGRAyAbKWjPoWsvSGq5puDR0d5Gbkh2faWUaS09KHe64B-vi3ZhEEdZT_kq-i1QXrlXEA`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        "Authorization": `Bearer ${token}`
                     }
                 });
 
@@ -37,6 +39,7 @@ const EditarItem = () => {
 
                 const data = await response.json();
                 setItem(data);
+                Cookie.set("token", data.token, { expires: 7 });
             } catch (error) {
                 console.error("Failed to fetch item:", error);
             }
@@ -65,11 +68,16 @@ const EditarItem = () => {
             const emprestavel = itemEmprestavel
             const tipo_item = tipoItem
 
+            const token = Cookie.get("token");
+            if (!token) {
+                throw new Error("Usuário não autenticado");
+            }
+
             const response = await fetch(`http://localhost:8080/item/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI3MjgxOTN9.42cBdN7Fnd81t8oroFGRAyAbKWjPoWsvSGq5puDR0d5Gbkh2faWUaS09KHe64B-vi3ZhEEdZT_kq-i1QXrlXEA`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({ nome, quantidade, valor_unitario, emprestavel, tipo_item })
             });

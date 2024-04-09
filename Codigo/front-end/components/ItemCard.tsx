@@ -2,6 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import Image from "next/image";
+import Cookie from 'js-cookie'
 import {
     Card,
     CardContent,
@@ -24,24 +25,27 @@ interface ItensCardProps {
 const ItensCard = ({ searchTerm } : ItensCardProps) => {
 
     const [items, setItems] = useState<Props[]>([]);
+    const token = Cookie.get("token");
 
     useEffect(() => {
         fetch("http://localhost:8080/item", {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI3MjgxOTN9.42cBdN7Fnd81t8oroFGRAyAbKWjPoWsvSGq5puDR0d5Gbkh2faWUaS09KHe64B-vi3ZhEEdZT_kq-i1QXrlXEA`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
             }
         })
             .then(response => response.json())
-            .then(data => setItems(data))
+            .then(data => {
+                setItems(data)
+                Cookie.set("token", data.token, { expires: 7 });
+            })
             .catch(error => console.error('Error fetching items:', error));
     }, []);
 
     const filteredItems = items.filter(item =>
         item.nome.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pl-60">

@@ -5,6 +5,7 @@ import React, {useEffect, useState} from "react";
 import { Separator } from "@/components/ui/separator";
 import {EditIcon, TrashIcon} from "lucide-react";
 import Link from "next/link";
+import Cookie from "js-cookie";
 
 type Props = {
     id: string;
@@ -17,11 +18,12 @@ type Props = {
 };
 const fetchItem = async (id: string | string[]) => {
     try {
+       const token = Cookie.get("token");
         const response = await fetch(`http://localhost:8080/item/${id}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI3MjgxOTN9.42cBdN7Fnd81t8oroFGRAyAbKWjPoWsvSGq5puDR0d5Gbkh2faWUaS09KHe64B-vi3ZhEEdZT_kq-i1QXrlXEA`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+               "Authorization": `Bearer ${token}`
             }
         });
 
@@ -38,12 +40,17 @@ const fetchItem = async (id: string | string[]) => {
 
 const deleteItem = async (id: string | string[]) => {
     try {
+
+        const token = Cookie.get("token");
+        if (!token) {
+            throw new Error("Usuário não autenticado");
+        }
+
         const response = await fetch(`http://localhost:8080/item/${id}`, {
             method: "DELETE",
             headers: {
-                Authorization:
-                    "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDNAZXhhbXBsZS5jb20iLCJleHAiOjE3MTI3MjgxOTN9.42cBdN7Fnd81t8oroFGRAyAbKWjPoWsvSGq5puDR0d5Gbkh2faWUaS09KHe64B-vi3ZhEEdZT_kq-i1QXrlXEA",
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             },
         });
 
