@@ -12,7 +12,7 @@ interface User {
   perfil_usuario: number;
 }
 
-function UserRow() {
+function UserRow({ searchTerm }: { searchTerm: string }) {
   const [users, setUsers] = useState<User[]>([]);
   const [token, setToken] = useState<string>("");
 
@@ -64,7 +64,10 @@ function UserRow() {
         });
     }
   };
-  
+
+  const filteredUsers = users.filter((user) =>
+    user.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="mt-10 flex justify-center">
@@ -80,7 +83,7 @@ function UserRow() {
           </div>
         </div>
 
-        {users.map((user, index) => (
+        {filteredUsers.map((user, index) => (
           <ul
             className={`usersTable table-row-group ${
               index % 2 === 0 ? "evenRow" : "oddRow"
