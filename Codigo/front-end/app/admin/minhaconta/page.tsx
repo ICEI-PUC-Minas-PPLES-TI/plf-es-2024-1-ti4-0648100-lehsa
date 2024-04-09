@@ -135,45 +135,59 @@ const MinhaConta = () => {
   return (
     <div>
       <TopMenu title="Minha Conta" />
-      <div className="flex flex-col gap-2 mt-10 items-center">
-        <div className="bg-white w-[45rem] px-10 py-5 rounded-xl">
-          <div className="flex gap-4 w-full py-3">
-            <h1 className="title">Meus Dados</h1>
+      <div className="flex justify-center">
+        <div className="flex-col gap-2 mt-10 items-center w-[45rem] rounded-xl">
+          <div className="bg-primary text-white text-lg px-3 w-full h-20 rounded-t-xl flex items-center justify-center">
+            <div className="flex w-full">
+              <h1 className="title">Meus Dados</h1>
+            </div>
           </div>
 
-          <form
-            className="flex flex-col gap-2 items-center"
-            onSubmit={handleSubmit}
-          >
-            <div className="w-full">
-              <Label htmlFor="nome">Nome</Label>
-              <Input
-                id="nome"
-                type="text"
-                value={userData.nome}
-                onChange={handleChange}
-              />
-            </div>
+          <div className="bg-white w-full px-10 py-5 rounded-b-xl">
+            <form
+              className="flex flex-col gap-2 items-center"
+              onSubmit={handleSubmit}
+            >
+              <div className="w-full">
+                <Label htmlFor="nome">Nome</Label>
+                <Input
+                  id="nome"
+                  type="text"
+                  value={userData.nome}
+                  onChange={handleChange}
+                />
+              </div>
 
-            <div className="w-full">
-              <Label htmlFor="telefone">Celular</Label>
-              <Input
-                id="telefone"
-                type="text"
-                value={userData.telefone}
-                onChange={handleChange}
-              />
-            </div>
+              <div className="w-full">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="text"
+                  value={userData.email}
+                  onChange={handleChange}
+                />
+              </div>
 
-            {/* <div className="w-full">
-              <Label htmlFor="cpf">CPF</Label>
-              <Input id="cpf" type="text" value={userData.cpf} readOnly />
-            </div> */}
+              <div className="w-full">
+                <Label htmlFor="telefone">Celular</Label>
+                <Input
+                  id="telefone"
+                  type="text"
+                  value={userData.telefone}
+                  onChange={handleChange}
+                />
+              </div>
 
-            <Button className="mt-3 w-[12rem]" type="submit">
-              Salvar
-            </Button>
-          </form>
+              <div className="w-full">
+                <Label htmlFor="cpf">CPF</Label>
+                <Input id="cpf" type="text" value={userData.cpf} readOnly />
+              </div>
+
+              <Button className="mt-3 w-[12rem]" type="submit">
+                Salvar
+              </Button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
