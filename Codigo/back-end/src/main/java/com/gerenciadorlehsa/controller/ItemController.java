@@ -5,11 +5,14 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -29,6 +32,16 @@ import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDT
 public class ItemController {
 
     private final ItemService itemService;
+
+    @GetMapping("/img/{id}")
+    public ResponseEntity<?> encontrarImagmePorId (@PathVariable UUID id) {
+        log.info(">>> encontrarImagmePorId: recebendo requisição para encontrar imagem por id");
+        byte [] img = this.itemService.encontrarImagemPorId(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("image/png"))
+                .body(img);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> encontrarPorId (@PathVariable UUID id) {
@@ -58,25 +71,28 @@ public class ItemController {
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
-    @PostMapping
-    public ResponseEntity<Void> criar (@Valid @RequestBody Item item) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> criar (@Valid @RequestPart("item") Item item,
+                                       @NotNull @RequestPart("imagem") MultipartFile img){
         log.info(">>> criar: recebendo requisição para criar item");
-        Item novoItem = this.itemService.criar(item);
-
+        Item novoItem = this.itemService.criar(item, img);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(novoItem.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> atualizar (@PathVariable UUID id,
-                                           @Valid @RequestBody Item item) {
+                                           @Valid @RequestPart("item") Item item,
+                                            @RequestPart("imagem") MultipartFile img) {
         log.info(">>> atualizar: recebendo requisição para atualizar item");
         item.setId(id);
-        this.itemService.atualizar(item);
+        this.itemService.atualizar(item, img);
 
         return ResponseEntity.noContent().build();
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar (@PathVariable UUID id) {

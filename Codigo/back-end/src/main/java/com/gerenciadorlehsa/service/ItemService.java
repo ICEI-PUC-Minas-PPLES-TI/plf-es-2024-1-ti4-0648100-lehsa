@@ -14,12 +14,14 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.beans.PropertyDescriptor;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ITEM_SERVICE;
 import static java.lang.String.format;
@@ -30,6 +32,29 @@ public class ItemService {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    private final String diretorioImgs = "Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs";
+
+    public byte[] encontrarImagemPorId(@NotNull UUID id) {
+        log.info(">>> encontrarImagemPorId: encontrando imagem por id");
+        Item itemImagem = encontrarPorId(id);
+        try {
+            return getImage(diretorioImgs, itemImagem.getNomeImg());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private byte[] getImage(String imageDirectory, String imageName) throws IOException {
+        Path imagePath = Path.of(imageDirectory, imageName);
+
+        if (Files.exists(imagePath)) {
+            byte[] imageBytes = Files.readAllBytes(imagePath);
+            return imageBytes;
+        } else {
+            return null; // Handle missing images
+        }
+    }
 
     public Item encontrarPorId(@NotNull UUID id) {
         log.info(">>> encontrarPorId: encontrando item por id");
@@ -43,26 +68,63 @@ public class ItemService {
     }
 
     @Transactional
-    public Item criar (@NotNull Item item) {
+    public Item criar (@NotNull Item item, MultipartFile img) {
         log.info(">>> criar: criando item");
-        item.setId(null);
-        item = this.itemRepository.save(item);
-        log.info(format(">>> criar: item criado, id: %s", item.getId()));
-        return item;
+
+        try {
+            String nomeImagem = saveImageToStorage(diretorioImgs, img);
+            item.setNomeImg(nomeImagem);
+            item.setId(null);
+            item = this.itemRepository.save(item);
+            log.info(format(">>> criar: item criado, id: %s", item.getId()));
+            return item;
+        } catch (IOException e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public String saveImageToStorage(String uploadDirectory, MultipartFile imageFile) throws IOException {
+        String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+
+        Path uploadPath = Path.of(uploadDirectory);
+        Path filePath = uploadPath.resolve(uniqueFileName);
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return uniqueFileName;
     }
 
     @Transactional
-    public Item atualizar (Item item) {
+    public Item atualizar (Item item, MultipartFile img) {
         log.info(">>> atualizar: atualizando item");
         Item itemExistente = encontrarPorId(item.getId());
+        List<String> propriedadesNulas = new ArrayList<>();
+        log.info("img é null?" + (img.getContentType()));
+        if (img.getContentType() == null) {
+            propriedadesNulas.add("nomeImagem");
+        } else {
+            try {
+                deleteImage(diretorioImgs, itemExistente.getNomeImg());
+                String nomeImagem = saveImageToStorage(diretorioImgs, img);
+                item.setNomeImg(nomeImagem);
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+        propriedadesNulas.addAll(getNullPropertyNames(item));
+        String[] arrayS = new String[propriedadesNulas.size()];
 
-        BeanUtils.copyProperties(item, itemExistente, getNullPropertyNames(item));
+        BeanUtils.copyProperties(item, itemExistente, propriedadesNulas.toArray(arrayS));
         itemExistente = this.itemRepository.save(itemExistente);
         log.info(format(">>> atualizar: item atualizado, id: %s", item.getId()));
         return itemExistente;
     }
 
-    private String[] getNullPropertyNames(Object source) {
+    private List<String> getNullPropertyNames(Object source) {
         final BeanWrapper src = new BeanWrapperImpl(source);
         PropertyDescriptor[] pds = src.getPropertyDescriptors();
         Set<String> emptyNames = new HashSet<>();
@@ -71,18 +133,33 @@ public class ItemService {
             if (srcValue == null) emptyNames.add(pd.getName());
 
         }
-        String[] result = new String[emptyNames.size()];
-        return emptyNames.toArray(result);
+
+        return emptyNames.stream().toList();
     }
 
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
-        encontrarPorId(id);
+        Item item = encontrarPorId(id);
         try {
+            deleteImage("Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs",
+                    item.getNomeImg());
             this.itemRepository.deleteById(id);
             log.info(format(">>> deletar: item deletado, id: %s", id));
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         } catch (Exception e) {
             throw new DeletarEntidadeException(format("existem entidades relacionadas: %s", e));
+        }
+    }
+
+    public String deleteImage(String imageDirectory, String imageName) throws IOException {
+        Path imagePath = Path.of(imageDirectory, imageName);
+
+        if (Files.exists(imagePath)) {
+            Files.delete(imagePath);
+            return "Success";
+        } else {
+            return "Failed"; // Handle missing images
         }
     }
 
