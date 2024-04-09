@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.controller;
 
+import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.ItemDTOResponse;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.service.ItemService;
@@ -33,29 +34,39 @@ public class ItemController {
 
     private final ItemService itemService;
 
+    @GetMapping("/img/{id}")
+    public ResponseEntity<?> encontrarImagmePorId (@PathVariable UUID id) {
+        log.info(">>> encontrarImagmePorId: recebendo requisição para encontrar imagem por id");
+        byte [] img = this.itemService.encontrarImagemPorId(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("image/png"))
+                .body(img);
+    }
+
+
     @GetMapping("/{id}")
-    public ResponseEntity<ItemDTOResponse> encontrarPorId (@PathVariable UUID id) {
+    public ResponseEntity<ItemDTO> encontrarPorId (@PathVariable UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar item por id");
         Item item = this.itemService.encontrarPorId(id);
         return ResponseEntity.ok().body(converterParaDTO(item));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDTOResponse>> listarTodos () {
+    public ResponseEntity<List<ItemDTO>> listarTodos () {
         log.info(">>> listarTodos: recebendo requisição para listar todos itens");
         List<Item> itens = this.itemService.listarTodos();
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
     @GetMapping("/tipo/{tipo}")
-    public ResponseEntity<List<ItemDTOResponse>> encontrarPorTipo (@PathVariable String tipo) {
+    public ResponseEntity<List<ItemDTO>> encontrarPorTipo (@PathVariable String tipo) {
         log.info(">>> encontrarPorTipo: recebendo requisição para encontrar itens por tipo");
         List<Item> itens = this.itemService.encontrarPorTipo(tipo);
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
     @GetMapping("/nome/{nome}")
-    public ResponseEntity<List<ItemDTOResponse>> encontrarPorNome (@PathVariable String nome) {
+    public ResponseEntity<List<ItemDTO>> encontrarPorNome (@PathVariable String nome) {
         log.info(">>> encontrarPorNome: recebendo requisição para encontrar itens por nome");
         List<Item> itens = this.itemService.encontrarPorNome(nome);
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
@@ -66,7 +77,6 @@ public class ItemController {
                                        @NotNull @RequestPart("imagem") MultipartFile img){
         log.info(">>> criar: recebendo requisição para criar item");
         Item novoItem = this.itemService.criar(item, img);
-
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(novoItem.getId()).toUri();
         return ResponseEntity.created(uri).build();
@@ -82,6 +92,8 @@ public class ItemController {
 
         return ResponseEntity.noContent().build();
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar (@PathVariable UUID id) {

@@ -49,8 +49,19 @@ public class ConversorEntidadeDTOUtil {
      * @return novo EnderecoDTO
      */
 
+    public static ItemDTO converterParaDTO(@NotNull Item item) {
+        log.info(format(">>> converterParaDTO: convertendo Item (id: %s) para DTO", item.getId()));
+        return ItemDTO.builder()
+                .id(item.getId())
+                .tipoItem(item.getTipoItem().name())
+                .nome(item.getNome())
+                .valorUnitario(item.getValorUnitario())
+                .emprestavel(item.getEmprestavel())
+                .quantidade(item.getQuantidade())
+                .build();
+    }
 
-    public static ItemDTOResponse converterParaDTO(@NotNull Item item) {
+    public static ItemDTOResponse converterParaDTOResponse(@NotNull Item item) {
         log.info(format(">>> converterParaDTO: convertendo Item (id: %s) para DTO", item.getId()));
         try {
             return ItemDTOResponse.builder()

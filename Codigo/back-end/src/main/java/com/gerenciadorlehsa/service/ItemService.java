@@ -35,6 +35,27 @@ public class ItemService {
 
     private final String diretorioImgs = "Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs";
 
+    public byte[] encontrarImagemPorId(@NotNull UUID id) {
+        log.info(">>> encontrarImagemPorId: encontrando imagem por id");
+        Item itemImagem = encontrarPorId(id);
+        try {
+            return getImage(diretorioImgs, itemImagem.getNomeImg());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private byte[] getImage(String imageDirectory, String imageName) throws IOException {
+        Path imagePath = Path.of(imageDirectory, imageName);
+
+        if (Files.exists(imagePath)) {
+            byte[] imageBytes = Files.readAllBytes(imagePath);
+            return imageBytes;
+        } else {
+            return null; // Handle missing images
+        }
+    }
+
     public Item encontrarPorId(@NotNull UUID id) {
         log.info(">>> encontrarPorId: encontrando item por id");
         return this.itemRepository.findById(id)
@@ -82,7 +103,8 @@ public class ItemService {
         log.info(">>> atualizar: atualizando item");
         Item itemExistente = encontrarPorId(item.getId());
         List<String> propriedadesNulas = new ArrayList<>();
-        if (img == null) {
+        log.info("img é null?" + (img.getContentType()));
+        if (img.getContentType() == null) {
             propriedadesNulas.add("nomeImagem");
         } else {
             try {
