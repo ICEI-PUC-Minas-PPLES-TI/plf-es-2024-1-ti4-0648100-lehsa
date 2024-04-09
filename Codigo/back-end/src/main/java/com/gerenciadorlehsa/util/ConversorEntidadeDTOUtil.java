@@ -1,5 +1,7 @@
 package com.gerenciadorlehsa.util;
 
+import com.gerenciadorlehsa.dto.ItemDTO;
+import com.gerenciadorlehsa.entity.Item;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -40,5 +42,18 @@ public class ConversorEntidadeDTOUtil {
      * @param endereco entidade do tipo Endereco
      * @return novo EnderecoDTO
      */
+
+
+    public static ItemDTO converterParaDTO(@NotNull Item item) {
+        log.info(format(">>> converterParaDTO: convertendo Item (id: %s) para DTO", item.getId()));
+        return ItemDTO.builder()
+                .id(item.getId())
+                .tipoItem(item.getTipoItem().name())
+                .nome(item.getNome())
+                .valorUnitario(item.getValorUnitario())
+                .emprestavel(item.getEmprestavel())
+                .quantidade(item.getQuantidade())
+                .build();
+    }
 
 }
