@@ -4,20 +4,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import Cookie from "js-cookie";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Link } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
+  const [userId, setUserId] = useState<string>(""); // Initialize with an empty string
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
+  
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email");
     const password = formData.get("password");
-
+  
     const response = await fetch("http://localhost:8080/login", {
       method: "POST",
       headers: {
@@ -26,15 +27,22 @@ export default function Home() {
       body: JSON.stringify({ email, password }),
     });
     const data = await response.json();
-
-    Cookie.set("token", data.token, { expires: 7 });
-
+  
+    // Assuming the token payload includes the user ID as 'userId'
+    const { token, userId } = data;
+  
+    Cookie.set("token", token, { expires: 7 });
+  
     if (response.ok) {
+      // Store user ID in state or context
+      setUserId(userId);
+  
       router.push("/admin");
     } else {
       window.alert("Falha no login");
     }
   }
+  
 
   return (
     <main className="flex h-screen">
