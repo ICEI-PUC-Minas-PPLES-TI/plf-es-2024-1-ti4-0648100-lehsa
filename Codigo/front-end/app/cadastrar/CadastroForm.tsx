@@ -37,12 +37,30 @@ const CadastroForm = () => {
     createUser(userData);
   };
 
+  const toggleComplete1 = () => {
+    setComplete1(!complete1);
+  };
+
+  const toggleComplete2 = () => {
+    setComplete2(!complete2);
+  };
+
+  const toggleComplete3 = () => {
+    setComplete3(!complete3);
+  };
+
   const handleChange = (e: { target: { id: any; value: any } }) => {
     const { id, value } = e.target;
     setUserData({ ...userData, [id]: value });
   };
 
-  const createUser = async (userData: { nome?: string; cpf?: string; telefone?: string; email: any; password: any; }) => {
+  const createUser = async (userData: {
+    nome?: string;
+    cpf?: string;
+    telefone?: string;
+    email: any;
+    password: any;
+  }) => {
     try {
       const response = await fetch(`http://localhost:8080/usuario`, {
         method: "POST",
@@ -71,7 +89,7 @@ const CadastroForm = () => {
           const { token, userId } = data;
           Cookie.set("token", token, { expires: 7 });
           setUserId(userId);
-          if (typeof window !== 'undefined') {
+          if (typeof window !== "undefined") {
             router.push("/admin");
           }
         } else {
@@ -85,110 +103,114 @@ const CadastroForm = () => {
     }
   };
 
-
   return (
     <section className="flex flex-col gap-2 items-center">
-      {!complete1 ? (
-        <div className="bg-white w-full px-10 py-5 rounded-xl">
+      <div className="bg-white w-full px-10 py-3 rounded-xl">
+        {!complete1 ? (
           <div className="flex gap-4 w-full py-3">
             <OneIcon color={"#444"} />
             <h1 className="title">Informações básicas</h1>
           </div>
+        ) : (
+          <div onClick={toggleComplete1} className="flex gap-4 w-full">
+            <OneIcon color={"#03B0F0"} />
+            <h1 className="title">Informações básicas</h1>
+          </div>
+        )}
+        <form
+          className={!complete1 ? "flex flex-col gap-2 items-center" : "hidden"}
+        >
+          <div className="w-full">
+            <Label htmlFor="nome">Nome</Label>
+            <Input id="nome" type="string" onChange={handleChange} />
+          </div>
 
-          <form className="flex flex-col gap-2 items-center">
-            <div className="w-full">
-              <Label htmlFor="nome">Nome</Label>
-              <Input id="nome" type="string" onChange={handleChange} />
-            </div>
+          <div className="w-full">
+            <Label htmlFor="cpf">CPF</Label>
+            <Input
+              placeholder="xxx.xxx.xxx-xx"
+              id="cpf"
+              type="cpf"
+              onChange={handleChange}
+            />
+          </div>
 
-            <div className="w-full">
-              <Label htmlFor="cpf">CPF</Label>
-              <Input
-                placeholder="xxx.xxx.xxx-xx"
-                id="cpf"
-                type="cpf"
-                onChange={handleChange}
-              />
-            </div>
+          <Button
+            className="mt-3 w-[12rem]"
+            type="button"
+            onClick={handleClick1}
+          >
+            Proximo
+          </Button>
+        </form>
+      </div>
 
-            <Button
-              className="mt-3 w-[12rem]"
-              type="button"
-              onClick={handleClick1}
-            >
-              Proximo
-            </Button>
-          </form>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
-          <OneIcon color={"#03B0F0"} />
-          <h1 className="title">Informações básicas</h1>
-        </div>
-      )}
-
-      {complete1 && !complete2 ? (
-        <div className="bg-white w-full px-10 py-5 rounded-xl">
-          <div className="flex gap-4 w-full py-3">
+      <div className="bg-white w-full px-10 py-3 rounded-xl">
+        {!complete2 || !complete1 ? (
+          <div className="flex gap-4 w-full">
             <TwoIcon color={"#444444"} />
             <h1 className="title">Contato</h1>
           </div>
+        ) : (
+          <div onClick={toggleComplete2} className="flex gap-4 w-full">
+            <TwoIcon color={"#03B0F0"} />
+            <h1 className="title">Contato</h1>
+          </div>
+        )}
 
-          <form className="flex flex-col gap-2 items-center">
-            <div className="w-full">
-              <Label htmlFor="telefone">Celular</Label>
-              <Input id="telefone" type="number" onChange={handleChange} />
-            </div>
+        <form
+          className={!complete1 || complete2 ? "hidden" : "flex flex-col gap-2 items-center"}
+        >
+          <div className="w-full">
+            <Label htmlFor="telefone">Celular</Label>
+            <Input id="telefone" type="number" onChange={handleChange} />
+          </div>
 
-            <Button
-              className="mt-3 w-[12rem]"
-              type="button"
-              onClick={handleClick2}
-            >
-              Proximo
-            </Button>
-          </form>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
-          <TwoIcon color={"#03B0F0"} />
-          <h1 className="title">Contato</h1>
-        </div>
-      )}
+          <Button
+            className="mt-3 w-[12rem]"
+            type="button"
+            onClick={handleClick2}
+          >
+            Proximo
+          </Button>
+        </form>
+      </div>
 
-      {complete2 && !complete3 ? (
-        <div className="bg-white w-full px-10 py-5 rounded-xl">
-          <div className="flex gap-4 w-full py-3">
+      <div className="bg-white w-full px-10 py-3 rounded-xl">
+        {!complete3 || !complete2 || !complete1 ? (
+          <div className="flex gap-4 w-full">
             <ThreeIcon color={"#444444"} />
             <h1 className="title">Login</h1>
           </div>
+        ) : (
+          <div className="flex gap-4 w-full">
+            <ThreeIcon color={"#03B0F0"} />
+            <h1 className="title">Login</h1>
+          </div>
+        )}
 
-          <form className="flex flex-col gap-2 items-center">
-            <div className="w-full">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="text" onChange={handleChange} />
-            </div>
+        <form
+          className={!complete1 || !complete2 ? "hidden" : "flex flex-col gap-2 items-center"}
+        >
+          <div className="w-full">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="text" onChange={handleChange} />
+          </div>
 
-            <div className="w-full">
-              <Label htmlFor="password">Senha</Label>
-              <Input id="password" type="password" onChange={handleChange} />
-            </div>
+          <div className="w-full">
+            <Label htmlFor="password">Senha</Label>
+            <Input id="password" type="password" onChange={handleChange} />
+          </div>
 
-            <Button
-              className="mt-3 w-[12rem]"
-              type="button"
-              onClick={handleClick3}
-            >
-              Concluir Cadastro
-            </Button>
-          </form>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4 bg-white w-full px-10 py-3 rounded-xl">
-          <ThreeIcon color={"#03B0F0"} />
-          <h1 className="title">Login</h1>
-        </div>
-      )}
+          <Button
+            className="mt-3 w-[12rem]"
+            type="button"
+            onClick={handleClick3}
+          >
+            Concluir Cadastro
+          </Button>
+        </form>
+      </div>
     </section>
   );
 };
