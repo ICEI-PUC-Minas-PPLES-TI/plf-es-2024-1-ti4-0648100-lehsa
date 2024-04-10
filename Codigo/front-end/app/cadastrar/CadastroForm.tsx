@@ -112,7 +112,7 @@ const CadastroForm = () => {
             <h1 className="title">Informações básicas</h1>
           </div>
         ) : (
-          <div onClick={toggleComplete1} className="flex gap-4 w-full">
+          <div onClick={toggleComplete1} className="flex gap-4 w-full hover:cursor-pointer">
             <OneIcon color={"#03B0F0"} />
             <h1 className="title">Informações básicas</h1>
           </div>
@@ -152,7 +152,7 @@ const CadastroForm = () => {
             <h1 className="title">Contato</h1>
           </div>
         ) : (
-          <div onClick={toggleComplete2} className="flex gap-4 w-full">
+          <div onClick={toggleComplete2} className="flex gap-4 w-full hover:cursor-pointer">
             <TwoIcon color={"#03B0F0"} />
             <h1 className="title">Contato</h1>
           </div>
