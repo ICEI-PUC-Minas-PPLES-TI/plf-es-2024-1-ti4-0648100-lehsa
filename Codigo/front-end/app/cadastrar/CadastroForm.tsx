@@ -1,4 +1,6 @@
 "use client";
+import { useRouter } from "next/navigation";
+import Cookie from "js-cookie";
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import OneIcon from "@/assets/OneIcon";
 import TwoIcon from "@/assets/TwoIcon";
 import ThreeIcon from "@/assets/ThreeIcon";
-import Cookie from "js-cookie";
-import router from "next/router";
 
 const CadastroForm = () => {
+  const router = useRouter();
+  const [userId, setUserId] = useState<string>("");
   const [userData, setUserData] = useState({
     nome: "",
     cpf: "",
@@ -53,7 +55,6 @@ const CadastroForm = () => {
       if (response.ok) {
         console.log("User created successfully");
 
-        // Automatically log in the user
         const loginResponse = await fetch("http://localhost:8080/login", {
           method: "POST",
           headers: {
@@ -65,31 +66,25 @@ const CadastroForm = () => {
           }),
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          const { token, userId } = data; // Destructure both token and userId from the response
-      
-          // Set the token in cookies
+        if (loginResponse.ok) {
+          const data = await loginResponse.json();
+          const { token, userId } = data;
           Cookie.set("token", token, { expires: 7 });
-      
-          // Optionally, store the user ID if needed
-          Cookie.set("userId", userId, { expires: 7 });
-      
-          userId(userId); // Update state or context as needed
-      
-          // Redirect to admin page
-          router.push("/admin");
+          setUserId(userId);
+          if (typeof window !== 'undefined') {
+            router.push("/admin");
+          }
         } else {
           window.alert("Login failed");
         }
       } else {
         console.error("Failed to create user");
-        // Handle failure to create user
       }
     } catch (error) {
       console.error("Error creating user:", error);
     }
   };
+
 
   return (
     <section className="flex flex-col gap-2 items-center">
