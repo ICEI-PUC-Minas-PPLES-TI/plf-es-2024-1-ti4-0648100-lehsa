@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import Cookie from "js-cookie";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
   const router = useRouter();
-  const [userId, setUserId] = useState<string>(""); // Initialize with an empty string
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,24 +28,13 @@ export default function Home() {
   
     if (response.ok) {
       const data = await response.json();
-      const { token, userId } = data; // Destructure both token and userId from the response
-  
-      // Set the token in cookies
+      const { token } = data
       Cookie.set("token", token, { expires: 7 });
-
-  
-      setUserId(userId); // Update state or context as needed
-  
-      // Redirect to admin page
       router.push("/admin");
     } else {
       window.alert("Login failed");
     }
   }
-  
-  
-  
-  
   
 
   return (
@@ -67,18 +56,13 @@ export default function Home() {
               name="password"
               type="password"
             />
-            <Button type="submit" className="w-full mt-9">
-              Login
-            </Button>
+            <Button type="submit" className="w-full mt-9">Login</Button>
           </form>
           <p className="text-center mt-12">
             Não possui uma conta?{" "}
-            <button
-              onClick={() => router.push("/cadastrar")}
-              className="text-primary font-semibold cursor-pointer"
-            >
+            <Link href={'/cadastrar'} className="text-primary font-semibold cursor-pointer">
               Cadastre-se
-            </button>
+            </Link>
           </p>
         </div>
       </div>
