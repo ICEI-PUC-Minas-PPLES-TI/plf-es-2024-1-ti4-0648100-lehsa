@@ -96,7 +96,7 @@ const MinhaConta = () => {
       const userDataToSend = {
         nome: userData.nome,
         email: userData.email,
-        password: userData.password,
+        password: userData.password, // assuming you have a password field in userData
         telefone: userData.telefone,
         cpf: userData.cpf,
         perfil_usuario: userData.perfil_usuario,
