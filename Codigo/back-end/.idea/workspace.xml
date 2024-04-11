@@ -4,7 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="68c87d29-9269-4184-bdd1-56f983617572" name="Changes" comment="" />
+    <list default="true" id="68c87d29-9269-4184-bdd1-56f983617572" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/GerenciadorLehsaApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/GerenciadorLehsaApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/components/JWTComp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/components/JWTComp.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/config/SegurancaConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/config/SegurancaConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/controller/UsuarioControllerImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/controller/UsuarioControllerImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO$UsuarioDTOBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO$UsuarioDTOBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/Item.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/Item.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/RespostaErro.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/RespostaErro.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/repository/UsuarioRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/repository/UsuarioRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/JWTFiltroAutenticacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/JWTFiltroAutenticacao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/UsuarioDetails$UsuarioDetailsBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/UsuarioDetails$UsuarioDetailsBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/service/UsuarioServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/service/UsuarioServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/service/interfaces/UsuarioService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/service/interfaces/UsuarioService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConstantesRequisicaoUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConstantesRequisicaoUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConstantesTopicosUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConstantesTopicosUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,13 +38,13 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="mavenHome" value="Use Maven wrapper" />
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2deuoXqa0ducKxLDUqqUXBbRTjR" />
   <component name="ProjectViewState">
     <option name="flattenPackages" value="true" />
@@ -36,10 +55,16 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.GerenciadorLehsaApplication.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "develop",
+    "kotlin-language-version-configured": "true",
     "last_opened_file_path": "L:/repositories/plf-es-2024-1-ti4-0648100-lehsa/Codigo/back-end",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -84,6 +109,7 @@
       <option name="presentableId" value="Default" />
       <updated>1710381044072</updated>
       <workItem from="1710381047001" duration="1799000" />
+      <workItem from="1712717759041" duration="316000" />
     </task>
     <servers />
   </component>
