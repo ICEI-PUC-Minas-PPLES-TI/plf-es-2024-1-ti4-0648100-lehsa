@@ -1,11 +1,11 @@
 'use client'
 
-import Image from "next/image";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import {EditIcon, TrashIcon} from "lucide-react";
+import { EditIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import Cookie from "js-cookie";
+import ImageComp from "@/components/ImageComp";
 
 type Props = {
     id: string;
@@ -18,12 +18,12 @@ type Props = {
 };
 const fetchItem = async (id: string | string[]) => {
     try {
-       const token = Cookie.get("token");
+        const token = Cookie.get("token");
         const response = await fetch(`http://localhost:8080/item/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-               "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${token}`
             }
         });
 
@@ -100,12 +100,12 @@ export default function ItemDetails() {
         <div className="container mx-auto px-4 py-8 max-w-4xl bg-white rounded-xl shadow-xl border border-gray-100">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div className="flex justify-center">
-                    <Image
-                        alt="Product Image"
+                    <ImageComp
+                        src={`http://localhost:8080/item/img/${item.id}`}
+                        alt="item picture"
+                        width={400}
+                        height={400}
                         className="w-full max-w-xs h-auto object-cover rounded-lg shadow-lg"
-                        src="/images/placeholder.svg"
-                        width="300"
-                        height="300"
                     />
                 </div>
                 <div className="flex flex-col gap-4">
@@ -115,18 +115,18 @@ export default function ItemDetails() {
                     <div className="flex gap-4">
                         <Link href={`/admin/itens/editar/${item.id}`}>
                             <div className="p-2 bg-yellow-500 rounded-full text-white hover:bg-yellow-600 transition duration-150 ease-in-out">
-                                <EditIcon className="h-6 w-6"/>
+                                <EditIcon className="h-6 w-6" />
                             </div>
                         </Link>
                         <button
                             onClick={handleDelete}
                             className="p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition duration-150 ease-in-out">
-                            <TrashIcon className="h-6 w-6"/>
+                            <TrashIcon className="h-6 w-6" />
                         </button>
                     </div>
                 </div>
             </div>
-            <hr className="my-8 border-gray-200"/>
+            <hr className="my-8 border-gray-200" />
             <ul className="space-y-4">
                 <li>
                     <h2 className="text-lg font-semibold">Tipo do item</h2>

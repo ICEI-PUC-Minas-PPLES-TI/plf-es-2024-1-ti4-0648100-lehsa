@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="68c87d29-9269-4184-bdd1-56f983617572" name="Changes" comment="" />
+    <list default="true" id="68c87d29-9269-4184-bdd1-56f983617572" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/ItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/ItemController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/app/admin/itens/cadastro/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/admin/itens/cadastro/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/app/admin/itens/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/admin/itens/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/components/ItemCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/components/ItemCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/components/ItensCard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/middleware.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/middleware.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/next.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/next.config.mjs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,13 +26,6 @@
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
-  </component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
-      </MavenGeneralSettings>
-    </option>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -44,9 +48,9 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;Spring Boot.GerenciadorLehsaApplication.executor&quot;: &quot;Run&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;users-branch&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;L:/repositories/plf-es-2024-1-ti4-0648100-lehsa/Codigo/back-end&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/lucas/Documents/GitHub/plf-es-2024-1-ti4-0648100-lehsa/Codigo/back-end&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -58,7 +62,20 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.GerenciadorLehsaApplication">
+    <configuration name="GerenciadorLehsaApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.gerenciadorlehsa.GerenciadorLehsaApplication" />
+      <module name="gerenciador-lehsa" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.gerenciadorlehsa.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="back-end" />
       <method v="2">
@@ -80,6 +97,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.GerenciadorLehsaApplication" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
