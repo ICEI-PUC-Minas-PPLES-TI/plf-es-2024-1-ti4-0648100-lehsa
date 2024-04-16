@@ -74,7 +74,7 @@ public class ItemController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> criar (@Valid @RequestPart("item") Item item,
                                        @NotNull @RequestPart("imagem") MultipartFile img){
-        log.info(">>> criar: recebendo requisição para criar item");
+        log.info(">>> criar: recebendo requisição para criar item");    
         Item novoItem = this.itemService.criar(item, img);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(novoItem.getId()).toUri();

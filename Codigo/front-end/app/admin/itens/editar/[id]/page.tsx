@@ -1,31 +1,29 @@
-'use client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import React, { useEffect, useState } from 'react'
+'use client';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookie from "js-cookie";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Image from 'next/image';
 
-function getIdFromUrl(url: string) {
-    const segments = url.split('/');
-    return segments[segments.length - 1];
-}
-
-const EditarItem = () => {
-
+const EditarItem = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
-    const [item, setItem] = useState(null);
-    const [tipoItem, setTipoItem] = useState("");
-    const [itemEmprestavel, setItemEmprestavel] = useState("");
-    const consultaId = getIdFromUrl(window.location.pathname);
+
+    const [nome, setNome] = useState('');
+    const [imagem, setImagem] = useState<File | null>(null);
+    const [quantidade, setQuantidade] = useState('');
+    const [valorUnitario, setValor] = useState('');
+    const [emprestavel, setIsToggled] = useState(false);
+    const [tipoItem, setSelectedOption] = useState<string>('');
 
     useEffect(() => {
         const fetchItemData = async () => {
-            console.log(consultaId)
             try {
                 const token = Cookie.get("token");
-                const response = await fetch(`http://localhost:8080/item/${consultaId}`, {
+                const response = await fetch(`http://localhost:8080/item/${params.id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -38,57 +36,76 @@ const EditarItem = () => {
                 }
 
                 const data = await response.json();
-                setItem(data);
-                //Cookie.set("token", data.token, { expires: 7 });
+                setNome(data.nome);
+                setQuantidade(data.quantidade.toString());
+                setValor(data.valor_unitario.toString());
+                setIsToggled(data.emprestavel);
+                setSelectedOption(data.tipo_item);
             } catch (error) {
                 console.error("Failed to fetch item:", error);
             }
         };
 
-
-        if (consultaId) {
+        if (params.id) {
             fetchItemData();
         }
-    }, [consultaId]);
+    }, [params.id]); 
+
+    const [imageUrl, setImageUrl] = useState<string>('');
+    
+    useEffect(() => {
+        const token = Cookie.get("token");
+        if (token) {
+            fetch(`http://localhost:8080/item/img/${params.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    const localUrl = URL.createObjectURL(blob);
+                    setImageUrl(localUrl);
+                })
+                .catch(error => console.error('Erro carregar imagem:', error));
+        }
+    }, [`http://localhost:8080/item/img/${params.id}`]);
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            setImagem(event.target.files[0]);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageUrl(reader.result as string);
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        const id = getIdFromUrl(window.location.pathname);
         event.preventDefault();
+        const formData = new FormData();
+        formData.append('item', new Blob([JSON.stringify({ nome, quantidade, valorUnitario, emprestavel, tipoItem })], {
+            type: "application/json"
+        }));
+        if (imagem) {
+            formData.append('imagem', imagem);
+        }
 
+        const token = Cookie.get("token");
         try {
-            if (!id) {
-                console.error("Item ID is null");
-                return;
-            }
-
-            const formData = new FormData(event.currentTarget);
-            const nome = formData.get('nome')
-            const quantidade = formData.get('quantidade')
-            const valor_unitario = formData.get('valor_unitario')
-            const emprestavel = itemEmprestavel
-            const tipo_item = tipoItem
-
-            const token = Cookie.get("token");
-            if (!token) {
-                throw new Error("Usuário não autenticado");
-            }
-
-            const response = await fetch(`http://localhost:8080/item/${id}`, {
+            const response = await fetch(`http://localhost:8080/item/${params.id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify({ nome, quantidade, valor_unitario, emprestavel, tipo_item })
+                body: formData
             });
-
             if (!response.ok) {
-                throw new Error("Failed to update item");
+                throw new Error('Falha ao enviar o formulário');
             }
-
-            router.push(`/admin/itens/${id}`);
-        } catch (error) {
-            console.error("Failed to update item:", error);
+            router.push('/admin/itens');
+        } catch (error: any) {
+            console.error('Erro ao enviar o formulário:', error.message);
         }
     };
 
@@ -98,34 +115,39 @@ const EditarItem = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <Label htmlFor='nome'>Nome</Label>
-                    <Input placeholder='Nome do item' name='nome' className="mt-1 block w-full"/>
+                    <Input value={nome} placeholder='Nome do item' name='nome' className="mt-1 block w-full" onChange={e => setNome(e.target.value)} />
+                </div>
+                <div className='flex space-x-8'>
+                    <div>
+                        <Label htmlFor='imagem'>Imagem Atual</Label>
+                        {imageUrl && <Image src={imageUrl} alt="Imagem do Item" width={200} height={200} className='rounded-md'/>}
+                    </div>
+                    <div>
+                        <Label htmlFor='imagem'>Atualizar Imagem</Label>
+                        <Input name='imagem' type='file' accept="image/*" onChange={handleImageChange} />
+                    </div>
                 </div>
                 <div>
                     <Label htmlFor="quantidade">Quantidade</Label>
-                    <Input placeholder='0' name='quantidade' type="number" className="mt-1 block w-full"/>
+                    <Input value={quantidade} placeholder='0' name='quantidade' type="number" className="mt-1 block w-full" onChange={e => setQuantidade(e.target.value)} />
                 </div>
                 <div>
                     <Label htmlFor="valor_unitario">Valor Unitário</Label>
-                    <Input placeholder='R$ 000,00' name='valor_unitario' type="number" className="mt-1 block w-full"/>
+                    <Input value={valorUnitario} placeholder='R$ 000,00' name='valor_unitario' type="number" className="mt-1 block w-full" onChange={e => setValor(e.target.value)} />
                 </div>
-                <div>
-                    <Label htmlFor='emprestavel'>Emprestável?</Label>
-                    <select value={itemEmprestavel} onChange={(e) => setItemEmprestavel(e.target.value)}
-                            className="mt-1 block w-full border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 rounded-md">
-                        <option value="">Selecione</option>
-                        <option value="true">Sim</option>
-                        <option value="false">Não</option>
-                    </select>
+                <div className='flex flex-col space-y-3'>
+                    <Label htmlFor='emprestavel'>Emprestavel?</Label>
+                    <Switch name='emprestavel' checked={emprestavel} onCheckedChange={setIsToggled} />
                 </div>
-                <div>
-                    <Label htmlFor='tipo_item'>Categoria</Label>
-                    <select value={tipoItem} onChange={(e) => setTipoItem(e.target.value)}
-                            className="mt-1 block w-full border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 rounded-md">
-                        <option value="">Selecione</option>
-                        <option value="EQUIPAMENTO">Equipamento</option>
-                        <option value="VIDRARIA">Vidraria</option>
-                    </select>
-                </div>
+                <Select name='tipo_item' value={tipoItem} onValueChange={setSelectedOption}>
+                    <SelectTrigger>
+                        <SelectValue placeholder='Selecione o tipo do item' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value='VIDRARIA'>Vidraria</SelectItem>
+                        <SelectItem value='EQUIPAMENTO'>Equipamento</SelectItem>
+                    </SelectContent>
+                </Select>
                 <Button type="submit" className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
                     Salvar
                 </Button>
@@ -134,4 +156,4 @@ const EditarItem = () => {
     )
 }
 
-export default EditarItem
+export default EditarItem;
