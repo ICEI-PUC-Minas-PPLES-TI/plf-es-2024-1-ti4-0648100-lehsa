@@ -39,7 +39,6 @@ public class ConversorEntidadeDTOUtil {
                 .cpf(usuario.getCpf())
                 .telefone (usuario.getTelefone ())
                 .email(usuario.getEmail())
-                .links(singletonList(linkTo(UsuarioControllerImpl.class).slash(usuario.getId()).withSelfRel()))
                 .build();
     }
 

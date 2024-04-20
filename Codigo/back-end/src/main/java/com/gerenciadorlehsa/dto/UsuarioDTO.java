@@ -16,6 +16,5 @@ public record UsuarioDTO(
         String nome,
         String cpf,
         String email,
-        String telefone,
-        List<Link> links) {
+        String telefone) {
 }
