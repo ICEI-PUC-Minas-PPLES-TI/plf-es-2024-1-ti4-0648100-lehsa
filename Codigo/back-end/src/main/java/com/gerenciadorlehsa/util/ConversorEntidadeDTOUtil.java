@@ -1,24 +1,17 @@
 package com.gerenciadorlehsa.util;
 
 import com.gerenciadorlehsa.dto.ItemDTO;
-import com.gerenciadorlehsa.dto.ItemDTOResponse;
 import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.enums.TipoItem;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import com.gerenciadorlehsa.controller.UsuarioControllerImpl;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.User;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.CONVERSOR_ENTIDADE_DTO_UTIL;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @UtilityClass
 @Slf4j(topic = CONVERSOR_ENTIDADE_DTO_UTIL)

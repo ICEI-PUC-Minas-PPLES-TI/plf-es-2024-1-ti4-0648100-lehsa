@@ -8,16 +8,6 @@
       <change beforePath="$PROJECT_DIR$/../../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/controller/UsuarioControllerImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/controller/UsuarioControllerImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO$UsuarioDTOBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO$UsuarioDTOBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/RespostaErro.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/RespostaErro.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/UsuarioDetails$UsuarioDetailsBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/UsuarioDetails$UsuarioDetailsBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,7 +100,7 @@
       <workItem from="1713275259297" duration="245000" />
       <workItem from="1713394006868" duration="939000" />
       <workItem from="1713564486055" duration="8965000" />
-      <workItem from="1713576741143" duration="628000" />
+      <workItem from="1713576741143" duration="2965000" />
     </task>
     <servers />
   </component>
