@@ -65,7 +65,7 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
     @Override
     public UsuarioDetails validarAutorizacaoRequisicao() {
 
-        UsuarioDetails usuarioDetails = autenticar();
+        UsuarioDetails usuarioDetails = autenticar(); // verifica se tá logado
 
         if (!usuarioEhAdmin(requireNonNull(usuarioDetails)))
             throw new UsuarioNaoAutorizadoException(format("usuário [%s] não possui autorização para utilizar esse método", usuarioDetails.getUsername()));

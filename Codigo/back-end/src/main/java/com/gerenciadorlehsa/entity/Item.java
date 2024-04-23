@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -51,4 +52,9 @@ public class Item {
 
     @Column(name = "caminho_img", nullable = false)
     private String nomeImg;
+
+    @ManyToMany(mappedBy = "itens")
+    private List<Agendamento> agendamentos;
+
+
 }

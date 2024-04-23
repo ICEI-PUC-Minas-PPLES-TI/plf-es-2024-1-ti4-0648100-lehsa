@@ -111,9 +111,11 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         log.info(">>> atualizar: atualizando usuário");
         User usuarioAtualizado = encontrarPorId(usuario.getId());
         copyProperties(usuario, usuarioAtualizado, PROPRIEDADES_IGNORADAS);
+
         if (usuarioAtualizado.getPerfilUsuario().equals(PerfilUsuario.ADMIN.getCodigo()))
             usuarioAtualizado.setPerfilUsuario(usuario.getPerfilUsuario());
         usuarioAtualizado = usuarioRepository.save(usuarioAtualizado);
+
         log.info(format(">>> atualizar: usuário atualizado, id: %s", usuarioAtualizado.getId()));
         return usuarioAtualizado;
     }

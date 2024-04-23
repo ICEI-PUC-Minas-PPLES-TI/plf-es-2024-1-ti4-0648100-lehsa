@@ -2,10 +2,10 @@ package com.gerenciadorlehsa.entity.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import static com.gerenciadorlehsa.util.ConstantesNumUtil.DOIS;
-import static com.gerenciadorlehsa.util.ConstantesNumUtil.UM;
+
 import java.util.Arrays;
 
+import static com.gerenciadorlehsa.util.ConstantesNumUtil.*;
 
 
 @Getter
@@ -13,7 +13,8 @@ import java.util.Arrays;
 public enum PerfilUsuario {
 
     ADMIN(UM, "ROLE_ADMIN"),
-    USUARIO(DOIS, "ROLE_USUARIO");
+    USUARIO(DOIS, "ROLE_USUARIO"),
+    TECNICO(TRES, "ROLE_USUARIO");
 
     private final Integer codigo;
     private final String descricao;

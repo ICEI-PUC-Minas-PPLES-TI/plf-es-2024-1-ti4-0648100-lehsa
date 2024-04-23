@@ -37,4 +37,12 @@ public class User extends Pessoa {
     @JsonProperty("perfil_usuario")
     private Integer perfilUsuario;
 
+
+    @OneToMany(mappedBy = "tecnico")
+    private List<Agendamento> agendamentosComoTecnico;
+
+
+    @ManyToMany(mappedBy = "solicitantes")
+    private List<Agendamento> agendamentosRealizados;
+
 }
