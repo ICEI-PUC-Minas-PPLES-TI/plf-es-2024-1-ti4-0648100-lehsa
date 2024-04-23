@@ -45,7 +45,7 @@ export default function Home() {
       <div className="bg-white w-1/3 min-w-80 p-10 space-y-14">
         <Image src="/images/logo.jpg" width={150} height={0} alt="logo"></Image>
         <div>
-          <h2 className="font-bold text-3xl">Log in.</h2>
+          <h2 className="font-bold text-3xl">Login</h2>
           <p className="lg:max-w-[80%] mb-6">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit{" "}
           </p>
