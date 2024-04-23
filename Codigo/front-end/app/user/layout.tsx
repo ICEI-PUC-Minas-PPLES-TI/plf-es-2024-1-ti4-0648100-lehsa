@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react'
+import TopMenu from '@/components/topMenu'
 
 interface Props {
     children: ReactNode
@@ -6,9 +7,12 @@ interface Props {
 
 const adminLayout = ({ children }: Props) => {
   return (
-    <div className='flex'>
-        <div className='p-6 grow h-screen overflow-y-auto'>{ children }</div>
-    </div>
+    
+        <div className='p-6  space-y-8'>
+          <TopMenu title='Página do Usuário'/>
+          { children }
+          </div>
+    
   )
 }
     

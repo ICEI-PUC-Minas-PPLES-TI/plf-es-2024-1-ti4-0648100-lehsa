@@ -11,6 +11,8 @@ import Link from "next/link";
 export default function Home() {
   const router = useRouter();
 
+  const [errorMessage, setErrorMessage] = useState('')
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
   
@@ -32,7 +34,8 @@ export default function Home() {
       Cookie.set("token", token, { expires: 7 });
       router.push("/admin");
     } else {
-      window.alert("Login failed");
+      setErrorMessage('Email ou senha inválida')
+      //window.alert("Login failed");
     }
   }
   
@@ -49,13 +52,14 @@ export default function Home() {
 
           <form onSubmit={handleSubmit}>
             <Label htmlFor="email">Email</Label>
-            <Input placeholder="exemplo@email.com" name="email" type="email" />
-            <Label htmlFor="password">Senha</Label>
+            <Input placeholder="exemplo@email.com" name="email" type="email" className="mb-2"/>
+            <Label htmlFor="password" >Senha</Label>
             <Input
               placeholder="mínimo de 8 caracteres"
               name="password"
               type="password"
             />
+            {errorMessage && <p className="font-semibold text-red-600 mt-3 text-center">{errorMessage}</p>}
             <Button type="submit" className="w-full mt-9">Login</Button>
           </form>
           <p className="text-center mt-12">

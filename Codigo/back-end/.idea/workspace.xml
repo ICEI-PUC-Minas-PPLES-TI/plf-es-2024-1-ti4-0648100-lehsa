@@ -4,17 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="68c87d29-9269-4184-bdd1-56f983617572" name="Changes" comment="">
+    <list default="true" id="07af1496-7f1f-4ddf-9643-ad99736be14b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/ItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/ItemController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/app/admin/itens/cadastro/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/admin/itens/cadastro/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/app/admin/itens/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/admin/itens/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/components/ItemCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/components/ItemCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/components/ItensCard.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/middleware.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/middleware.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/next.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/next.config.mjs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

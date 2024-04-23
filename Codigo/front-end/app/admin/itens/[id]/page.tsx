@@ -1,11 +1,21 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import { Separator } from "@/components/ui/separator";
 import { EditIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import Cookie from "js-cookie";
 import ImageComp from "@/components/ImageComp";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 type Props = {
     id: string;
@@ -118,11 +128,24 @@ export default function ItemDetails() {
                                 <EditIcon className="h-6 w-6" />
                             </div>
                         </Link>
-                        <button
-                            onClick={handleDelete}
-                            className="p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition duration-150 ease-in-out">
-                            <TrashIcon className="h-6 w-6" />
-                        </button>
+                        <AlertDialog>
+                            <AlertDialogTrigger className="p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition duration-150 ease-in-out">
+                                <TrashIcon className="h-6 w-6 " />
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Esta ação não pode ser revertida. Este Item será deletado permanentemente do sistema.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel className="border-none">Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 transition duration-150 ease-in-out">Continuar</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+
+                        </AlertDialog>
                     </div>
                 </div>
             </div>

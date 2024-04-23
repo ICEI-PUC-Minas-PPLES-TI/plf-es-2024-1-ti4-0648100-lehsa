@@ -1,4 +1,5 @@
 'use client'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -7,7 +8,6 @@ import { Switch } from '@/components/ui/switch'
 import React, { useState } from 'react'
 import { useRouter } from "next/navigation";
 import Cookie from 'js-cookie'
-
 
 const CadastroItem = () => {
   const router = useRouter();
@@ -54,36 +54,73 @@ const CadastroItem = () => {
   };
 
   return (
-    <div className='bg-white rounded-xl w-full h-full p-5'>
-      <h3 className='text-xl font-semibold'>Cadastro</h3>
-      <form onSubmit={handleSubmit}>
-        <Label htmlFor='nome'>Nome</Label>
-        <Input placeholder='Nome do item' name='nome' value={nome} type="text"
-          onChange={e => setNome(e.target.value)} required />
-        <Label htmlFor='imagem'>Imagem</Label>
-        <Input name='imagem' type='file' accept="image/*" onChange={handleImageChange} />
-        <Label htmlFor="quantidade">Quantidade</Label>
-        <Input placeholder='0' type='number' name='quantidade' value={quantidade}
-          onChange={e => setQuantidade(e.target.value)} required />
-        <Label htmlFor="valor_unitario">Valor unitário</Label>
-        <Input placeholder='R$ 000,00' name='valor_unitario' value={valor_unitario}
-          onChange={e => setValor(e.target.value)} required />
-        <div className='flex flex-col space-y-3'>
-          <Label htmlFor='emprestavel'>Emprestavel?</Label>
-          <Switch name='emprestavel' checked={emprestavel}
-            onCheckedChange={setIsToggled} />
+    <div className='bg-white rounded-xl w-full h-full flex flex-col '>
+      <div className='bg-primary h-14 content-center p-6 rounded-t-xl'>
+        <h3 className='text-xl font-semibold flex-none text-white'>Cadastro</h3>
+      </div>
+      <form onSubmit={handleSubmit} className='grow flex flex-col justify-between p-6'>
+        <div>
+          <div className='flex space-x-6'>
+            <div className='space-y-4'>
+              <div>
+                <Label htmlFor='nome'>
+                  Nome
+                  <Input placeholder='Nome do item' name='nome' value={nome} type="text"
+                    onChange={e => setNome(e.target.value)} required />
+                </Label>
+              </div>
+              <div className='flex space-x-6'>
+                <div>
+                  <Label htmlFor="quantidade">
+                    Quantidade
+                    <Input placeholder='0' type='number' name='quantidade' value={quantidade}
+                      onChange={e => setQuantidade(e.target.value)} required />
+                  </Label>
+                </div>
+                <div>
+                  <Label htmlFor="valor_unitario">
+                    Valor unitário
+                    <Input placeholder='R$ 000,00' type='number' name='valor_unitario' value={valor_unitario}
+                      onChange={e => setValor(e.target.value)} required />
+                  </Label>
+                </div>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor='imagem'>
+                Imagem
+                <Input name='imagem' type='file' accept="image/*" onChange={handleImageChange} />
+              </Label>
+            </div>
+          </div>
+
+          <div className='flex space-x-6 space-y-4'>
+            <div className='pt-5'>
+              <Label htmlFor='emprestavel' className='flex flex-col gap-3'>
+                Emprestavel?
+                <Switch name='emprestavel' checked={emprestavel}
+                  onCheckedChange={setIsToggled} />
+              </Label>
+            </div>
+
+            <div>
+              <Label htmlFor='tipo_item'>
+                Tipo do item
+                <Select name='tipo_item' value={tipo_item} onValueChange={setSelectedOption}>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Selecione o tipo do item' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='VIDRARIA'>Vidraria</SelectItem>
+                    <SelectItem value='EQUIPAMENTO'>Equipamento</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Label>
+            </div>
+          </div>
         </div>
-        <Label htmlFor='tipo_item'>Tipo do item</Label>
-        <Select name='tipo_item' value={tipo_item} onValueChange={setSelectedOption}>
-          <SelectTrigger>
-            <SelectValue placeholder='Selecione o tipo do item' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='VIDRARIA'>Vidraria</SelectItem>
-            <SelectItem value='EQUIPAMENTO'>Equipamento</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button type='submit'>Confirmar</Button>
+
+        <Button className='self-end' type='submit'>Confirmar</Button>
       </form>
     </div>
   );
