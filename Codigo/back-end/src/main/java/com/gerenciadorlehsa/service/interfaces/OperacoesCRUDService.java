@@ -14,7 +14,7 @@ public interface OperacoesCRUDService<I> {
 
     I encontrarPorId(@NotNull UUID id);
 
-    List<I> listarTodos();
+    //List<I> listarTodos();
 
     I criar(@NotNull I obj);
 

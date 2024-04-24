@@ -1,5 +1,7 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
+import com.gerenciadorlehsa.service.interfaces.OperacoesAdminService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,20 +69,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         return usuarioRepository.existsByEmail (email);
     }
 
-
-    /**
-     * Lista todos os usuários criados
-     *
-     * @return lista de usuários
-     */
-    @Override
-    public List<User> listarTodos() {
-        log.info(">>> listarTodos: listando todos usuários");
-        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
-        return usuarioRepository.findAll()
-                .stream()
-                .toList();
-    }
 
     /**
      * Cria um novo usuário
@@ -152,4 +140,32 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         else
             throw new AtualizarSenhaException(format("senha original incorreta, id do usuário: %s", id));
     }
+
+
+
+    /**
+     * Lista todos os usuários criados
+     *
+     * @return lista de usuários
+     */
+    @Override
+    public List<User> listarTodos() {
+        log.info(">>> listarTodos: listando todos usuários");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        return usuarioRepository.findAll();
+    }
+
+    @Override
+    public void atualizarPerfil(@NotNull UUID id, Integer code) {
+        log.info(">>> atualizarStatus: atualizando status");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        User usuarioAtulizado = encontrarPorId (id);
+
+        if(!(code > 0 && code < 4))
+            throw new AtualizarStatusException ("O Código de perfil do usuário não existe");
+        usuarioAtulizado.setPerfilUsuario (code);
+        usuarioRepository.save (usuarioAtulizado);
+    }
+    
+
 }

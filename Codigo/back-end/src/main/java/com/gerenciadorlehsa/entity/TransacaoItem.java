@@ -2,7 +2,6 @@ package com.gerenciadorlehsa.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
-import com.gerenciadorlehsa.entity.enums.TipoItem;
 import jakarta.persistence.*;
 import lombok.*;
 

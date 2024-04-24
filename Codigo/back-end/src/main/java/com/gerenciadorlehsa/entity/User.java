@@ -1,6 +1,9 @@
 package com.gerenciadorlehsa.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.gerenciadorlehsa.entity.enums.StatusCurso;
+import com.gerenciadorlehsa.entity.enums.TipoCurso;
+import com.gerenciadorlehsa.entity.enums.TipoItem;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -36,6 +39,19 @@ public class User extends Pessoa {
     @Column(name = "PERFIL_USUARIO", nullable = false)
     @JsonProperty("perfil_usuario")
     private Integer perfilUsuario;
+
+    @Column(name = "CURSO")
+    private String curso;
+
+    @Column(name = "TIPO_CURSO")
+    @JsonProperty("tipo_curso")
+    @Enumerated(EnumType.STRING)
+    private TipoCurso tipoCurso;
+
+    @Column(name = "STATUS_CURSO")
+    @JsonProperty("status_curso")
+    @Enumerated(EnumType.STRING)
+    private StatusCurso statusCurso;
 
 
     @OneToMany(mappedBy = "tecnico")

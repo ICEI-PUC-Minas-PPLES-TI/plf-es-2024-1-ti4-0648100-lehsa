@@ -13,11 +13,9 @@ import com.gerenciadorlehsa.dto.SenhaDTO;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +62,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
     @GetMapping
     public ResponseEntity<List<UsuarioDTO>> listarTodos() {
         log.info(">>> listarTodos: recebendo requisição para listar todos usuários");
-        List<User> usuarios = operacoesCRUDService.listarTodos();
+        List<User> usuarios = usuarioService.listarTodos();
         return ResponseEntity.ok().body(usuarios.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
@@ -129,6 +127,19 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_USUARIO_SENHA, id)));
     }
 
+    @PutMapping("/perfil/{id}")
+    public ResponseEntity<Map<String, Object>> atualizarPerfil(
+            @PathVariable("id") UUID id,
+            @RequestParam("codigoPerfil") Integer codigoPerfil) {
+            log.info(">>> atualizarStatus:  recebendo requisição para atualizar status de usuário");
+
+            usuarioService.atualizarPerfil(id, codigoPerfil);
+
+            return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(),
+                    MSG_PERFIL_ATUALIZADO, id)));
+
+    }
+
 
     /**
      * Verifica se o token é válido
@@ -147,6 +158,8 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
             return ResponseEntity.badRequest().body("Token inválido.");
         }
     }
+
+
 
 
 }

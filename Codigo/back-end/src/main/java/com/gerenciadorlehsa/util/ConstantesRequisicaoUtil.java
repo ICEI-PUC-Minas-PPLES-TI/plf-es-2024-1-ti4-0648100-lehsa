@@ -17,15 +17,13 @@ public class ConstantesRequisicaoUtil {
 
     public static final String ENDPOINT_ITEM = "/item";
 
-    public static final String ENDPOINT_ENDERECO = "/endereco";
-
     public static final String[] CAMINHOS_PUBLICOS = {"/", "/actuator/health", "/usuario/verificar-token"};
 
     public static final String[] CAMINHOS_PUBLICOS_POST = {"/usuario", "/login"};
 
-    public static final List<String> METODOS_PERMITIDOS_CORS = new ArrayList<>(asList("GET", "POST", "PUT", "PATCH", "HEAD", "OPTIONS"));
+/*    public static final List<String> METODOS_PERMITIDOS_CORS = new ArrayList<>(asList("GET", "POST", "PUT", "PATCH", "HEAD", "OPTIONS"));*/
 
-    public static final String CONFIGURACAO_CORS = "/**";
+    //public static final String CONFIGURACAO_CORS = "/**";
 
     public static final String HEADER_AUTORIZACAO = "Authorization";
 
@@ -44,19 +42,14 @@ public class ConstantesRequisicaoUtil {
 
     public static final String[] PROPRIEDADES_IGNORADAS = new String[]{"id", "password", "perfilUsuario"};
 
-    public static final List<String> CHAVES_ENDERECO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_endereco"));
 
     public static final List<String> CHAVES_USUARIO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_usuario"));
-
-    public static final String MSG_ENDERECO_CRIADO = "endereco criado com sucesso";
-
-    public static final String MSG_ENDERECO_ATUALIZADO = "endereco atualizado com sucesso";
-
-    public static final String MSG_ENDERECO_DELETADO = "endereco deletado com sucesso";
 
     public static final String MSG_USUARIO_CRIADO = "usuario criado com sucesso";
 
     public static final String MSG_USUARIO_ATUALIZADO = "usuario atualizado com sucesso";
+
+    public static final String MSG_PERFIL_ATUALIZADO = "perfil do usuário atualizado com sucesso";
 
     public static final String MSG_USUARIO_DELETADO = "usuario deletado com sucesso";
 

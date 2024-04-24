@@ -16,5 +16,8 @@ public record UsuarioDTO(
         String nome,
         String cpf,
         String email,
-        String telefone) {
+        String telefone,
+        String curso,
+        @JsonProperty("tipo_curso") String tipoCurso,
+        @JsonProperty("status_curso") String statusCurso) {
 }

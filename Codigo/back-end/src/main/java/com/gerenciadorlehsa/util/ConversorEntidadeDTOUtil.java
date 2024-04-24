@@ -31,9 +31,13 @@ public class ConversorEntidadeDTOUtil {
                 .nome(usuario.getNome ())
                 .cpf(usuario.getCpf())
                 .telefone (usuario.getTelefone ())
+                .tipoCurso (usuario.getTipoCurso () != null ? usuario.getTipoCurso ().toString () : null)
+                .statusCurso (usuario.getStatusCurso () != null ? usuario.getStatusCurso ().toString () : null)
+                .curso (usuario.getCurso ())
                 .email(usuario.getEmail())
                 .build();
     }
+
 
     /**
      * Converte uma entidade do tipo Endereco para EnderecoDTO
