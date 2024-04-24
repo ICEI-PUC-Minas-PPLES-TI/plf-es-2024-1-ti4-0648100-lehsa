@@ -1,7 +1,9 @@
 package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.components.JWTComp;
+import com.gerenciadorlehsa.controller.interfaces.OperacoesAdminController;
 import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.service.interfaces.OperacoesAdminService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +35,11 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_USUARIO)
 @AllArgsConstructor
-public class UsuarioControllerImpl implements OperacoesCRUDController<User, UsuarioDTO>, UsuarioController {
+public class UsuarioControllerImpl implements OperacoesCRUDController<User, UsuarioDTO>, UsuarioController, OperacoesAdminController<User, UsuarioDTO> {
 
     private final OperacoesCRUDService<User> operacoesCRUDService;
     private final UsuarioService usuarioService;
+    private final OperacoesAdminService<User> operacoesAdminService;
     private JWTComp jwtComp;
 
     /**
@@ -53,18 +56,6 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
         return ResponseEntity.ok().body(converterParaDTO(usuario));
     }
 
-    /**
-     * Lista todos os usuários cadastrados
-     *
-     * @return lista de usuários cadastrados
-     */
-    @Override
-    @GetMapping
-    public ResponseEntity<List<UsuarioDTO>> listarTodos() {
-        log.info(">>> listarTodos: recebendo requisição para listar todos usuários");
-        List<User> usuarios = usuarioService.listarTodos();
-        return ResponseEntity.ok().body(usuarios.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
-    }
 
     /**
      * Cria um novo usuário
@@ -128,25 +119,6 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
     }
 
 
-    /**
-     * Atualiza o perfil de um usuário
-     * @param id id do usuário
-     * @param codigoPerfil código referente ao perfil do usuário
-     * @return id do usuário cujo perfil foi atualizado
-     */
-    @PutMapping("/perfil/{id}")
-    public ResponseEntity<Map<String, Object>> atualizarPerfil(
-            @PathVariable("id") UUID id,
-            @RequestParam("codigoPerfil") Integer codigoPerfil) {
-            log.info(">>> atualizarStatus:  recebendo requisição para atualizar status de usuário");
-
-            usuarioService.atualizarPerfil(id, codigoPerfil);
-
-            return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(),
-                    MSG_PERFIL_ATUALIZADO, id)));
-
-    }
-
 
     /**
      * Verifica se o token é válido
@@ -167,6 +139,38 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
     }
 
 
+    /**
+     * Lista todos os usuários cadastrados
+     *
+     * @return lista de usuários cadastrados
+     */
+    @Override
+    @GetMapping
+    public ResponseEntity<List<UsuarioDTO>> listarTodos() {
+        log.info(">>> listarTodos: recebendo requisição para listar todos usuários");
+        List<User> usuarios = operacoesAdminService.listarTodos();
+        return ResponseEntity.ok().body(usuarios.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
+    }
+
+
+    /**
+     * Atualiza o perfil de um usuário
+     * @param id id do usuário
+     * @param codigoPerfil código referente ao perfil do usuário
+     * @return id do usuário cujo perfil foi atualizado
+     */
+    @PutMapping("/perfil/{id}")
+    public ResponseEntity<Map<String, Object>> atualizarPerfil(
+            @PathVariable("id") UUID id,
+            @RequestParam("codigoPerfil") Integer codigoPerfil) {
+        log.info(">>> atualizarStatus:  recebendo requisição para atualizar status de usuário");
+
+        operacoesAdminService.atualizarPerfil(id, codigoPerfil);
+
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(),
+                MSG_PERFIL_ATUALIZADO, id)));
+
+    }
 
 
 }

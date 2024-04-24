@@ -19,9 +19,6 @@ public interface OperacoesCRUDController<I, O> {
     @GetMapping("/{id}")
     ResponseEntity<O> encontrarPorId(@PathVariable UUID id);
 
-    @GetMapping
-    ResponseEntity<List<O>> listarTodos();
-
     @PostMapping
     ResponseEntity<Map<String, Object>> criar(@Valid @RequestBody I obj);
 

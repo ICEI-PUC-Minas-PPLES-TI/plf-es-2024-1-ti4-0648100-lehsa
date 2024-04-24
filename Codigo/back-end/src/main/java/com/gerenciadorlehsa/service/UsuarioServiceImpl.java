@@ -28,7 +28,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = USUARIO_SERVICE)
 @Service
 @AllArgsConstructor
-public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService {
+public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService, OperacoesAdminService<User> {
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 

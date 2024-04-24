@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Entidade com os métodos específicos do UsuarioService
  */
-public interface UsuarioService extends OperacoesAdminService<User>{
+public interface UsuarioService{
 
     User encontrarPorEmail(@NotNull String email);
     void atualizarSenha(@NotNull UUID id, @NotNull SenhaDTO senhaDTO);
