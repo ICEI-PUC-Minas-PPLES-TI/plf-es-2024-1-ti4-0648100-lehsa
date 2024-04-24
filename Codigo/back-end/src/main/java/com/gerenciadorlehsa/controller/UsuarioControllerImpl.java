@@ -127,6 +127,13 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_USUARIO_SENHA, id)));
     }
 
+
+    /**
+     * Atualiza o perfil de um usuário
+     * @param id id do usuário
+     * @param codigoPerfil código referente ao perfil do usuário
+     * @return id do usuário cujo perfil foi atualizado
+     */
     @PutMapping("/perfil/{id}")
     public ResponseEntity<Map<String, Object>> atualizarPerfil(
             @PathVariable("id") UUID id,
