@@ -10,9 +10,10 @@ public class ConstantesTopicosUtil {
 
     public static final String USUARIO_SERVICE = "USUARIO_SERVICE";
 
+    public static final String AGENDAMENTO_SERVICE = "AGENDAMENTO_SERVICE";
+
     public static final String ITEM_SERVICE = "ITEM_SERVICE";
 
-    public static final String ENDERECO_SERVICE = "ENDERECO_SERVICE";
 
     public static final String VALIDADOR_AUTORIZACAO_REQUISICAO_SERVICE = "VALIDADOR_AUTORIZACAO_REQUISICAO_SERVICE";
 
@@ -24,9 +25,6 @@ public class ConstantesTopicosUtil {
 
     public static final String ITEM_CONTROLLER = "ITEM_CONTROLLER";
 
-    public static final String ENDERECO_CONTROLLER = "ENDERECO_CONTROLLER";
-
-    public static final String INDICADOR_SAUDE_SISTEMA_COMP = "INDICADOR_SAUDE_SISTEMA_COMP";
 
     public static final String JWT_COMP = "JWT_COMP";
 
@@ -39,4 +37,6 @@ public class ConstantesTopicosUtil {
     public static final String JWT_FILTRO_AUTORIZACAO = "JWT_FILTRO_AUTORIZACAO";
 
     public static final String CONVERSOR_ENTIDADE_DTO_UTIL = "CONVERSOR_ENTIDADE_DTO_UTIL";
+
+    public static final String DATA_HORA_UTIL = "DATA_HORA_UTIL";
 }

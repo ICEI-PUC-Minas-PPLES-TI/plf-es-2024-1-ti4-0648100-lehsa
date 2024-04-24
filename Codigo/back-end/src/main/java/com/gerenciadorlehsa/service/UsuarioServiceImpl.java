@@ -50,25 +50,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(format("usuário não encontrado, id: %s", id)));
     }
 
-    /**
-     * Encontra um usuário a partir do seu email
-     *
-     * @param email email do usuário
-     * @return usuário encontrado
-     */
-    @Override
-    public User encontrarPorEmail(@NotNull String email) {
-        log.info(">>> encontrarPorEmail: encontrando usuário por email");
-        return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException(format("usuário não encontrado, email: %s", email)));
-    }
-
-
-    @Override
-    public boolean existEmail(String email) {
-        return usuarioRepository.existsByEmail (email);
-    }
-
 
     /**
      * Cria um novo usuário
@@ -83,6 +64,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         usuario.setId(null);
         usuario.setPassword (passwordEncoder.encode(usuario.getPassword ()));
         usuario.setPerfilUsuario(PerfilUsuario.USUARIO.getCodigo());
+        usuario.setNota (5.0);
         usuario = usuarioRepository.save(usuario);
         log.info(format(">>> criar: usuário criado, id: %s", usuario.getId()));
         return usuario;
@@ -126,6 +108,25 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     }
 
     /**
+     * Encontra um usuário a partir do seu email
+     *
+     * @param email email do usuário
+     * @return usuário encontrado
+     */
+    @Override
+    public User encontrarPorEmail(@NotNull String email) {
+        log.info(">>> encontrarPorEmail: encontrando usuário por email");
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(format("usuário não encontrado, email: %s", email)));
+    }
+
+    @Override
+    public boolean existEmail(String email) {
+        return usuarioRepository.existsByEmail (email);
+    }
+
+
+    /**
      * Atualiza senha do usuário
      *
      * @param id       id do usuário
@@ -142,7 +143,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     }
 
 
-
     /**
      * Lista todos os usuários criados
      *
@@ -154,6 +154,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         return usuarioRepository.findAll();
     }
+
 
     @Override
     public void atualizarPerfil(@NotNull UUID id, Integer code) {

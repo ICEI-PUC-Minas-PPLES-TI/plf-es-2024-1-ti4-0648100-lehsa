@@ -1,14 +1,12 @@
 package com.gerenciadorlehsa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerenciadorlehsa.entity.enums.StatusCurso;
 import com.gerenciadorlehsa.entity.enums.TipoCurso;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.hateoas.RepresentationModel;
@@ -42,6 +40,10 @@ public class User extends Pessoa {
 
     @Column(name = "CURSO")
     private String curso;
+
+    @Column(name = "NOTA")
+    @JsonIgnore
+    private Double nota;
 
     @Column(name = "TIPO_CURSO")
     @JsonProperty("tipo_curso")

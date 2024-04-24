@@ -1,6 +1,8 @@
 package com.gerenciadorlehsa.util;
 
+import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.ItemDTO;
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,10 @@ import com.gerenciadorlehsa.entity.User;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 import static java.lang.String.format;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.CONVERSOR_ENTIDADE_DTO_UTIL;
 
@@ -33,6 +39,7 @@ public class ConversorEntidadeDTOUtil {
                 .telefone (usuario.getTelefone ())
                 .tipoCurso (usuario.getTipoCurso () != null ? usuario.getTipoCurso ().toString () : null)
                 .statusCurso (usuario.getStatusCurso () != null ? usuario.getStatusCurso ().toString () : null)
+                .nota (usuario.getNota ())
                 .curso (usuario.getCurso ())
                 .email(usuario.getEmail())
                 .build();
@@ -40,10 +47,9 @@ public class ConversorEntidadeDTOUtil {
 
 
     /**
-     * Converte uma entidade do tipo Endereco para EnderecoDTO
-     *
-     * @param endereco entidade do tipo Endereco
-     * @return novo EnderecoDTO
+     * Converter uma entidade Item para ItemDTO
+     * @param item
+     * @return
      */
 
     public static ItemDTO converterParaDTO(@NotNull Item item) {
@@ -57,6 +63,43 @@ public class ConversorEntidadeDTOUtil {
                 .quantidade(item.getQuantidade())
                 .build();
     }
+
+
+    public static AgendamentoDTO converterParaDto(@NotNull Agendamento agendamento) {
+        log.info(format(">>> converterParaDTO: convertendo Item (id: %s) para DTO", agendamento.getId()));
+
+
+        List<UsuarioDTO> solicitantesDTO = agendamento.getSolicitantes() != null ?
+                agendamento.getSolicitantes().stream()
+                        .map(ConversorEntidadeDTOUtil::converterParaDTO)
+                        .collect(Collectors.toList()) :
+                null;
+
+
+        List<ItemDTO> itensDTO = agendamento.getItens() != null ?
+                agendamento.getItens().stream()
+                        .map(ConversorEntidadeDTOUtil::converterParaDTO)
+                        .collect(Collectors.toList()) :
+                null;
+
+
+        UsuarioDTO tecnicoDTO = agendamento.getTecnico() != null ?
+                converterParaDTO(agendamento.getTecnico()) :
+                null;
+
+        return AgendamentoDTO.builder()
+                .id(agendamento.getId())
+                .dataHoraInicio(converterDataHora(agendamento.getDataHoraInicio()))
+                .dataHoraFim(converterDataHora(agendamento.getDataHoraFim()))
+                .observacaoSolicitacao(agendamento.getObservacaoSolicitacao())
+                .statusTransacaoItem(agendamento.getStatusTransacaoItem())
+                .solicitantes(solicitantesDTO)
+                .itens(itensDTO)
+                .tecnico(tecnicoDTO)
+                .build();
+    }
+
+
 
     private byte[] getImage(String imageDirectory, String imageName) throws IOException {
         Path imagePath = Path.of(imageDirectory, imageName);
@@ -102,4 +145,6 @@ public class ConversorEntidadeDTOUtil {
         }
     }
 */
+
+
 }
