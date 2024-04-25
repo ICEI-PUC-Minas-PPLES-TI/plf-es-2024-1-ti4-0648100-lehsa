@@ -1,9 +1,7 @@
 package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.components.JWTComp;
-import com.gerenciadorlehsa.controller.interfaces.OperacoesAdminController;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.service.interfaces.OperacoesAdminService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +33,10 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_USUARIO)
 @AllArgsConstructor
-public class UsuarioControllerImpl implements OperacoesCRUDController<User, UsuarioDTO>, UsuarioController, OperacoesAdminController<User, UsuarioDTO> {
+public class UsuarioControllerImpl implements OperacoesCRUDController<User, UsuarioDTO>, UsuarioController{
 
     private final OperacoesCRUDService<User> operacoesCRUDService;
     private final UsuarioService usuarioService;
-    private final OperacoesAdminService<User> operacoesAdminService;
     private JWTComp jwtComp;
 
     /**
@@ -148,7 +145,8 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
     @GetMapping
     public ResponseEntity<List<UsuarioDTO>> listarTodos() {
         log.info(">>> listarTodos: recebendo requisição para listar todos usuários");
-        List<User> usuarios = operacoesAdminService.listarTodos();
+        List<User> usuarios = operacoesCRUDService.listarTodos();
+        // List<User> usuarios = operacoesCrudService.listarTodos()
         return ResponseEntity.ok().body(usuarios.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
@@ -165,7 +163,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
             @RequestParam("codigoPerfil") Integer codigoPerfil) {
         log.info(">>> atualizarStatus:  recebendo requisição para atualizar status de usuário");
 
-        operacoesAdminService.atualizarPerfil(id, codigoPerfil);
+        usuarioService.atualizarPerfil(id, codigoPerfil);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(),
                 MSG_PERFIL_ATUALIZADO, id)));

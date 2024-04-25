@@ -1,7 +1,6 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
-import com.gerenciadorlehsa.service.interfaces.OperacoesAdminService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = USUARIO_SERVICE)
 @Service
 @AllArgsConstructor
-public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService, OperacoesAdminService<User> {
+public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService{
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
@@ -156,7 +155,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     }
 
 
-    @Override
     public void atualizarPerfil(@NotNull UUID id, Integer code) {
         log.info(">>> atualizarStatus: atualizando status");
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();

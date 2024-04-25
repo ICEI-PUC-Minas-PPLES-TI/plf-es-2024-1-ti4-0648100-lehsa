@@ -148,6 +148,16 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
     }
 
 
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DataConflitanteAgendamenteException.class)
+    public ResponseEntity<Object> capturarDataConflitanteAgendamentoException(@NotNull DataConflitanteAgendamenteException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] DataConflitanteAgendamenteException: erro na seleção da data: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
+
+
     /**
      * Captura exceções do tipo UsuarioNaoAutorizadoException
      *

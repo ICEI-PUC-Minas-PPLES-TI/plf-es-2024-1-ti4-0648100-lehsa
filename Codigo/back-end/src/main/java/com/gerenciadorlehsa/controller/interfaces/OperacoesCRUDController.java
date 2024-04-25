@@ -27,4 +27,7 @@ public interface OperacoesCRUDController<I, O> {
 
     @DeleteMapping("/{id}")
     ResponseEntity<Map<String, Object>> deletar(@PathVariable UUID id);
+
+    @GetMapping
+    ResponseEntity<List<O>> listarTodos();
 }

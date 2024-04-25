@@ -16,4 +16,9 @@ public class DataHoraUtil {
         return dataHora.format (FORMATAR_DATA_HORA);
     }
 
+    public static LocalDateTime converterDataHora(String dataHora) {
+        return LocalDateTime.parse (dataHora, FORMATAR_DATA_HORA);
+    }
+
+
 }

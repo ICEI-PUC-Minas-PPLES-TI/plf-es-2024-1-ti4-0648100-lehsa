@@ -12,6 +12,8 @@ public class ConstantesTopicosUtil {
 
     public static final String AGENDAMENTO_SERVICE = "AGENDAMENTO_SERVICE";
 
+    public static final String AGENDAMENTO_CONVERTER_SERVICE = "AGENDAMENTO_CONVERTER_SERVICE";
+
     public static final String ITEM_SERVICE = "ITEM_SERVICE";
 
 
@@ -22,6 +24,8 @@ public class ConstantesTopicosUtil {
     public static final String ENCRIPTADOR_SENHA_SERVICE = "ENCRIPTADOR_SENHA_SERVICE";
 
     public static final String USUARIO_CONTROLLER = "USUARIO_CONTROLLER";
+
+    public static final String AGENDAMENTO_CONTROLLER = "AGENDAMENTO_CONTROLLER";
 
     public static final String ITEM_CONTROLLER = "ITEM_CONTROLLER";
 

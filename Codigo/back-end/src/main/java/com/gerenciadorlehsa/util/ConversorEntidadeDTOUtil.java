@@ -71,14 +71,14 @@ public class ConversorEntidadeDTOUtil {
 
         List<UsuarioDTO> solicitantesDTO = agendamento.getSolicitantes() != null ?
                 agendamento.getSolicitantes().stream()
-                        .map(ConversorEntidadeDTOUtil::converterParaDTO)
+                        .map(ConversorEntidadeDTOUtil::converterUsuarioTransacaoParaDTO)
                         .collect(Collectors.toList()) :
                 null;
 
 
         List<ItemDTO> itensDTO = agendamento.getItens() != null ?
                 agendamento.getItens().stream()
-                        .map(ConversorEntidadeDTOUtil::converterParaDTO)
+                        .map(ConversorEntidadeDTOUtil::converterItemTransacaoParaDTO)
                         .collect(Collectors.toList()) :
                 null;
 
@@ -100,8 +100,26 @@ public class ConversorEntidadeDTOUtil {
     }
 
 
+    public static UsuarioDTO converterUsuarioTransacaoParaDTO(@NotNull User usuario){
+        return UsuarioDTO.builder ()
+                .nome (usuario.getNome ())
+                .curso (usuario.getCurso ())
+                .perfilUsuario (usuario.getPerfilUsuario ())
+                .nota (usuario.getNota ())
+                .build ();
+    }
 
-    private byte[] getImage(String imageDirectory, String imageName) throws IOException {
+    public static ItemDTO converterItemTransacaoParaDTO(@NotNull Item item) {
+        return ItemDTO.builder ()
+                .id (item.getId ())
+                .nome (item.getNome ())
+                .tipoItem (item.getTipoItem () != null ? String.valueOf (item.getTipoItem ()) : null)
+                .build ();
+    }
+
+
+
+  /*  private byte[] getImage(String imageDirectory, String imageName) throws IOException {
         Path imagePath = Path.of(imageDirectory, imageName);
 
         if (Files.exists(imagePath)) {
@@ -110,7 +128,7 @@ public class ConversorEntidadeDTOUtil {
         } else {
             return null; // Handle missing images
         }
-    }
+    }*/
 
 
 /*

@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.exceptions.lancaveis.DataConflitanteAgendamenteException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
@@ -11,10 +12,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
-import static java.lang.String.format;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
@@ -27,6 +29,12 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
+
+    /**
+     * Procura um agendamento por id
+     * @param id o id do agendamento
+     * @return objeto agendamento cujo id foi o passado como argumento
+     */
     @Override
     public Agendamento encontrarPorId(UUID id) {
         log.info(">>> encontrarPorId: encontrando agendamento por id");
@@ -46,14 +54,15 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
 
 
-    /*public void verificarRelacaoUsuarioAgendamento(Agendamento agendamento) {
-        UsuarioDetails usuarioDetails = validadorAutorizacaoService.
-    }*/
-
-
-
     @Override
     public Agendamento criar (Agendamento obj) {
+
+        validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+
+        verificarConflitoData (obj.getDataHoraInicio (), obj.getDataHoraFim ());
+
+
+
         return null;
     }
 
@@ -65,6 +74,16 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     @Override
     public void deletar (UUID id) {
 
+    }
+
+
+    public void verificarConflitoData(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+
+        List<Agendamento> agendamentosConflitantes =
+                agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
+
+        if(!agendamentosConflitantes.isEmpty ())
+            throw new DataConflitanteAgendamenteException ("Já existe um agendamento para essa data");
     }
 
 
@@ -105,6 +124,16 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     private boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado) {
         return Objects.equals(agendamento.getTecnico().getEmail(), usuarioLogado.getEmail());
     }
+
+
+    @Override
+    public List<Agendamento> listarTodos () {
+        return null;
+    }
+
+
+
+    // fazer método que retorna dia e hora disponível
 
 
 }

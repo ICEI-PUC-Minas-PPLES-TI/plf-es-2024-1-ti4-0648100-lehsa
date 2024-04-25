@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.service.interfaces;
 
+import com.gerenciadorlehsa.entity.User;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
@@ -14,11 +15,11 @@ public interface OperacoesCRUDService<I> {
 
     I encontrarPorId(@NotNull UUID id);
 
-    //List<I> listarTodos();
-
     I criar(@NotNull I obj);
 
     I atualizar(@NotNull I obj);
 
     void deletar(@NotNull UUID id);
+
+    List<I> listarTodos();
 }
