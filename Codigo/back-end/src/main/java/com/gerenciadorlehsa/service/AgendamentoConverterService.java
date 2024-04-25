@@ -6,7 +6,7 @@ import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.exceptions.lancaveis.ItemAgendamentoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.ItensAgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.SolicitantesAgendamentoException;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import lombok.AllArgsConstructor;
@@ -35,7 +35,9 @@ public class AgendamentoConverterService {
         agendamento.setObservacaoSolicitacao(agendamentoDTO.observacaoSolicitacao());
         agendamento.setStatusTransacaoItem(agendamentoDTO.statusTransacaoItem());
 
-        User tecnico = encontrarTecnico(agendamentoDTO.tecnico().email());
+        User tecnico = agendamentoDTO.tecnico () != null ?
+                encontrarTecnico(agendamentoDTO.tecnico().email()) :
+                null;
         agendamento.setTecnico(tecnico);
 
         List<User> solicitantes = encontrarSolicitantes(agendamentoDTO.solicitantes());
@@ -86,13 +88,13 @@ public class AgendamentoConverterService {
 
     private void validarListaItens(List<ItemDTO> itensDTO) {
         if (itensDTO == null || itensDTO.isEmpty())
-            throw new ItemAgendamentoException ("O agendamento tem que ter no mínimo 1 item");
+            throw new ItensAgendamentoException ("O agendamento tem que ter no mínimo 1 item");
         if (itensDTO.contains(null))
-            throw new ItemAgendamentoException("A lista de itens contém elementos nulos");
+            throw new ItensAgendamentoException ("A lista de itens contém elementos nulos");
         if (itensDTO.stream().anyMatch(itemDTO -> itemDTO.id() == null))
-            throw new ItemAgendamentoException("A lista de itens contém IDs nulos");
+            throw new ItensAgendamentoException ("A lista de itens contém IDs nulos");
         if (itensDTO.size() > 10)
-            throw new ItemAgendamentoException("O máximo de itens é 10");
+            throw new ItensAgendamentoException ("O máximo de itens é 10");
     }
 
 

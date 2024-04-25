@@ -1,21 +1,26 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.exceptions.lancaveis.DataConflitanteAgendamenteException;
+import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.DataConflitanteAgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
+import com.gerenciadorlehsa.util.DataHoraUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
@@ -23,7 +28,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVIC
 @AllArgsConstructor
 public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento> {
 
-    //private
+    private static final int LIMITE_AGENDAMENTOS_EM_ANALISE = 10;
 
     private final AgendamentoRepository agendamentoRepository;
 
@@ -56,14 +61,22 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     @Override
     public Agendamento criar (Agendamento obj) {
-
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
-        verificarConflitoData (obj.getDataHoraInicio (), obj.getDataHoraFim ());
+        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
+        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
+        DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
+        verificarConflitoData (dataHoraInicio, dataHoraFim);
 
+        for (User solicitante : obj.getSolicitantes ()) {
+            verificarLimiteAgendamentosEmAnalise (solicitante);
+        }
 
-        return null;
+        obj.setId (null);
+        obj.setStatusTransacaoItem (EM_ANALISE);
+
+        return agendamentoRepository.save (obj);
     }
 
     @Override
@@ -76,6 +89,16 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     }
 
+    private void verificarLimiteAgendamentosEmAnalise(User solicitante) {
+
+        long agendamentosEmAnalise = solicitante.getAgendamentosRealizados().stream()
+                .filter(agendamento -> agendamento.getStatusTransacaoItem() == StatusTransacaoItem.EM_ANALISE)
+                .count();
+        if (agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE) {
+            throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
+        }
+    }
+
 
     public void verificarConflitoData(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
 
@@ -83,7 +106,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
                 agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
 
         if(!agendamentosConflitantes.isEmpty ())
-            throw new DataConflitanteAgendamenteException ("Já existe um agendamento para essa data");
+            throw new DataConflitanteAgendamentoException ("Já existe um agendamento para essa data");
     }
 
 
@@ -130,6 +153,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     public List<Agendamento> listarTodos () {
         return null;
     }
+
 
 
 

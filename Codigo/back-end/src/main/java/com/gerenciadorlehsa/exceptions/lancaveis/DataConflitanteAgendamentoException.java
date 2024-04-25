@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
-public class DataConflitanteAgendamenteException extends RuntimeException{
+public class DataConflitanteAgendamentoException extends RuntimeException{
 
-    public DataConflitanteAgendamenteException(String message) {
+    public DataConflitanteAgendamentoException (String message) {
         super(message);
     }
 }

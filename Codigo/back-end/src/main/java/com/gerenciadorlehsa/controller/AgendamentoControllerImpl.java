@@ -50,8 +50,6 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         return ResponseEntity.created (URI.create("/agendamento/" + agendamentoCriado.getId())).body (construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(CREATED.value(), MSG_AGENDAMENTO_CRIADO, agendamentoCriado.getId())));
     }
 
-
-
     @Override
     public ResponseEntity<Map<String, Object>> atualizar (UUID id, AgendamentoDTO obj) {
         return null;

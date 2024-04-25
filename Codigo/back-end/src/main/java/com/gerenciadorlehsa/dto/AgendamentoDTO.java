@@ -15,10 +15,7 @@ public record AgendamentoDTO(
         UsuarioDTO tecnico,
         List<UsuarioDTO> solicitantes,
         List<ItemDTO> itens,
-
-        @NotNull(message = "dataHoraInicio não pode ser nulo")
         String dataHoraInicio,
-        @NotNull(message = "dataHoraFim não pode ser nulo")
         String dataHoraFim,
 
         String observacaoSolicitacao,

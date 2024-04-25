@@ -147,13 +147,21 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DataException.class)
+    public ResponseEntity<Object> capturarAtualizarStatusException(@NotNull DataException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] DataException: falha ao escolher data: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
 
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(DataConflitanteAgendamenteException.class)
-    public ResponseEntity<Object> capturarDataConflitanteAgendamentoException(@NotNull DataConflitanteAgendamenteException e, WebRequest request) {
+    @ExceptionHandler(DataConflitanteAgendamentoException.class)
+    public ResponseEntity<Object> capturarDataConflitanteAgendamentoException(@NotNull DataConflitanteAgendamentoException e, WebRequest request) {
         String msgErro = e.getMessage();
-        log.error(format("[ERRO] DataConflitanteAgendamenteException: erro na seleção da data: %s", msgErro));
+        log.error(format("[ERRO] DataConflitanteAgendamenteException: conflito de data: %s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
@@ -168,10 +176,20 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
 
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ItemAgendamentoException.class)
-    public ResponseEntity<Object> capturarItemAgendamentoException(@NotNull ItemAgendamentoException e, WebRequest request) {
+    @ExceptionHandler(ItensAgendamentoException.class)
+    public ResponseEntity<Object> capturarItensAgendamentoException(@NotNull ItensAgendamentoException e, WebRequest request) {
         String msgErro = e.getMessage();
         log.error(format("[ERRO] ItemAgendamentoException: erro ao escolher item: " +
+                "%s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AgendamentoException.class)
+    public ResponseEntity<Object> capturarAgendamentoException(@NotNull AgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] AgendamentoException: erro no agendamento: " +
                 "%s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }

@@ -9,9 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.User;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 

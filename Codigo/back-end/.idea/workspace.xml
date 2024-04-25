@@ -5,14 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d13086a4-242b-4621-a004-3a2ebb51a70b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/ItemAgendamentoException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/SolicitantesAgendamentoException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/AgendamentoException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/DataException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/listener/AgendamentoListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/AgendamentoControllerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/AgendamentoControllerImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/dto/AgendamentoDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/dto/AgendamentoDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/Agendamento.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/Agendamento.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/DataConflitanteAgendamenteException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/DataConflitanteAgendamentoException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/ItemAgendamentoException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/ItensAgendamentoException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/SolicitantesAgendamentoException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/SolicitantesAgendamentoException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoConverterService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoConverterService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/util/DataHoraUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/util/DataHoraUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +131,8 @@
       <workItem from="1713993529738" duration="20691000" />
       <workItem from="1714017794576" duration="1634000" />
       <workItem from="1714046468195" duration="2881000" />
-      <workItem from="1714053430910" duration="6511000" />
+      <workItem from="1714053430910" duration="6936000" />
+      <workItem from="1714063328035" duration="12864000" />
     </task>
     <servers />
   </component>

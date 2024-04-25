@@ -1,12 +1,12 @@
 package com.gerenciadorlehsa.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 
 @Entity
+//@EntityListeners(AgendamentoListener.class)
 @Table(name = "TB_AGENDAMENTO")
 @Data
 @Getter
@@ -16,11 +16,11 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class Agendamento extends TransacaoItem {
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "tecnico_id")
     private User tecnico;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "agendamento_usuario",
             joinColumns = @JoinColumn(name = "agendamento_id"),
@@ -29,7 +29,7 @@ public class Agendamento extends TransacaoItem {
     private List<User> solicitantes;
 
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "agendamento_item",
             joinColumns = @JoinColumn(name = "agendamento_id"),
