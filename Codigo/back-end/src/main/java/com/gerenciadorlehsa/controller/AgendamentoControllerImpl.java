@@ -2,18 +2,9 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
-import com.gerenciadorlehsa.dto.ItemDTO;
-import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.service.AgendamentoConverterService;
-import com.gerenciadorlehsa.service.AgendamentoServiceImpl;
-import com.gerenciadorlehsa.service.ItemService;
-import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
-import com.gerenciadorlehsa.util.DataHoraUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,18 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_CONTROLLER;
 import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirRespostaJSON;
-import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
 
