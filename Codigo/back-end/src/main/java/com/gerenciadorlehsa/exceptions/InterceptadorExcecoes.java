@@ -157,6 +157,25 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(SolicitantesAgendamentoException.class)
+    public ResponseEntity<Object> capturarSolicitantesAgendamentoException(@NotNull SolicitantesAgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] SolicitantesAgendamentoException: erro ao atribuir solicitantes para o agendamento: " +
+                "%s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ItemAgendamentoException.class)
+    public ResponseEntity<Object> capturarItemAgendamentoException(@NotNull ItemAgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ItemAgendamentoException: erro ao escolher item: " +
+                "%s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
 
     /**
      * Captura exceções do tipo UsuarioNaoAutorizadoException
