@@ -6,7 +6,6 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-//@EntityListeners(AgendamentoListener.class)
 @Table(name = "TB_AGENDAMENTO")
 @Data
 @Getter

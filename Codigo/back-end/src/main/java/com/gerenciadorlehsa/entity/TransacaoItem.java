@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;

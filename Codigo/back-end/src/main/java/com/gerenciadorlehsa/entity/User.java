@@ -4,17 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerenciadorlehsa.entity.enums.StatusCurso;
 import com.gerenciadorlehsa.entity.enums.TipoCurso;
-import com.gerenciadorlehsa.entity.enums.TipoItem;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.hibernate.validator.constraints.br.CPF;
-import org.springframework.hateoas.RepresentationModel;
-
-import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
-
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.*;
 
 @Entity

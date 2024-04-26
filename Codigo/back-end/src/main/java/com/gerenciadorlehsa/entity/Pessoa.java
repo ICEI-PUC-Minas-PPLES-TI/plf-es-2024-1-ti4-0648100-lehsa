@@ -5,11 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.*;
 
 @MappedSuperclass

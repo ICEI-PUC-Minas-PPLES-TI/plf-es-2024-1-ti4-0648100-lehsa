@@ -3,11 +3,9 @@ package com.gerenciadorlehsa.util;
 import com.gerenciadorlehsa.exceptions.lancaveis.DataException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.DATA_HORA_UTIL;
 
 @UtilityClass

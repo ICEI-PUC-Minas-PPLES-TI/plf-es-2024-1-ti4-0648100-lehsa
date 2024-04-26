@@ -1,10 +1,8 @@
 package com.gerenciadorlehsa.util;
 
 import lombok.experimental.UtilityClass;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static java.util.Arrays.asList;
 
 /**
@@ -22,10 +20,6 @@ public class ConstantesRequisicaoUtil {
     public static final String[] CAMINHOS_PUBLICOS = {"/", "/actuator/health", "/usuario/verificar-token"};
 
     public static final String[] CAMINHOS_PUBLICOS_POST = {"/usuario", "/login"};
-
-/*    public static final List<String> METODOS_PERMITIDOS_CORS = new ArrayList<>(asList("GET", "POST", "PUT", "PATCH", "HEAD", "OPTIONS"));*/
-
-    //public static final String CONFIGURACAO_CORS = "/**";
 
     public static final String HEADER_AUTORIZACAO = "Authorization";
 
