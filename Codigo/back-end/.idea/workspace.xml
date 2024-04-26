@@ -5,13 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d13086a4-242b-4621-a004-3a2ebb51a70b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/lancaveis/EntidadesRelacionadasException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/Agendamento.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/Agendamento.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/Pessoa.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/Pessoa.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/util/DataHoraUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/util/DataHoraUtil.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +61,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "agendamento",
-    "last_opened_file_path": "L:/repositories/skanboo/src/Skanboo",
+    "last_opened_file_path": "L:/repositories/plf-es-2024-1-ti4-0648100-lehsa/Codigo/back-end",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -123,6 +121,7 @@
       <workItem from="1714063328035" duration="13039000" />
       <workItem from="1714082861932" duration="11907000" />
       <workItem from="1714095639834" duration="3527000" />
+      <workItem from="1714136490962" duration="396000" />
     </task>
     <servers />
   </component>

@@ -28,7 +28,7 @@ public abstract class Pessoa implements Serializable {
     @Column(name = "ID", unique = true, nullable = false, updatable = false)
     private UUID id;
 
-    @Column(name = "NOME", nullable = false)
+    @Column(name = "NOME", length = 100,nullable = false)
     private String nome;
 
     @Column(name = "EMAIL", unique = true, nullable = false)

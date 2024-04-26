@@ -22,7 +22,7 @@ public class DataHoraUtil {
 
     public static LocalDateTime converterDataHora(String dataHora) {
         if(dataHora == null)
-            throw new DataException ("Não é permitido ficar sem data e hora de início ou de fim");
+            throw new DataException ("Não é permitido ficar sem data e hora");
         try {
             return LocalDateTime.parse (dataHora, FORMATAR_DATA_HORA);
         } catch (DateTimeParseException e) {

@@ -38,7 +38,7 @@ public class User extends Pessoa {
     @JsonProperty("perfil_usuario")
     private Integer perfilUsuario;
 
-    @Column(name = "CURSO")
+    @Column(name = "CURSO", length = 20)
     private String curso;
 
     @Column(name = "NOTA")
