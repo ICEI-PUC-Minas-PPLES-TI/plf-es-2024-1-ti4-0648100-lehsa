@@ -100,7 +100,25 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     @Override
     public void deletar (UUID id) {
+        /*
+        //Codigo onde todos do agendamento podem deletar (Adimns, Participantes e tecnico do agendamento)
+        Agendamento agendamento = encontrarPorId(id);
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
+        if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
+            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para deletar o agendamento");
+        }
+        */
+        //Somente Admins podem apagar
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        encontrarPorId(id);
+        log.info(">>> deletar: deletando agendamento");
+        try{
+            this.agendamentoRepository.deleteById(id);
+        } catch (Exception e){
+            // como se comporta?? os outros registros vao se apagar?
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override

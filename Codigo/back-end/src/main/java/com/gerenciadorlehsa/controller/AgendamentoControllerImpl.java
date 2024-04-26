@@ -48,7 +48,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     @Override
     @PostMapping
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody AgendamentoDTO agendamentoDTO) {
-
+        log.info(">>> criar: recebendo requisição para criar agendamento");
         Agendamento agendamento = agendamentoConverterService.convertToEntity (agendamentoDTO);
         Agendamento agendamentoCriado = operacoesCRUDService.criar (agendamento);
 
@@ -59,6 +59,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
                                                           @Valid @RequestBody AgendamentoDTO obj) {
+        log.info(">>> atualizar: recebendo requisição para atualizar agendamento");
         Agendamento agendamento = agendamentoConverterService.convertToEntity (obj);
         agendamento.setId(id);
         Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
@@ -66,10 +67,13 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, agendamentoAtt.getId())));
     }
 
+    @Override
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> deletar (@PathVariable UUID id) {
+        log.info(">>> deletar: recebendo requisição para deletar agendamento");
 
-
-    public ResponseEntity<Map<String, Object>> deletar (UUID id) {
-        return null;
+        operacoesCRUDService.deletar(id);
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_DELETADO, id)));
     }
 
     @Override

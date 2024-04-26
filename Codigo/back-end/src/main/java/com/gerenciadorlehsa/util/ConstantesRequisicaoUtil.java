@@ -53,6 +53,8 @@ public class ConstantesRequisicaoUtil {
 
     public static final String MSG_AGENDAMENTO_ATUALIZADO = "agendamento atualizado com sucesso";
 
+    public static final String MSG_AGENDAMENTO_DELETADO = "agendamento deletado com sucesso";
+
     public static final String MSG_USUARIO_ATUALIZADO = "usuario atualizado com sucesso";
 
     public static final String MSG_PERFIL_ATUALIZADO = "perfil do usuário atualizado com sucesso";
