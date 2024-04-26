@@ -21,6 +21,7 @@ import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirResp
 import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDto;
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @Slf4j(topic = AGENDAMENTO_CONTROLLER)
 @RestController
@@ -54,9 +55,16 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> atualizar (UUID id, AgendamentoDTO obj) {
-        return null;
+    @PutMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
+                                                          @Valid @RequestBody AgendamentoDTO obj) {
+        Agendamento agendamento = agendamentoConverterService.convertToEntity (obj);
+        agendamento.setId(id);
+        Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
+
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, agendamentoAtt.getId())));
     }
+
 
 
     public ResponseEntity<Map<String, Object>> deletar (UUID id) {

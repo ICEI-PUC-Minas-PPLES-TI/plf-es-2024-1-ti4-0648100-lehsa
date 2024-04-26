@@ -13,7 +13,6 @@ import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import lombok.AllArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
@@ -23,6 +22,7 @@ import java.util.UUID;
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
+import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
@@ -77,9 +77,25 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         return agendamentoRepository.save (obj);
     }
 
+    // nao atualiza o status
     @Override
     public Agendamento atualizar (Agendamento obj) {
-        return null;
+        log.info(">>> atualizar: atualizando agendamento");
+        Agendamento agendamentoAtt = encontrarPorId(obj.getId());
+
+        verificarTecnicoAgendamento(obj);
+
+        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
+        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
+
+        DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
+        verificarConflitoData (dataHoraInicio, dataHoraFim);
+        verificarAgendamentosDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
+
+        String[] propriedadesIgnoradas = new String[]{"id", "statusTransacaoItem"};
+
+        copyProperties(obj, agendamentoAtt, propriedadesIgnoradas);
+        return this.agendamentoRepository.save(agendamentoAtt);
     }
 
     @Override
