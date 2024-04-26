@@ -103,6 +103,13 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     }
 
+    @Override
+    public List<Agendamento> listarTodos () {
+        log.info(">>> listarTodos: listando todos agendamentos");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        return this.agendamentoRepository.findAll();
+    }
+
 
     private void verificarTecnicoAgendamento(Agendamento agendamento) {
 
@@ -207,10 +214,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     }
 
 
-    @Override
-    public List<Agendamento> listarTodos () {
-        return null;
-    }
+
 
 
    /* public void excluirAgendamentoSeSemSolicitantes(UUID agendamentoId) {

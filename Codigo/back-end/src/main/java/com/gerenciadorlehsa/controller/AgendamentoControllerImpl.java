@@ -5,6 +5,7 @@ import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.service.AgendamentoConverterService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
+import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,8 +73,12 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
     @Override
+    @GetMapping
     public ResponseEntity<List<AgendamentoDTO>> listarTodos () {
-        return null;
+        log.info(">>> listarTodos: recebendo requisição para listar todos agendamentos");
+        List<Agendamento> agendamentos = this.operacoesCRUDService.listarTodos();
+
+        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDto).toList());
     }
 
 
