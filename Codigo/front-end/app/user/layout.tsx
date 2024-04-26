@@ -1,19 +1,16 @@
-import React, { ReactNode } from 'react'
-import TopMenu from '@/components/topMenu'
+import React, { ReactNode } from "react";
+import TopMenu from "@/components/topMenu";
 
 interface Props {
-    children: ReactNode
+  children: ReactNode;
 }
 
 const adminLayout = ({ children }: Props) => {
   return (
-    
-        <div className='p-6  space-y-8'>
-          <TopMenu title='Página do Usuário'/>
-          { children }
-          </div>
-    
-  )
-}
-    
-export default adminLayout
+    <div className="flex">
+      <div className="p-6 grow h-screen overflow-y-auto">{children}</div>
+    </div>
+  );
+};
+
+export default adminLayout;

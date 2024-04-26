@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="07af1496-7f1f-4ddf-9643-ad99736be14b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/app/user/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/user/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/app/user/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/user/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +34,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Application.GerenciadorLehsaApplication.executor&quot;: &quot;Run&quot;,
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
     &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
@@ -50,6 +54,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -97,13 +102,16 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="68c87d29-9269-4184-bdd1-56f983617572" name="Changes" comment="" />
+      <changelist id="07af1496-7f1f-4ddf-9643-ad99736be14b" name="Changes" comment="" />
       <created>1710381044072</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1710381044072</updated>
       <workItem from="1710381047001" duration="1799000" />
       <workItem from="1712717759041" duration="316000" />
+      <workItem from="1714046688175" duration="1253000" />
+      <workItem from="1714065114771" duration="3661000" />
+      <workItem from="1714130250817" duration="712000" />
     </task>
     <servers />
   </component>
