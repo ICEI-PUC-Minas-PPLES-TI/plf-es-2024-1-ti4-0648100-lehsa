@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
+import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
@@ -28,7 +28,6 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVIC
 @AllArgsConstructor
 public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento> {
 
-    private static final int LIMITE_AGENDAMENTOS_EM_ANALISE = 10;
 
     private final AgendamentoRepository agendamentoRepository;
 
@@ -58,20 +57,18 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     }
 
 
-
+//Você já tem um agendamento para essa data
     @Override
     public Agendamento criar (Agendamento obj) {
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-
+        verificarTecnicoAgendamento(obj);
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
         DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
         verificarConflitoData (dataHoraInicio, dataHoraFim);
-
-        for (User solicitante : obj.getSolicitantes ()) {
-            verificarLimiteAgendamentosEmAnalise (solicitante);
-        }
+        verificarLimiteAgendamentosEmAnaliseDosParticipantes (obj.getSolicitantes ());
+        verificarAgendamentosDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
 
         obj.setId (null);
         obj.setStatusTransacaoItem (EM_ANALISE);
@@ -89,14 +86,58 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     }
 
-    private void verificarLimiteAgendamentosEmAnalise(User solicitante) {
 
-        long agendamentosEmAnalise = solicitante.getAgendamentosRealizados().stream()
-                .filter(agendamento -> agendamento.getStatusTransacaoItem() == StatusTransacaoItem.EM_ANALISE)
-                .count();
-        if (agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE) {
-            throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
+    private void verificarTecnicoAgendamento(Agendamento agendamento) {
+
+        if(agendamento.getTecnico () != null) {
+            if(agendamento.getTecnico ().getPerfilUsuario () != 3)
+                throw new AgendamentoException ("O usuário encarregado para ser técnico não tem o perfil " +
+                        "correspondente");
         }
+    }
+
+
+    private void verificarAgendamentosDeMesmaDataDoUsuario(List<User> solicitantes, Agendamento agendamento) {
+
+        for (User solicitante : solicitantes) {
+            boolean conflitoDeData = solicitante.getAgendamentosRealizados().stream()
+                    .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
+
+            if (conflitoDeData) {
+                throw new AgendamentoException ("Um dos solicitantes já fez uma agendamento na mesma data");
+            }
+        }
+    }
+
+    // Método para verificar se há conflito de datas entre dois agendamentos
+    private boolean temConflitoDeData(Agendamento agendamentoExistente, Agendamento novoAgendamento) {
+        LocalDateTime dataHoraInicioExistente = agendamentoExistente.getDataHoraInicio();
+        LocalDateTime dataHoraFimExistente = agendamentoExistente.getDataHoraFim();
+        LocalDateTime dataHoraInicioNovo = novoAgendamento.getDataHoraInicio();
+        LocalDateTime dataHoraFimNovo = novoAgendamento.getDataHoraFim();
+
+        return (dataHoraInicioNovo.isBefore(dataHoraFimExistente) ||
+                dataHoraInicioNovo.isEqual(dataHoraFimExistente)) &&
+                (dataHoraFimNovo.isAfter(dataHoraInicioExistente) ||
+                        dataHoraFimNovo.isEqual(dataHoraInicioExistente));
+    }
+
+
+
+    private void verificarLimiteAgendamentosEmAnaliseDosParticipantes(List<User> solicitantes) {
+
+        long agendamentosEmAnalise;
+
+        for (User solicitante : solicitantes) {
+
+            agendamentosEmAnalise = solicitante.getAgendamentosRealizados().stream()
+                    .filter(agendamento -> agendamento.getStatusTransacaoItem() == StatusTransacaoItem.EM_ANALISE)
+                    .count();
+
+            if(agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE)
+                throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
+        }
+
     }
 
 
@@ -153,11 +194,6 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     public List<Agendamento> listarTodos () {
         return null;
     }
-
-
-
-
-    // fazer método que retorna dia e hora disponível
 
 
 }

@@ -10,10 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +18,7 @@ import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_CONTROLLER;
 import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirRespostaJSON;
+import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDto;
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -36,11 +34,16 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     private final AgendamentoConverterService agendamentoConverterService;
 
 
-    public ResponseEntity<AgendamentoDTO> encontrarPorId (UUID id) {
-        return null;
+    @Override
+    @GetMapping("/{id}")
+    public ResponseEntity<AgendamentoDTO> encontrarPorId (@PathVariable  UUID id) {
+        log.info(">>> encontrarPorId: recebendo requisição para encontrar usuário por id");
+        Agendamento agendamento = operacoesCRUDService.encontrarPorId(id);
+        return ResponseEntity.ok().body(converterParaDto (agendamento));
     }
 
 
+    @Override
     @PostMapping
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody AgendamentoDTO agendamentoDTO) {
 

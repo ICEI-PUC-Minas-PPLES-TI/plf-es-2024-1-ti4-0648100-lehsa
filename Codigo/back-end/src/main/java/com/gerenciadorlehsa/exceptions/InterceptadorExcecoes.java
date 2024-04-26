@@ -149,7 +149,7 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DataException.class)
-    public ResponseEntity<Object> capturarAtualizarStatusException(@NotNull DataException e, WebRequest request) {
+    public ResponseEntity<Object> capturarDataException(@NotNull DataException e, WebRequest request) {
         String msgErro = e.getMessage();
         log.error(format("[ERRO] DataException: falha ao escolher data: %s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
