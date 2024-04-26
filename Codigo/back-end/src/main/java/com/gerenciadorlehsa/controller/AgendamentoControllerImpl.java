@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
+import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.service.AgendamentoConverterService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
@@ -19,7 +20,7 @@ import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_CONTROLLER;
 import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirRespostaJSON;
-import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDto;
+import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDtoRes;
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -29,7 +30,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_AGENDAMENTO)
 @AllArgsConstructor
-public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTO>{
+public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>{
 
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
 
@@ -38,10 +39,10 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<AgendamentoDTO> encontrarPorId (@PathVariable  UUID id) {
+    public ResponseEntity<AgendamentoDTORes> encontrarPorId (@PathVariable  UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar usuário por id");
         Agendamento agendamento = operacoesCRUDService.encontrarPorId(id);
-        return ResponseEntity.ok().body(converterParaDto (agendamento));
+        return ResponseEntity.ok().body(converterParaDtoRes (agendamento));
     }
 
 
@@ -52,7 +53,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         Agendamento agendamento = agendamentoConverterService.convertToEntity (agendamentoDTO);
         Agendamento agendamentoCriado = operacoesCRUDService.criar (agendamento);
 
-        return ResponseEntity.created (URI.create("/agendamento/" + agendamentoCriado.getId())).body (construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(CREATED.value(), MSG_AGENDAMENTO_CRIADO, agendamentoCriado.getId())));
+        return ResponseEntity.created (URI.create("/agendamento/" + agendamentoCriado.getId())).body (construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(CREATED.value(), MSG_AGENDAMENTO_CRIADO, agendamentoCriado.getId())));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         agendamento.setId(id);
         Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
 
-        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, agendamentoAtt.getId())));
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, agendamentoAtt.getId())));
     }
 
     @Override
@@ -73,16 +74,16 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         log.info(">>> deletar: recebendo requisição para deletar agendamento");
 
         operacoesCRUDService.deletar(id);
-        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_DELETADO, id)));
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_DELETADO, id)));
     }
 
     @Override
     @GetMapping
-    public ResponseEntity<List<AgendamentoDTO>> listarTodos () {
+    public ResponseEntity<List<AgendamentoDTORes>> listarTodos () {
         log.info(">>> listarTodos: recebendo requisição para listar todos agendamentos");
         List<Agendamento> agendamentos = this.operacoesCRUDService.listarTodos();
 
-        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDto).toList());
+        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 
 

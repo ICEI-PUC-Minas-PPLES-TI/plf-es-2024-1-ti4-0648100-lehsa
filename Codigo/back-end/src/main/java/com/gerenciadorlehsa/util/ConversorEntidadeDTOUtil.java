@@ -1,13 +1,11 @@
 package com.gerenciadorlehsa.util;
 
-import com.gerenciadorlehsa.dto.AgendamentoDTO;
-import com.gerenciadorlehsa.dto.ItemDTO;
+import com.gerenciadorlehsa.dto.*;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.User;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,30 +59,29 @@ public class ConversorEntidadeDTOUtil {
                 .build();
     }
 
+    public static AgendamentoDTORes converterParaDtoRes(@NotNull Agendamento agendamento) {
+        log.info(format(">>> converterParaDTORes: convertendo Agendamento (id: %s) para DTORes", agendamento.getId()));
 
-    public static AgendamentoDTO converterParaDto(@NotNull Agendamento agendamento) {
-        log.info(format(">>> converterParaDTO: convertendo Item (id: %s) para DTO", agendamento.getId()));
 
-
-        List<UsuarioDTO> solicitantesDTO = agendamento.getSolicitantes() != null ?
+        List<UsuarioShortDTORes> solicitantesDTO = agendamento.getSolicitantes() != null ?
                 agendamento.getSolicitantes().stream()
-                        .map(ConversorEntidadeDTOUtil::converterUsuarioTransacaoParaDTO)
+                        .map(ConversorEntidadeDTOUtil::converterUsuarioParaShortDTORes)
                         .collect(Collectors.toList()) :
                 null;
 
 
-        List<ItemDTO> itensDTO = agendamento.getItens() != null ?
+        List<ItemDTORes> itensDTO = agendamento.getItens() != null ?
                 agendamento.getItens().stream()
-                        .map(ConversorEntidadeDTOUtil::converterItemTransacaoParaDTO)
+                        .map(ConversorEntidadeDTOUtil::converterItemParaDTORes)
                         .collect(Collectors.toList()) :
                 null;
 
 
-        UsuarioDTO tecnicoDTO = agendamento.getTecnico() != null ?
-                converterParaDTO(agendamento.getTecnico()) :
+        UsuarioShortDTORes tecnicoDTO = agendamento.getTecnico() != null ?
+                converterUsuarioParaShortDTORes(agendamento.getTecnico()) :
                 null;
 
-        return AgendamentoDTO.builder()
+        return AgendamentoDTORes.builder()
                 .id(agendamento.getId())
                 .dataHoraInicio(converterDataHora(agendamento.getDataHoraInicio()))
                 .dataHoraFim(converterDataHora(agendamento.getDataHoraFim()))
@@ -97,17 +94,17 @@ public class ConversorEntidadeDTOUtil {
     }
 
 
-    public static UsuarioDTO converterUsuarioTransacaoParaDTO(@NotNull User usuario){
-        return UsuarioDTO.builder ()
+    public static UsuarioShortDTORes converterUsuarioParaShortDTORes (@NotNull User usuario){
+        return UsuarioShortDTORes.builder ()
                 .nome (usuario.getNome ())
+                .email (usuario.getEmail())
+                .telefone (usuario.getTelefone())
                 .curso (usuario.getCurso ())
-                .perfilUsuario (usuario.getPerfilUsuario ())
-                .nota (usuario.getNota ())
                 .build ();
     }
 
-    public static ItemDTO converterItemTransacaoParaDTO(@NotNull Item item) {
-        return ItemDTO.builder ()
+    public static ItemDTORes converterItemParaDTORes (@NotNull Item item) {
+        return ItemDTORes.builder ()
                 .id (item.getId ())
                 .nome (item.getNome ())
                 .tipoItem (item.getTipoItem () != null ? String.valueOf (item.getTipoItem ()) : null)

@@ -47,6 +47,8 @@ public class ConstantesRequisicaoUtil {
 
     public static final List<String> CHAVES_USUARIO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_usuario"));
 
+    public static final List<String> CHAVES_AGENDAMENTO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_agendamento"));
+
     public static final String MSG_USUARIO_CRIADO = "usuario criado com sucesso";
 
     public static final String MSG_AGENDAMENTO_CRIADO = "agendamento criado com sucesso";
