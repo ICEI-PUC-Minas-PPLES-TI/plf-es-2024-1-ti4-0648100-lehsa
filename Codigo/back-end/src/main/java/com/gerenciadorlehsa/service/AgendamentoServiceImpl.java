@@ -44,11 +44,11 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     public Agendamento encontrarPorId(UUID id) {
         log.info(">>> encontrarPorId: encontrando agendamento por id");
 
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+
         Agendamento agendamento = agendamentoRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(
                         String.format("Agendamento não encontrado, id: %s", id)));
-
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
         if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
             throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para acessar o agendamento");
@@ -82,6 +82,12 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     public Agendamento atualizar (Agendamento obj) {
         log.info(">>> atualizar: atualizando agendamento");
         Agendamento agendamentoAtt = encontrarPorId(obj.getId());
+
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+
+        if (!ehUsuarioAutorizado(agendamentoAtt, usuarioLogado)) {
+            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
+        }
 
         verificarTecnicoAgendamento(obj);
 
@@ -228,6 +234,8 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
      * @return true se o usuário é técnico, false caso contrário
      */
     private boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+        if (agendamento.getTecnico() == null)
+            return false;
         return Objects.equals(agendamento.getTecnico().getEmail(), usuarioLogado.getEmail());
     }
 
