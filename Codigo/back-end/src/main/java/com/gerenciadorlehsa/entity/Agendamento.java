@@ -16,10 +16,12 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class Agendamento extends TransacaoItem {
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "tecnico_id")
     private User tecnico;
 
+    // CascadeType.PERSIST = operações de persistência (criação)
+    // CascadeType.MERGE = operações de mesclagem (atualização)
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "agendamento_usuario",

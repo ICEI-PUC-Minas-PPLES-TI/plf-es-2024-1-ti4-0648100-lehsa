@@ -240,6 +240,16 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
 
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler({EntidadesRelacionadasException.class})
+    public ResponseEntity<Object> capturarEntidadesRelacionadasException(@NotNull EntidadesRelacionadasException e, WebRequest request) {
+        final String msgErro = e.getMessage();
+        log.error(format("[ERRO] EntidadesRelacionadasException: erro desconhecido ocorrido: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
+
+
     /**
      * Captura exceções do tipo TipoItemNaoEncontradoException
      *

@@ -13,6 +13,7 @@ import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
@@ -194,6 +195,20 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     public List<Agendamento> listarTodos () {
         return null;
     }
+
+
+   /* public void excluirAgendamentoSeSemSolicitantes(UUID agendamentoId) {
+        Agendamento agendamento = encontrarPorId (agendamentoId);
+        if(!agendamento.getSolicitantes().isEmpty())
+            throw new DataIntegrityViolationException ()
+
+
+        if (agendamento.getSolicitantes().isEmpty()) {
+            agendamentoRepository.delete (agendamento);
+        } else {
+            throw new RuntimeException("Não é possível excluir o agendamento, pois possui solicitantes vinculados.");
+        }
+    }*/
 
 
 }
