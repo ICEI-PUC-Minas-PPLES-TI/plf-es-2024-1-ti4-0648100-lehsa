@@ -7,11 +7,14 @@ import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.DataConflitanteAgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +30,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
 @AllArgsConstructor
-public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento> {
+public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>, AgendamentoService {
 
 
     private final AgendamentoRepository agendamentoRepository;
@@ -141,6 +144,35 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         log.info(">>> listarTodos: listando todos agendamentos");
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         return this.agendamentoRepository.findAll();
+    }
+
+    @Override
+    public void atualizarStatus (@NotNull String status, @NotNull UUID id) {
+        log.info(">>> atualizarStatus: atualizando status do agendamento");
+        try {
+            //Pegando uma string e vendo se tem o tipo correspondente
+            StatusTransacaoItem statusUpperCase =
+                    Enum.valueOf(StatusTransacaoItem.class, status.toUpperCase());
+
+            Agendamento agendamento = encontrarPorId(id);
+
+            if (statusUpperCase.equals(StatusTransacaoItem.CANCELADO) ||
+                    statusUpperCase.equals(StatusTransacaoItem.CONFIRMADO)) {
+                UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+                if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
+                    throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
+                }
+            } else
+                validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+
+            agendamento.setStatusTransacaoItem(statusUpperCase);
+            this.agendamentoRepository.save(agendamento);
+            log.info(">>> atualizarStatus: status do agendamento "+agendamento.getId()
+                    + " atualizado para "+agendamento.getStatusTransacaoItem());
+
+        } catch (IllegalArgumentException e) {
+            throw new EnumNaoEncontradoException ("O status passado não existe: " + status);
+        }
     }
 
 

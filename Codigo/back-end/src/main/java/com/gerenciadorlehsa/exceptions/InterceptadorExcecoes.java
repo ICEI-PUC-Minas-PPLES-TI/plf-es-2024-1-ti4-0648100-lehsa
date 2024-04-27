@@ -257,8 +257,8 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
      * @return tratamento da exceção (log e resposta requisição)
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(TipoItemNaoEncontradoException.class)
-    public ResponseEntity<Object> capturarTipoItemNaoEncontradaException(@NotNull TipoItemNaoEncontradoException e, WebRequest request) {
+    @ExceptionHandler(EnumNaoEncontradoException.class)
+    public ResponseEntity<Object> capturarTipoItemNaoEncontradaException(@NotNull EnumNaoEncontradoException e, WebRequest request) {
         String msgErro = e.getMessage();
         log.error(format("[ERRO] TipoItemNaoEncontradoException: tipo de item não encontrado: %s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.NOT_FOUND, request);

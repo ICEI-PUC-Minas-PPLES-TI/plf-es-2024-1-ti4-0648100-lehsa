@@ -4,7 +4,7 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
-import com.gerenciadorlehsa.exceptions.lancaveis.TipoItemNaoEncontradoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
 import com.gerenciadorlehsa.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
@@ -170,7 +170,7 @@ public class ItemService {
             TipoItem enumTipo = Enum.valueOf(TipoItem.class, tipo);
             return this.itemRepository.findByTipoItem(enumTipo);
         } catch (IllegalArgumentException e) {
-            throw  new TipoItemNaoEncontradoException(format("não existe o tipo passado: " + tipo));
+            throw  new EnumNaoEncontradoException(format("não existe o tipo passado: " + tipo));
         }
     }
 

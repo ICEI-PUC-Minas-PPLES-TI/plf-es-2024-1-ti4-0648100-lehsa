@@ -5,6 +5,7 @@ import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.service.AgendamentoConverterService;
+import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
@@ -31,10 +32,10 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_AGENDAMENTO)
 @AllArgsConstructor
-public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>{
+public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes> {
 
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
-
+    private final AgendamentoService agendamentoService;
     private final AgendamentoConverterService agendamentoConverterService;
 
 
@@ -87,5 +88,13 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 
+    @PatchMapping("/{id}/{status}")
+    public ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
+                                                                @PathVariable String status) {
+        log.info(">>> atualizarStatus: recebendo requisição para atualizar status do agendamento");
 
+        agendamentoService.atualizarStatus(status, id);
+
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
+    }
 }
