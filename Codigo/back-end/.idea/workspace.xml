@@ -7,6 +7,21 @@
     <list default="true" id="d13086a4-242b-4621-a004-3a2ebb51a70b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/AgendamentoControllerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/AgendamentoControllerImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/components/JWTComp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/components/JWTComp.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/config/SegurancaConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/config/SegurancaConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO$UsuarioDTOBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO$UsuarioDTOBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/dto/UsuarioDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/Item.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/Item.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/entity/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/exceptions/InterceptadorExcecoes.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/JWTFiltroAutenticacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/JWTFiltroAutenticacao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/JWTFiltroAutorizacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/security/JWTFiltroAutorizacao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConstantesRequisicaoUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConstantesRequisicaoUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConstrutorRespostaJsonUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConstrutorRespostaJsonUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gerenciadorlehsa/util/ConversorEntidadeDTOUtil.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,26 +63,26 @@
     <option name="showMembers" value="true" />
     <option name="showVisibilityIcons" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "agendamento",
-    "last_opened_file_path": "L:/repositories/to-do-list",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "spring.configuration.checksum": "4e683dea99088a380e2959db1859256f",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;agendamento&quot;,
+    &quot;last_opened_file_path&quot;: &quot;L:/repositories/plf-es-2024-1-ti4-0648100-lehsa/Codigo/back-end&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;4e683dea99088a380e2959db1859256f&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="back-end" />
@@ -119,10 +134,24 @@
       <workItem from="1714082861932" duration="11907000" />
       <workItem from="1714095639834" duration="3527000" />
       <workItem from="1714136490962" duration="647000" />
+      <workItem from="1714171985407" duration="1533000" />
+      <workItem from="1714174739327" duration="1931000" />
+      <workItem from="1714220859450" duration="3718000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

@@ -25,6 +25,7 @@ import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
+
 @Slf4j(topic = AGENDAMENTO_CONTROLLER)
 @RestController
 @Validated

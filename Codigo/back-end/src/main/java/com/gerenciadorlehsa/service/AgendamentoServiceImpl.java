@@ -63,6 +63,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     public Agendamento criar (Agendamento obj) {
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         verificarTecnicoAgendamento(obj);
+        checkTecnicoNaoSolicita (obj);
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
@@ -76,6 +77,14 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
         return agendamentoRepository.save (obj);
     }
+
+    private void checkTecnicoNaoSolicita(Agendamento agendamento) {
+
+        if(agendamento.getTecnico () != null)
+            if(agendamento.getSolicitantes ().contains (agendamento.getTecnico ()))
+                throw new AgendamentoException ("O técnico encarregado não pode ser solicitante");
+    }
+
 
     // nao atualiza o status
     @Override
