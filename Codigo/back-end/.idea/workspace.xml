@@ -23,9 +23,9 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2deuoXqa0ducKxLDUqqUXBbRTjR" />
   <component name="ProjectViewState">
     <option name="flattenPackages" value="true" />
@@ -39,8 +39,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "develop",
-    "last_opened_file_path": "L:/repositories/plf-es-2024-1-ti4-0648100-lehsa/Codigo/back-end",
+    "git-widget-placeholder": "docs",
+    "last_opened_file_path": "L:/repositories/plf-es-2024-1-ti4-0648100-lehsa",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
