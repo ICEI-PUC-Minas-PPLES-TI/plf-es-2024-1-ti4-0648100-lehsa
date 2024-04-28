@@ -64,6 +64,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 //Você já tem um agendamento para essa data
     @Override
     public Agendamento criar (Agendamento obj) {
+        log.info(">>> criando: criando agendamento");
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         verificarTecnicoAgendamento(obj);
         checkTecnicoNaoSolicita (obj);
@@ -82,7 +83,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     }
 
     private void checkTecnicoNaoSolicita(Agendamento agendamento) {
-
+        log.info(">>> Verificar solicitação de técnico: Barrando solicitação de agendamento do técnico");
         if(agendamento.getTecnico () != null)
             if(agendamento.getSolicitantes ().contains (agendamento.getTecnico ()))
                 throw new AgendamentoException ("O técnico encarregado não pode ser solicitante");
@@ -177,7 +178,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
 
     private void verificarTecnicoAgendamento(Agendamento agendamento) {
-
+        log.info(">>> Verificando perfil de técnico: barrando usuário que não é técnico");
         if(agendamento.getTecnico () != null) {
             if(agendamento.getTecnico ().getPerfilUsuario () != 3)
                 throw new AgendamentoException ("O usuário encarregado para ser técnico não tem o perfil " +
@@ -187,7 +188,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
 
     private void verificarAgendamentosDeMesmaDataDoUsuario(List<User> solicitantes, Agendamento agendamento) {
-
+        log.info(">>> Verificar conflito de data de um solicitante: barrando agendamento de mesma data de um solicitante");
         for (User solicitante : solicitantes) {
             boolean conflitoDeData = solicitante.getAgendamentosRealizados().stream()
                     .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
@@ -200,6 +201,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     // Método para verificar se há conflito de datas entre dois agendamentos
     private boolean temConflitoDeData(Agendamento agendamentoExistente, Agendamento novoAgendamento) {
+        log.info(">>> Verificando datas conflitantes: barrando agendamento solicitado em uma mesma data");
         LocalDateTime dataHoraInicioExistente = agendamentoExistente.getDataHoraInicio();
         LocalDateTime dataHoraFimExistente = agendamentoExistente.getDataHoraFim();
         LocalDateTime dataHoraInicioNovo = novoAgendamento.getDataHoraInicio();
@@ -214,7 +216,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
 
     private void verificarLimiteAgendamentosEmAnaliseDosParticipantes(List<User> solicitantes) {
-
+        log.info(">>> Verificar limite de solicitação: Barrando limite excedente de solicitação");
         long agendamentosEmAnalise;
 
         for (User solicitante : solicitantes) {
@@ -231,7 +233,8 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
 
     public void verificarConflitoData(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
-
+        log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
+                "confirmado ou aprovado");
         List<Agendamento> agendamentosConflitantes =
                 agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
 
@@ -248,7 +251,8 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
      * @return true se o usuário é autorizado, false caso contrário
      */
     private boolean ehUsuarioAutorizado(Agendamento agendamento, UsuarioDetails usuarioLogado) {
-        // Verificar se o usuário é solicitante, técnico ou administrador
+        log.info(">>> Verificar autorização do usuário: Verificando se usuário é o técnico, adm ou solicitante do " +
+                "agendamento");
         return ehSolicitante(agendamento, usuarioLogado) ||
                 ehTecnico(agendamento, usuarioLogado) ||
                 usuarioLogado.getPerfilUsuario().getCodigo() == 1;
@@ -263,6 +267,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
      * @return true se o usuário é solicitante, false caso contrário
      */
     private boolean ehSolicitante(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+        log.info(">>> ehSolicitante: Verificando se o usuário logado é o solicitante do agendamento procurado");
         return agendamento.getSolicitantes().stream()
                 .anyMatch(solicitante -> Objects.equals(solicitante.getEmail(), usuarioLogado.getEmail()));
     }
@@ -275,6 +280,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
      * @return true se o usuário é técnico, false caso contrário
      */
     private boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+        log.info(">>> ehTecnico: Verificando se o usuário logado é o técnico do agendamento");
         if (agendamento.getTecnico() == null)
             return false;
         return Objects.equals(agendamento.getTecnico().getEmail(), usuarioLogado.getEmail());
