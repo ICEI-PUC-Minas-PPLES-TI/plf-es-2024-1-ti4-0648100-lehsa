@@ -75,6 +75,9 @@ public class AgendamentoConverterService {
         return null;
     }
 
+    public User encontrarUsuario(String email){
+        return  usuarioService.encontrarPorEmail(email);
+    }
 
     private List<Item> encontrarItens(List<ItemDTO> itensDTO) {
         validarListaItens(itensDTO);

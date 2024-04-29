@@ -157,6 +157,17 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     }
 
     @Override
+    public List<Agendamento> listarAgendamentoUsuario (@NotNull User usuario) {
+        log.info(">>> listarAgendamentoUsuario: listando todos agendamentos do usuario de id: " + usuario.getId());
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        log.info(""+usuarioLogado.getId());
+        if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
+            return this.agendamentoRepository.findBySolicitantes(usuario);
+
+        throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses agendamentos");
+    }
+
+    @Override
     public void atualizarStatus (@NotNull String status, @NotNull UUID id) {
         log.info(">>> atualizarStatus: atualizando status do agendamento");
         try {

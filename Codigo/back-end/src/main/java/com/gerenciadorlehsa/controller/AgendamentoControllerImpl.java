@@ -88,6 +88,14 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 
+    @GetMapping("/usuario/{email}")
+    public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoUsuario (@PathVariable String email) {
+        log.info(">>> listarAgendamentoUsuario: recebendo requisição para listar todos agendamentos de um usuario");
+        List<Agendamento> agendamentos = this.agendamentoService.listarAgendamentoUsuario(this.agendamentoConverterService.encontrarUsuario(email));
+
+        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
+    }
+
     @PatchMapping("/{id}/{status}")
     public ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
                                                                 @PathVariable String status) {
