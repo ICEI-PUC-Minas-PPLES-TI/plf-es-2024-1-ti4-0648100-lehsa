@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -98,20 +99,28 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
         UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
+
         if (!ehUsuarioAutorizado(agendamentoAtt, usuarioLogado)) {
             throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
         }
 
-        verificarTecnicoAgendamento(obj);
+        List<String> atributosIguais = atributosIguais(agendamentoAtt, obj);
+
+        if(!atributosIguais.contains("tecnico"))
+            verificarTecnicoAgendamento(obj);
 
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
-        DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
-        verificarConflitoData (dataHoraInicio, dataHoraFim);
-        verificarAgendamentosDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
-
-        String[] propriedadesIgnoradas = new String[]{"id", "statusTransacaoItem"};
+        if (!(atributosIguais.contains("dataHoraInicio") && atributosIguais.contains("dataHoraFim"))) {
+            DataHoraUtil.dataValida(dataHoraInicio, dataHoraFim);
+            verificarConflitoData(dataHoraInicio, dataHoraFim);
+            verificarAgendamentosDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
+        }
+        atributosIguais.add("statusTransacaoItem");
+        atributosIguais.add("id");
+        String[] propriedadesIgnoradas = new String[atributosIguais.size()];
+        propriedadesIgnoradas = atributosIguais.toArray(propriedadesIgnoradas);
 
         copyProperties(obj, agendamentoAtt, propriedadesIgnoradas);
         return this.agendamentoRepository.save(agendamentoAtt);
@@ -202,6 +211,10 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     // Método para verificar se há conflito de datas entre dois agendamentos
     private boolean temConflitoDeData(Agendamento agendamentoExistente, Agendamento novoAgendamento) {
         log.info(">>> Verificando datas conflitantes: barrando agendamento solicitado em uma mesma data");
+
+        if (agendamentoExistente.getId() == novoAgendamento.getId())
+            return false;
+
         LocalDateTime dataHoraInicioExistente = agendamentoExistente.getDataHoraInicio();
         LocalDateTime dataHoraFimExistente = agendamentoExistente.getDataHoraFim();
         LocalDateTime dataHoraInicioNovo = novoAgendamento.getDataHoraInicio();
@@ -222,7 +235,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         for (User solicitante : solicitantes) {
 
             agendamentosEmAnalise = solicitante.getAgendamentosRealizados().stream()
-                    .filter(agendamento -> agendamento.getStatusTransacaoItem() == StatusTransacaoItem.EM_ANALISE)
+                    .filter(agendamento -> agendamento.getStatusTransacaoItem() == EM_ANALISE)
                     .count();
 
             if(agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE)
@@ -286,9 +299,20 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         return Objects.equals(agendamento.getTecnico().getEmail(), usuarioLogado.getEmail());
     }
 
+    private List<String> atributosIguais (Agendamento a, Agendamento b) {
+        List<String> atributosIguais = new ArrayList<>();
 
+        if (a.getDataHoraInicio().isEqual(b.getDataHoraInicio()))
+            atributosIguais.add("dataHoraInicio");
+        if (a.getDataHoraFim().isEqual(b.getDataHoraFim()))
+            atributosIguais.add("dataHoraFim");
+        if (a.getObservacaoSolicitacao().equals(b.getObservacaoSolicitacao()))
+            atributosIguais.add("observacaoSolicitacao");
+        if (a.getTecnico() == (b.getTecnico()))
+            atributosIguais.add("tecnico");
 
-
+        return atributosIguais;
+    }
 
    /* public void excluirAgendamentoSeSemSolicitantes(UUID agendamentoId) {
         Agendamento agendamento = encontrarPorId (agendamentoId);

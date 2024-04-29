@@ -3,7 +3,10 @@ package com.gerenciadorlehsa.util;
 import com.gerenciadorlehsa.exceptions.lancaveis.DataException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.DATA_HORA_UTIL;
@@ -29,9 +32,17 @@ public class DataHoraUtil {
     }
 
     public static void dataValida(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim){
+        Duration tempoEntreDatas = Duration.between(dataHoraInicio, dataHoraFim);
+
         boolean NaoEhValida = dataHoraInicio.isBefore (LocalDateTime.now ()) ||
                 dataHoraFim.isBefore (LocalDateTime.now ()) ||
-                dataHoraFim.isBefore (dataHoraInicio);
+                dataHoraFim.isBefore (dataHoraInicio) ||
+                tempoEntreDatas.toHours() > 5 ||
+                tempoEntreDatas.toHours() < 1 ||
+                dataHoraInicio.getHour() < 7 ||
+                dataHoraInicio.getHour() > 19 ||
+                dataHoraFim.getHour() > 20 ||
+                dataHoraFim.getHour() < 8;
         if(NaoEhValida)
             throw new DataException ("Data inválida!");
     }
