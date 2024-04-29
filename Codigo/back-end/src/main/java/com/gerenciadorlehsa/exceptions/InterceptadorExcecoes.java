@@ -250,17 +250,17 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
 
 
     /**
-     * Captura exceções do tipo TipoItemNaoEncontradoException
+     * Captura exceções do tipo EnumNaoEncontradoException
      *
-     * @param e       exceção do tipo TipoItemNaoEncontradoException
+     * @param e       exceção do tipo EnumNaoEncontradoException
      * @param request requisição
      * @return tratamento da exceção (log e resposta requisição)
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EnumNaoEncontradoException.class)
-    public ResponseEntity<Object> capturarTipoItemNaoEncontradaException(@NotNull EnumNaoEncontradoException e, WebRequest request) {
+    public ResponseEntity<Object> capturarEnumNaoEncontradoException(@NotNull EnumNaoEncontradoException e, WebRequest request) {
         String msgErro = e.getMessage();
-        log.error(format("[ERRO] TipoItemNaoEncontradoException: tipo de item não encontrado: %s", msgErro));
+        log.error(format("[ERRO] EnumNaoEncontradoException: enum não encontrado: %s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.NOT_FOUND, request);
     }
 
