@@ -11,6 +11,8 @@ import Link from "next/link";
 export default function Home() {
   const router = useRouter();
 
+  const [errorMessage, setErrorMessage] = useState('')
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
   
@@ -32,7 +34,8 @@ export default function Home() {
       Cookie.set("token", token, { expires: 7 });
       router.push("/admin");
     } else {
-      window.alert("Login failed");
+      setErrorMessage('Email ou senha inválida')
+      //window.alert("Login failed");
     }
   }
   
@@ -42,20 +45,21 @@ export default function Home() {
       <div className="bg-white w-1/3 min-w-80 p-10 space-y-14">
         <Image src="/images/logo.jpg" width={150} height={0} alt="logo"></Image>
         <div>
-          <h2 className="font-bold text-3xl">Log in.</h2>
+          <h2 className="font-bold text-3xl">Login</h2>
           <p className="lg:max-w-[80%] mb-6">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit{" "}
           </p>
 
           <form onSubmit={handleSubmit}>
             <Label htmlFor="email">Email</Label>
-            <Input placeholder="exemplo@email.com" name="email" type="email" />
-            <Label htmlFor="password">Senha</Label>
+            <Input placeholder="exemplo@email.com" name="email" type="email" className="mb-2"/>
+            <Label htmlFor="password" >Senha</Label>
             <Input
               placeholder="mínimo de 8 caracteres"
               name="password"
               type="password"
             />
+            {errorMessage && <p className="font-semibold text-red-600 mt-3 text-center">{errorMessage}</p>}
             <Button type="submit" className="w-full mt-9">Login</Button>
           </form>
           <p className="text-center mt-12">

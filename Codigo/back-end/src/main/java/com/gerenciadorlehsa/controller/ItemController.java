@@ -32,14 +32,13 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/img/{id}")
-    public ResponseEntity<?> encontrarImagmePorId (@PathVariable UUID id) {
-        log.info(">>> encontrarImagmePorId: recebendo requisição para encontrar imagem por id");
+    public ResponseEntity<?> encontrarImagemPorId (@PathVariable UUID id) {
+        log.info(">>> encontrarImagemPorId: recebendo requisição para encontrar imagem por id");
         byte [] img = this.itemService.encontrarImagemPorId(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf("image/png"))
                 .body(img);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> encontrarPorId (@PathVariable UUID id) {
@@ -89,8 +88,6 @@ public class ItemController {
 
         return ResponseEntity.noContent().build();
     }
-
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar (@PathVariable UUID id) {

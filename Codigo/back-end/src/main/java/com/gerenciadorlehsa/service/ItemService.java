@@ -33,26 +33,25 @@ public class ItemService {
     @Autowired
     private ItemRepository itemRepository;
 
-    private final String diretorioImgs = "Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs";
+    private final String DIRETORIO_IMGS = "Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs";
 
     public byte[] encontrarImagemPorId(@NotNull UUID id) {
         log.info(">>> encontrarImagemPorId: encontrando imagem por id");
         Item itemImagem = encontrarPorId(id);
         try {
-            return getImage(diretorioImgs, itemImagem.getNomeImg());
+            return getImage(itemImagem.getNomeImg());
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    private byte[] getImage(String imageDirectory, String imageName) throws IOException {
-        Path imagePath = Path.of(imageDirectory, imageName);
+    private byte[] getImage(String imageName) throws IOException {
+        Path imagePath = Path.of(DIRETORIO_IMGS, imageName);
 
         if (Files.exists(imagePath)) {
-            byte[] imageBytes = Files.readAllBytes(imagePath);
-            return imageBytes;
+            return Files.readAllBytes(imagePath);
         } else {
-            return null; // Handle missing images
+            throw new EntidadeNaoEncontradaException("Imagem não encontrada"); // Handle missing images
         }
     }
 
@@ -72,7 +71,7 @@ public class ItemService {
         log.info(">>> criar: criando item");
 
         try {
-            String nomeImagem = saveImageToStorage(diretorioImgs, img);
+            String nomeImagem = saveImageToStorage(img);
             item.setNomeImg(nomeImagem);
             item.setId(null);
             item = this.itemRepository.save(item);
@@ -83,10 +82,10 @@ public class ItemService {
         }
     }
 
-    public String saveImageToStorage(String uploadDirectory, MultipartFile imageFile) throws IOException {
+    public String saveImageToStorage(MultipartFile imageFile) throws IOException {
         String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
 
-        Path uploadPath = Path.of(uploadDirectory);
+        Path uploadPath = Path.of(DIRETORIO_IMGS);
         Path filePath = uploadPath.resolve(uniqueFileName);
 
         if (!Files.exists(uploadPath)) {
@@ -108,8 +107,8 @@ public class ItemService {
             propriedadesNulas.add("nomeImagem");
         } else {
             try {
-                deleteImage(diretorioImgs, itemExistente.getNomeImg());
-                String nomeImagem = saveImageToStorage(diretorioImgs, img);
+                deleteImage(itemExistente.getNomeImg());
+                String nomeImagem = saveImageToStorage(img);
                 item.setNomeImg(nomeImagem);
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage());
@@ -141,8 +140,7 @@ public class ItemService {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
         try {
-            deleteImage("Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs",
-                    item.getNomeImg());
+            deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
             log.info(format(">>> deletar: item deletado, id: %s", id));
         } catch (IOException e) {
@@ -152,8 +150,8 @@ public class ItemService {
         }
     }
 
-    public String deleteImage(String imageDirectory, String imageName) throws IOException {
-        Path imagePath = Path.of(imageDirectory, imageName);
+    public String deleteImage(String imageName) throws IOException {
+        Path imagePath = Path.of(DIRETORIO_IMGS, imageName);
 
         if (Files.exists(imagePath)) {
             Files.delete(imagePath);
