@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="07af1496-7f1f-4ddf-9643-ad99736be14b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/app/user/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/user/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/app/user/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/user/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/components/AgendamentoInfoRow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/components/AgendamentoInfoRow.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,9 +41,10 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;Spring Boot.GerenciadorLehsaApplication.executor&quot;: &quot;Run&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;agendamento-view&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/lucas/Documents/GitHub/plf-es-2024-1-ti4-0648100-lehsa/Codigo/back-end&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/vitor/Programas/ToDoLabSoftware&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -112,6 +111,9 @@
       <workItem from="1714046688175" duration="1253000" />
       <workItem from="1714065114771" duration="3661000" />
       <workItem from="1714130250817" duration="712000" />
+      <workItem from="1714394086015" duration="1405000" />
+      <workItem from="1714408045546" duration="769000" />
+      <workItem from="1714412349639" duration="917000" />
     </task>
     <servers />
   </component>

@@ -57,9 +57,9 @@ function AgendamentoInfoRow({ searchTerm }: { searchTerm: string }) {
     }
   };
 
-  const filteredUsers = users.filter((user) =>
-    user.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredUsers = users.filter((user) =>
+  //   user.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   return (
     <div className="flex justify-center">
@@ -73,7 +73,7 @@ function AgendamentoInfoRow({ searchTerm }: { searchTerm: string }) {
           </div>
         </div>
 
-        {filteredUsers.map((user, index) => (
+        {/* {filteredUsers.map((user, index) => (
           <ul
             className={`usersTable table-row-group ${
               index % 2 === 0 ? "evenRow" : "oddRow"
@@ -93,7 +93,7 @@ function AgendamentoInfoRow({ searchTerm }: { searchTerm: string }) {
             <li className="table-cell text-left h-[3rem] align-middle pl-5 ">
             </li>
           </ul>
-        ))}
+        ))} */}
       </div>
     </div>
   );
