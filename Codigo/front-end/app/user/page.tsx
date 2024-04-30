@@ -2,10 +2,10 @@
 
 import Agendamento from "@/components/Agendamento";
 import FilterSelect from "@/components/FilterSelect";
-import ItensCard from "@/components/ItemCard";
 import SearchBar from "@/components/SearchBar";
 import TopMenu from "@/components/topMenu";
 import React, { useState } from "react";
+import ItensDisplay from "./ItensDisplay";
 
 const UserPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,10 +30,10 @@ const UserPage = () => {
         <div className="flex flex-1 justify-between my-5">
           <SearchBar onChange={(e) => setSearchTerm(e.target.value)} />
           <div className="flex justify-items-end space-x-5">
-            <FilterSelect />
+            {/* <FilterSelect /> */}
           </div>
         </div>
-        <ItensCard searchTerm={searchTerm} />
+        <ItensDisplay searchTerm={searchTerm}/>
       </div>
     </div>
   );

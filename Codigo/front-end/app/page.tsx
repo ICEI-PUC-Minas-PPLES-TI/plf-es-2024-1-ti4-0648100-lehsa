@@ -33,6 +33,7 @@ export default function Home() {
       const { token } = data
       Cookie.set("token", token, { expires: 7 });
       router.push("/admin");
+      
     } else {
       setErrorMessage('Email ou senha inválida')
       //window.alert("Login failed");
