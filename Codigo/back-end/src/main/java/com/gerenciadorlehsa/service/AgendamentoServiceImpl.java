@@ -132,23 +132,12 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     @Override
     public void deletar (UUID id) {
-        /*
-        //Codigo onde todos do agendamento podem deletar (Adimns, Participantes e tecnico do agendamento)
-        Agendamento agendamento = encontrarPorId(id);
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-
-        if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
-            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para deletar o agendamento");
-        }
-        */
-        //Somente Admins podem apagar
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         encontrarPorId(id);
         log.info(">>> deletar: deletando agendamento");
         try{
             this.agendamentoRepository.deleteById(id);
         } catch (Exception e){
-            // como se comporta?? os outros registros vao se apagar?
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -205,25 +194,21 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
         Agendamento agendamento = encontrarPorId(id);
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        verificarPerfilTecnico (tecnico);
+        agendamento.setTecnico(tecnico);
+        this.agendamentoRepository.save(agendamento);
+    }
+
+      private void verificarPerfilTecnico(User tecnico) {
+        log.info(">>> Verificando perfil de técnico: barrando usuário que não é técnico");
         if(tecnico != null) {
             if(tecnico.getPerfilUsuario () != 3)
                 throw new AgendamentoException ("O usuário encarregado para ser técnico não tem o perfil " +
                         "correspondente");
         }
-
-        agendamento.setTecnico(tecnico);
-        this.agendamentoRepository.save(agendamento);
     }
 
 
-    private void verificarTecnicoAgendamento(Agendamento agendamento) {
-        log.info(">>> Verificando perfil de técnico: barrando usuário que não é técnico");
-        if(agendamento.getTecnico () != null) {
-            if(agendamento.getTecnico ().getPerfilUsuario () != 3)
-                throw new AgendamentoException ("O usuário encarregado para ser técnico não tem o perfil " +
-                        "correspondente");
-        }
-    }
 
 
     private void verificarAgendamentosDeMesmaDataDoUsuario(List<User> solicitantes, Agendamento agendamento) {
@@ -341,19 +326,6 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
         return atributosIguais;
     }
-
-   /* public void excluirAgendamentoSeSemSolicitantes(UUID agendamentoId) {
-        Agendamento agendamento = encontrarPorId (agendamentoId);
-        if(!agendamento.getSolicitantes().isEmpty())
-            throw new DataIntegrityViolationException ()
-
-
-        if (agendamento.getSolicitantes().isEmpty()) {
-            agendamentoRepository.delete (agendamento);
-        } else {
-            throw new RuntimeException("Não é possível excluir o agendamento, pois possui solicitantes vinculados.");
-        }
-    }*/
 
 
 }
