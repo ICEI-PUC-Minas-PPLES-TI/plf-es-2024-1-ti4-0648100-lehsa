@@ -5,8 +5,9 @@ import { Agendamento as AgendamentoType } from "@/components/types";
 import Agendamento from "@/components/Agendamento";
 import TopMenu from "@/components/topMenu";
 import SearchBar from "@/components/SearchBar";
-import FilterSelect from "@/components/FilterSelect";
-import ItensCard from "@/components/ItemCard";
+import FilterSelect from "@/components/FilterSelect"
+import ItensDisplay from "./ItensDisplay";
+
 
 const UserPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,10 +50,10 @@ const UserPage = () => {
         <div className="flex flex-1 justify-between my-5">
           <SearchBar onChange={(e) => setSearchTerm(e.target.value)} />
           <div className="flex justify-items-end space-x-5">
-            <FilterSelect />
+            {/* <FilterSelect /> */}
           </div>
         </div>
-        <ItensCard searchTerm={searchTerm} />
+        <ItensDisplay searchTerm={searchTerm}/>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.ItensAgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.SolicitantesAgendamentoException;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
@@ -33,12 +34,9 @@ public class AgendamentoConverterService {
         agendamento.setDataHoraInicio(converterDataHora (agendamentoDTO.dataHoraInicio ()));
         agendamento.setDataHoraFim(converterDataHora (agendamentoDTO.dataHoraFim ()));
         agendamento.setObservacaoSolicitacao(agendamentoDTO.observacaoSolicitacao());
-        agendamento.setStatusTransacaoItem(agendamentoDTO.statusTransacaoItem());
+        agendamento.setStatusTransacaoItem(StatusTransacaoItem.EM_ANALISE);
 
-        User tecnico = agendamentoDTO.tecnico () != null ?
-                encontrarTecnico(agendamentoDTO.tecnico().email()) :
-                null;
-        agendamento.setTecnico(tecnico);
+        agendamento.setTecnico(null);
 
         List<User> solicitantes = encontrarSolicitantes(agendamentoDTO.solicitantes());
         agendamento.setSolicitantes(solicitantes);
