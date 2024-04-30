@@ -7,15 +7,22 @@ import TopMenu from "@/components/topMenu";
 import SearchBar from "@/components/SearchBar";
 import FilterSelect from "@/components/FilterSelect"
 import ItensDisplay from "./ItensDisplay";
+import { jwtDecode } from 'jwt-decode';
 
 
 const UserPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [agendamentos, setAgendamentos] = useState<AgendamentoType[]>([]);
 
+  const token = Cookie.get("token");
+  let decoded = ''
+  if (token) {
+    decoded = jwtDecode(token);
+}
+
   useEffect(() => {
     const authToken = Cookie.get("token") ?? "";
-    fetch("http://localhost:8080/agendamento", {
+    fetch(`http://localhost:8080/agendamento/usuario/${decoded.sub}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -39,9 +46,9 @@ const UserPage = () => {
         <div className="w-full bg-white h-auto rounded-2xl p-5">
           <h2 className="font-semibold text-xl mb-4">Seus Agendamentos</h2>
           <div className="grid gap-4 justify-center lg:grid-cols-2">
-            {/* {agendamentos.map(agendamento => (
-              <Agendamento key={agendamento.id} items={agendamento.itens} />
-            ))} */}
+            {agendamentos.map(agendamento => (
+              <Agendamento key={agendamento.id} items={agendamento.itens} dataHoraFim={agendamento.dataHoraFim} dataHoraInicio={agendamento.dataHoraInicio} tecnico={agendamento.tecnico}/>
+            ))}
           </div>
         </div>
       </div>
