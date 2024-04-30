@@ -101,20 +101,20 @@ const ValidarAgendamento = () => {
     const fetchItemData = async () => {
       const router = window.location.pathname;
       const id = router.split("/")[3];
-
+  
       if (!id) return;
-
+  
       const data = await fetchItem(id);
-      if (data) setAgendamento(data);
-    };
-
-    if (agendamento) {
-        const acaoUsuarioArmazenada = agendamento.statusTransacaoItem;
-        setAcaoUsuario(acaoUsuarioArmazenada);
+      if (data) {
+        if (JSON.stringify(data) !== JSON.stringify(agendamento)) {
+          setAgendamento(data);
+        }
       }
-
+    };
+  
     fetchItemData();
-  }, [agendamento]);
+  }, []);
+  
 
   return (
     <>
