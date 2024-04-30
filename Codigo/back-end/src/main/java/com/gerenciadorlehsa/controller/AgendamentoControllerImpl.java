@@ -105,4 +105,14 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
     }
+
+    @PatchMapping("/tecnico/{id}/{email}")
+    public ResponseEntity<Map<String, Object>> atualizarTecnico (@PathVariable UUID id,
+                                                                @PathVariable String email) {
+        log.info(">>> atualizarTecnico: recebendo requisição para atualizar tecnico do agendamento");
+
+        agendamentoService.atualizarTecnico(agendamentoConverterService.encontrarUsuario(email), id);
+
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
+    }
 }

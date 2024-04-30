@@ -67,7 +67,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     public Agendamento criar (Agendamento obj) {
         log.info(">>> criando: criando agendamento");
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-        verificarTecnicoAgendamento(obj);
+
         checkTecnicoNaoSolicita (obj);
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
@@ -78,6 +78,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         verificarAgendamentosDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
 
         obj.setId (null);
+        obj.setTecnico(null);
         obj.setStatusTransacaoItem (EM_ANALISE);
 
         return agendamentoRepository.save (obj);
@@ -100,14 +101,13 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
 
-        if (!ehUsuarioAutorizado(agendamentoAtt, usuarioLogado)) {
+        if (!ehSolicitante(obj, usuarioLogado)) {
             throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
         }
 
         List<String> atributosIguais = atributosIguais(agendamentoAtt, obj);
 
-        if(!atributosIguais.contains("tecnico"))
-            verificarTecnicoAgendamento(obj);
+
 
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
@@ -117,12 +117,16 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
             verificarConflitoData(dataHoraInicio, dataHoraFim);
             verificarAgendamentosDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
         }
+        atributosIguais.add("tecnico");
         atributosIguais.add("statusTransacaoItem");
         atributosIguais.add("id");
         String[] propriedadesIgnoradas = new String[atributosIguais.size()];
         propriedadesIgnoradas = atributosIguais.toArray(propriedadesIgnoradas);
 
         copyProperties(obj, agendamentoAtt, propriedadesIgnoradas);
+        log.info("Tencnic " + (agendamentoAtt.getTecnico()==null));
+
+        log.info("Teste");
         return this.agendamentoRepository.save(agendamentoAtt);
     }
 
@@ -194,6 +198,21 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         } catch (IllegalArgumentException e) {
             throw new EnumNaoEncontradoException ("O status passado não existe: " + status);
         }
+    }
+
+    @Override
+    public void atualizarTecnico (User tecnico, @NotNull UUID id) {
+        log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
+        Agendamento agendamento = encontrarPorId(id);
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        if(tecnico != null) {
+            if(tecnico.getPerfilUsuario () != 3)
+                throw new AgendamentoException ("O usuário encarregado para ser técnico não tem o perfil " +
+                        "correspondente");
+        }
+
+        agendamento.setTecnico(tecnico);
+        this.agendamentoRepository.save(agendamento);
     }
 
 
@@ -319,8 +338,6 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
             atributosIguais.add("dataHoraFim");
         if (a.getObservacaoSolicitacao().equals(b.getObservacaoSolicitacao()))
             atributosIguais.add("observacaoSolicitacao");
-        if (a.getTecnico() == (b.getTecnico()))
-            atributosIguais.add("tecnico");
 
         return atributosIguais;
     }
