@@ -65,7 +65,7 @@ const TopMenu = ({ title }: Props) => {
               className="text-red-700 font-medium"
               onClick={LogOut}
             >
-              Log Out
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

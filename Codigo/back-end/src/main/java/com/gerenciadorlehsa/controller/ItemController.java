@@ -14,11 +14,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.ENDPOINT_ITEM;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ITEM_CONTROLLER;
 import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDTO;
@@ -34,14 +32,13 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/img/{id}")
-    public ResponseEntity<?> encontrarImagmePorId (@PathVariable UUID id) {
-        log.info(">>> encontrarImagmePorId: recebendo requisição para encontrar imagem por id");
+    public ResponseEntity<?> encontrarImagemPorId (@PathVariable UUID id) {
+        log.info(">>> encontrarImagemPorId: recebendo requisição para encontrar imagem por id");
         byte [] img = this.itemService.encontrarImagemPorId(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf("image/png"))
                 .body(img);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> encontrarPorId (@PathVariable UUID id) {
@@ -74,7 +71,7 @@ public class ItemController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> criar (@Valid @RequestPart("item") Item item,
                                        @NotNull @RequestPart("imagem") MultipartFile img){
-        log.info(">>> criar: recebendo requisição para criar item");
+        log.info(">>> criar: recebendo requisição para criar item");    
         Item novoItem = this.itemService.criar(item, img);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(novoItem.getId()).toUri();
@@ -91,8 +88,6 @@ public class ItemController {
 
         return ResponseEntity.noContent().build();
     }
-
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar (@PathVariable UUID id) {

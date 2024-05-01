@@ -23,7 +23,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
 import java.io.IOException;
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_USUARIO_SENHA;
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_VALIDACAO;
@@ -132,6 +131,69 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
+
+    /**
+     * Captura exceção do tipo AtualizarStatusException
+     * @param e Exceção do tipo AtualizarStatusException
+     * @param request requisição
+     * @return tratamento da exceção (log e resposta da requisição)
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AtualizarStatusException.class)
+    public ResponseEntity<Object> capturarAtualizarStatusException(@NotNull AtualizarStatusException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] AtualizarStatusException: falha ao atualizar status do usuário: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DataException.class)
+    public ResponseEntity<Object> capturarDataException(@NotNull DataException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] DataException: falha ao escolher data: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DataConflitanteAgendamentoException.class)
+    public ResponseEntity<Object> capturarDataConflitanteAgendamentoException(@NotNull DataConflitanteAgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] DataConflitanteAgendamenteException: conflito de data: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(SolicitantesAgendamentoException.class)
+    public ResponseEntity<Object> capturarSolicitantesAgendamentoException(@NotNull SolicitantesAgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] SolicitantesAgendamentoException: erro ao atribuir solicitantes para o agendamento: " +
+                "%s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ItensAgendamentoException.class)
+    public ResponseEntity<Object> capturarItensAgendamentoException(@NotNull ItensAgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ItemAgendamentoException: erro ao escolher item: " +
+                "%s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AgendamentoException.class)
+    public ResponseEntity<Object> capturarAgendamentoException(@NotNull AgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] AgendamentoException: erro no agendamento: " +
+                "%s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+
     /**
      * Captura exceções do tipo UsuarioNaoAutorizadoException
      *
@@ -177,18 +239,28 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
 
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler({EntidadesRelacionadasException.class})
+    public ResponseEntity<Object> capturarEntidadesRelacionadasException(@NotNull EntidadesRelacionadasException e, WebRequest request) {
+        final String msgErro = e.getMessage();
+        log.error(format("[ERRO] EntidadesRelacionadasException: erro desconhecido ocorrido: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
+
+
     /**
-     * Captura exceções do tipo TipoItemNaoEncontradoException
+     * Captura exceções do tipo EnumNaoEncontradoException
      *
-     * @param e       exceção do tipo TipoItemNaoEncontradoException
+     * @param e       exceção do tipo EnumNaoEncontradoException
      * @param request requisição
      * @return tratamento da exceção (log e resposta requisição)
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(TipoItemNaoEncontradoException.class)
-    public ResponseEntity<Object> capturarTipoItemNaoEncontradaException(@NotNull TipoItemNaoEncontradoException e, WebRequest request) {
+    @ExceptionHandler(EnumNaoEncontradoException.class)
+    public ResponseEntity<Object> capturarEnumNaoEncontradoException(@NotNull EnumNaoEncontradoException e, WebRequest request) {
         String msgErro = e.getMessage();
-        log.error(format("[ERRO] TipoItemNaoEncontradoException: tipo de item não encontrado: %s", msgErro));
+        log.error(format("[ERRO] EnumNaoEncontradoException: enum não encontrado: %s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.NOT_FOUND, request);
     }
 

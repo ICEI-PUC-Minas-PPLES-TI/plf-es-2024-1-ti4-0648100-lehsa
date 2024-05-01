@@ -3,7 +3,6 @@ package com.gerenciadorlehsa.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
-
 import java.util.UUID;
 
 @Builder

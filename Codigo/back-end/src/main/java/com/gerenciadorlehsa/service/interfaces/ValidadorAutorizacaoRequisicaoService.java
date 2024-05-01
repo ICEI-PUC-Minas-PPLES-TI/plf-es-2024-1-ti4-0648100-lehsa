@@ -11,5 +11,7 @@ public interface ValidadorAutorizacaoRequisicaoService {
 
     UsuarioDetails validarAutorizacaoRequisicao(UUID id, String topico);
 
+    UsuarioDetails getUsuarioLogado();
+
     UsuarioDetails validarAutorizacaoRequisicao();
 }

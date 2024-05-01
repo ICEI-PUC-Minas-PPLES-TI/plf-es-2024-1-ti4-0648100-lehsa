@@ -15,9 +15,10 @@ interface User {
 function UserRow({ searchTerm }: { searchTerm: string }) {
   const [users, setUsers] = useState<User[]>([]);
   const [token, setToken] = useState<string>("");
+  const [loggedInUserId, setLoggedInUserId] = useState<number>(0); // State to store logged-in user ID
 
   useEffect(() => {
-    const authToken = Cookie.get("token") ?? "";
+    const authToken = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDFAZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJ1c2VySWQiOiJjOTI4NzdhNC1lYTZmLTRjYjctYmI5NC01NGVhYmEzZWVhYTgiLCJleHAiOjE3MTQ1Mzc5OTN9.N-lAIJ6LQZvZ0gODBcLQgGOIZ5u5Ns2DAogD6LeHT-mP7y28WfYBBn801dwBLls0l3tm-hlBJJyoO_iQAWFLsg";
     setToken(authToken);
 
     fetch(`http://localhost:8080/usuario`, {
@@ -34,6 +35,16 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
       .catch((error) => {
         console.error("Error fetching users:", error);
       });
+
+    // Decode token to get the ID of the logged-in user
+    try {
+      const decodedToken = JSON.parse(atob(authToken.split(".")[1]));
+      if (decodedToken && decodedToken.userId) {
+        setLoggedInUserId(decodedToken.userId);
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
   }, []);
 
   const renderProfileType = (perfil_usuario: number) => {
@@ -107,12 +118,14 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
               <p>{renderProfileType(user.perfil_usuario)}</p>
             </li>
             <li className="table-cell text-left h-[3rem] align-middle pl-5 ">
-              <button
-                className="transition ease-out hover:text-red-500 rounded-xl px-2"
-                onClick={() => deleteUser(user.id)}
-              >
-                <TrashIcon className="h-4 w-4"/>
-              </button>
+              {loggedInUserId !== user.id && ( // Check if the user is not the logged-in user
+                <button
+                  className="transition ease-out hover:text-red-500 rounded-xl px-2"
+                  onClick={() => deleteUser(user.id)}
+                >
+                  <TrashIcon className="h-4 w-4"/>
+                </button>
+              )}
             </li>
           </ul>
         ))}
