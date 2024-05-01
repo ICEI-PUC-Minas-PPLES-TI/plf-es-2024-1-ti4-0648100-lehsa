@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = USUARIO_SERVICE)
 @Service
 @AllArgsConstructor
-public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService {
+public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService{
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
@@ -48,39 +49,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(format("usuário não encontrado, id: %s", id)));
     }
 
-    /**
-     * Encontra um usuário a partir do seu email
-     *
-     * @param email email do usuário
-     * @return usuário encontrado
-     */
-    @Override
-    public User encontrarPorEmail(@NotNull String email) {
-        log.info(">>> encontrarPorEmail: encontrando usuário por email");
-        return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException(format("usuário não encontrado, email: %s", email)));
-    }
-
-
-    @Override
-    public boolean existEmail(String email) {
-        return usuarioRepository.existsByEmail (email);
-    }
-
-
-    /**
-     * Lista todos os usuários criados
-     *
-     * @return lista de usuários
-     */
-    @Override
-    public List<User> listarTodos() {
-        log.info(">>> listarTodos: listando todos usuários");
-        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
-        return usuarioRepository.findAll()
-                .stream()
-                .toList();
-    }
 
     /**
      * Cria um novo usuário
@@ -95,6 +63,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         usuario.setId(null);
         usuario.setPassword (passwordEncoder.encode(usuario.getPassword ()));
         usuario.setPerfilUsuario(PerfilUsuario.USUARIO.getCodigo());
+        usuario.setNota (5.0);
         usuario = usuarioRepository.save(usuario);
         log.info(format(">>> criar: usuário criado, id: %s", usuario.getId()));
         return usuario;
@@ -111,9 +80,11 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         log.info(">>> atualizar: atualizando usuário");
         User usuarioAtualizado = encontrarPorId(usuario.getId());
         copyProperties(usuario, usuarioAtualizado, PROPRIEDADES_IGNORADAS);
+
         if (usuarioAtualizado.getPerfilUsuario().equals(PerfilUsuario.ADMIN.getCodigo()))
             usuarioAtualizado.setPerfilUsuario(usuario.getPerfilUsuario());
         usuarioAtualizado = usuarioRepository.save(usuarioAtualizado);
+
         log.info(format(">>> atualizar: usuário atualizado, id: %s", usuarioAtualizado.getId()));
         return usuarioAtualizado;
     }
@@ -136,6 +107,25 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     }
 
     /**
+     * Encontra um usuário a partir do seu email
+     *
+     * @param email email do usuário
+     * @return usuário encontrado
+     */
+    @Override
+    public User encontrarPorEmail(@NotNull String email) {
+        log.info(">>> encontrarPorEmail: encontrando usuário por email");
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(format("usuário não encontrado, email: %s", email)));
+    }
+
+    @Override
+    public boolean existEmail(String email) {
+        return usuarioRepository.existsByEmail (email);
+    }
+
+
+    /**
      * Atualiza senha do usuário
      *
      * @param id       id do usuário
@@ -150,4 +140,31 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         else
             throw new AtualizarSenhaException(format("senha original incorreta, id do usuário: %s", id));
     }
+
+
+    /**
+     * Lista todos os usuários criados
+     *
+     * @return lista de usuários
+     */
+    @Override
+    public List<User> listarTodos() {
+        log.info(">>> listarTodos: listando todos usuários");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        return usuarioRepository.findAll();
+    }
+
+
+    public void atualizarPerfil(@NotNull UUID id, Integer code) {
+        log.info(">>> atualizarStatus: atualizando status");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        User usuarioAtulizado = encontrarPorId (id);
+
+        if(!(code > 0 && code < 4))
+            throw new AtualizarStatusException ("O Código de perfil do usuário não existe");
+        usuarioAtulizado.setPerfilUsuario (code);
+        usuarioRepository.save (usuarioAtulizado);
+    }
+    
+
 }

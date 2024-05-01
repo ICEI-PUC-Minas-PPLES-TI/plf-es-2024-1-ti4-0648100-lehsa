@@ -1,24 +1,18 @@
 package com.gerenciadorlehsa.util;
 
-import com.gerenciadorlehsa.dto.ItemDTO;
-import com.gerenciadorlehsa.dto.ItemDTOResponse;
+import com.gerenciadorlehsa.dto.*;
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.enums.TipoItem;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import com.gerenciadorlehsa.controller.UsuarioControllerImpl;
-import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.User;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
+import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.CONVERSOR_ENTIDADE_DTO_UTIL;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @UtilityClass
 @Slf4j(topic = CONVERSOR_ENTIDADE_DTO_UTIL)
@@ -38,16 +32,19 @@ public class ConversorEntidadeDTOUtil {
                 .nome(usuario.getNome ())
                 .cpf(usuario.getCpf())
                 .telefone (usuario.getTelefone ())
+                .tipoCurso (usuario.getTipoCurso () != null ? usuario.getTipoCurso ().toString () : null)
+                .statusCurso (usuario.getStatusCurso () != null ? usuario.getStatusCurso ().toString () : null)
+                .nota (usuario.getNota ())
+                .curso (usuario.getCurso ())
                 .email(usuario.getEmail())
-                .links(singletonList(linkTo(UsuarioControllerImpl.class).slash(usuario.getId()).withSelfRel()))
                 .build();
     }
 
+
     /**
-     * Converte uma entidade do tipo Endereco para EnderecoDTO
-     *
-     * @param endereco entidade do tipo Endereco
-     * @return novo EnderecoDTO
+     * Converter uma entidade Item para ItemDTO
+     * @param item
+     * @return
      */
 
     public static ItemDTO converterParaDTO(@NotNull Item item) {
@@ -62,48 +59,56 @@ public class ConversorEntidadeDTOUtil {
                 .build();
     }
 
-    private byte[] getImage(String imageDirectory, String imageName) throws IOException {
-        Path imagePath = Path.of(imageDirectory, imageName);
+    public static AgendamentoDTORes converterParaDtoRes(@NotNull Agendamento agendamento) {
+        log.info(format(">>> converterParaDTORes: convertendo Agendamento (id: %s) para DTORes", agendamento.getId()));
 
-        if (Files.exists(imagePath)) {
-            byte[] imageBytes = Files.readAllBytes(imagePath);
-            return imageBytes;
-        } else {
-            return null; // Handle missing images
-        }
+
+        List<UsuarioShortDTORes> solicitantesDTO = agendamento.getSolicitantes() != null ?
+                agendamento.getSolicitantes().stream()
+                        .map(ConversorEntidadeDTOUtil::converterUsuarioParaShortDTORes)
+                        .collect(Collectors.toList()) :
+                null;
+
+
+        List<ItemDTORes> itensDTO = agendamento.getItens() != null ?
+                agendamento.getItens().stream()
+                        .map(ConversorEntidadeDTOUtil::converterItemParaDTORes)
+                        .collect(Collectors.toList()) :
+                null;
+
+
+        UsuarioShortDTORes tecnicoDTO = agendamento.getTecnico() != null ?
+                converterUsuarioParaShortDTORes(agendamento.getTecnico()) :
+                null;
+
+        return AgendamentoDTORes.builder()
+                .id(agendamento.getId())
+                .dataHoraInicio(converterDataHora(agendamento.getDataHoraInicio()))
+                .dataHoraFim(converterDataHora(agendamento.getDataHoraFim()))
+                .observacaoSolicitacao(agendamento.getObservacaoSolicitacao())
+                .statusTransacaoItem(agendamento.getStatusTransacaoItem())
+                .solicitantes(solicitantesDTO)
+                .itens(itensDTO)
+                .tecnico(tecnicoDTO)
+                .build();
     }
 
 
-/*
-    public static Item converterParaItem(@NotNull ItemDTO itemDTO){
-        log.info(">>> converterParaItem: convertendo DTO para Item");
-
-        Item novoItem = new Item();
-        novoItem.setId(null);
-        novoItem.setTipoItem(TipoItem.valueOf(itemDTO.tipoItem()));
-        novoItem.setNome(itemDTO.nome());
-        novoItem.setValorUnitario(itemDTO.valorUnitario());
-        novoItem.setEmprestavel(itemDTO.emprestavel());
-        novoItem.setQuantidade(itemDTO.quantidade());
-
-        return novoItem;
+    public static UsuarioShortDTORes converterUsuarioParaShortDTORes (@NotNull User usuario){
+        return UsuarioShortDTORes.builder ()
+                .nome (usuario.getNome ())
+                .email (usuario.getEmail())
+                .telefone (usuario.getTelefone())
+                .curso (usuario.getCurso ())
+                .build ();
     }
-    public static ItemDTOResponse converterParaDTOResponse(@NotNull Item item) {
-        log.info(format(">>> converterParaDTO: convertendo Item (id: %s) para DTO", item.getId()));
-        try {
-            return ItemDTOResponse.builder()
-                    .id(item.getId())
-                    .tipoItem(item.getTipoItem().name())
-                    .nome(item.getNome())
-                    .valorUnitario(item.getValorUnitario())
-                    .emprestavel(item.getEmprestavel())
-                    .quantidade(item.getQuantidade())
-                    .bytesImagem(getImage("Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs",
-                            item.getNomeImg()))
-                    .build();
-        } catch (IOException e){
-            throw new RuntimeException(e.getMessage());
-        }
+
+    public static ItemDTORes converterItemParaDTORes (@NotNull Item item) {
+        return ItemDTORes.builder ()
+                .id (item.getId ())
+                .nome (item.getNome ())
+                .tipoItem (item.getTipoItem () != null ? String.valueOf (item.getTipoItem ()) : null)
+                .build ();
     }
-*/
+
 }

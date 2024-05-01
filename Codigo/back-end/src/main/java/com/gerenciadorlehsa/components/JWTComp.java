@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.JWT_COMP;
 import static io.jsonwebtoken.Jwts.parserBuilder;
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;

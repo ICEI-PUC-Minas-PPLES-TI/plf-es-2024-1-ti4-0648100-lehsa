@@ -18,7 +18,7 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
   const [loggedInUserId, setLoggedInUserId] = useState<number>(0); // State to store logged-in user ID
 
   useEffect(() => {
-    const authToken = Cookie.get("token") ?? "";
+    const authToken = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c3VhcmlvMDFAZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJ1c2VySWQiOiJjOTI4NzdhNC1lYTZmLTRjYjctYmI5NC01NGVhYmEzZWVhYTgiLCJleHAiOjE3MTQ1Mzc5OTN9.N-lAIJ6LQZvZ0gODBcLQgGOIZ5u5Ns2DAogD6LeHT-mP7y28WfYBBn801dwBLls0l3tm-hlBJJyoO_iQAWFLsg";
     setToken(authToken);
 
     fetch(`http://localhost:8080/usuario`, {
