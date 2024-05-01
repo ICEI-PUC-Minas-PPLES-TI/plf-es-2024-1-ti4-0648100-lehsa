@@ -4,7 +4,8 @@ Este diretório mantém os artefatos do projeto com os seguintes diretórios e e
 
 * `/DERs`
 	* *diagrama-er-sprint2*: Diagrama de Entidade-Relacionamento da Sprint 2.
-
+* `/MERs`
+	* *MER-sprint3*: Modelo Entidade Relacionamento ou Modelo Lógico da Sprint 3.
 * `/apresentacoes`
 	* *apresentacao-sprint1*: Apresentação da sprint 1.
  * `/casos-de-uso`
