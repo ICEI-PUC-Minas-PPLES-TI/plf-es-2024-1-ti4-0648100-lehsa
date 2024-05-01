@@ -28,7 +28,7 @@ type Item = {
 
 type AgendamentoProps = {
   id: string;
-  statusTransacaoItem: string;
+  statusTransacaoItem: String;
   dataHoraInicio: string;
   dataHoraFim: string;
   tecnico: string | null;
@@ -61,60 +61,56 @@ const fetchItem = async (id: string | string[]) => {
 
 const ValidarAgendamento = () => {
   const [agendamento, setAgendamento] = useState<AgendamentoProps | null>(null);
-  const [acaoUsuario, setAcaoUsuario] = useState<string>("");
+  
+  const handleAcao = async (status: String) => {
+    try {
+      const token = Cookie.get("token");
+      const response = await fetch(
+        `http://localhost:8080/agendamento/${agendamento?.id}/${status}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error("Failed to update status");
+      }
 
-  const handleAprovar = async () => {
-    const token = Cookie.get("token");
-    const response = await fetch(
-      `http://localhost:8080/agendamento/${agendamento?.id}/APROVADO`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-    if (response.ok) {
-      setAcaoUsuario("APROVADO");
-    }
-  };
+      setAgendamento({
+        ...agendamento!,
+        statusTransacaoItem: status,
+      });
 
-  const handleRecusar = async () => {
-    const token = Cookie.get("token");
-    const response = await fetch(
-      `http://localhost:8080/agendamento/${agendamento?.id}/RECUSADO`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-    if (response.ok) {
-      setAcaoUsuario("RECUSADO");
+    } catch (error) {
+      console.error("Error updating status:", error);
     }
   };
 
   useEffect(() => {
     const fetchItemData = async () => {
       const router = window.location.pathname;
-      const id = router.split("/")[3];
-  
+      const id = router.split('/')[3];
+      const status = router.split('/')[4];
+
       if (!id) return;
-  
+
       const data = await fetchItem(id);
-      if (data) {
-        if (JSON.stringify(data) !== JSON.stringify(agendamento)) {
-          setAgendamento(data);
-        }
+      setAgendamento(data);
+
+      if (status) {
+        handleAcao(status);
       }
-    };
-  
-    fetchItemData();
+
+      console.log(data)
+  };
+
+  fetchItemData();
   }, []);
-  
+
 
   return (
     <>
@@ -139,15 +135,14 @@ const ValidarAgendamento = () => {
                     <li className="flex space-x-2">
                       <h2 className="font-bold">Status:</h2>
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          acaoUsuario === "APROVADO"
-                            ? "bg-green-100 text-green-800"
-                            : acaoUsuario === "RECUSADO"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {agendamento?.statusTransacaoItem}
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            agendamento?.statusTransacaoItem === 'APROVADO' ? "bg-green-100 text-green-800" :
+                            agendamento?.statusTransacaoItem === 'EM_ANALISE' ? "bg-yellow-100 text-yellow-800" :
+                            agendamento?.statusTransacaoItem === 'RECUSADO' ? "bg-red-100 text-red-800" :
+                            'bg-gray-500 text-white'
+                          }`}
+                        >
+                          {agendamento?.statusTransacaoItem}
                       </span>
                     </li>
                     <li className="flex space-x-2">
@@ -170,14 +165,14 @@ const ValidarAgendamento = () => {
                   <Button
                     type="submit"
                     className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline"
-                    onClick={() => handleAprovar()}
+                    onClick={() => handleAcao("APROVADO")}
                   >
                     Aprovar
                   </Button>
                   <Button
                     type="submit"
                     className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline"
-                    onClick={() => handleRecusar()}
+                    onClick={() => handleAcao("RECUSADO")}
                   >
                     Recusar
                   </Button>
