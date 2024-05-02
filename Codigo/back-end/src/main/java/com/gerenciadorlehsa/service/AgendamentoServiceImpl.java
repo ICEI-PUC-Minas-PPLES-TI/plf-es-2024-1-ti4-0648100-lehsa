@@ -78,8 +78,6 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         verificarAgendamentosDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
 
         obj.setId (null);
-        obj.setTecnico(null);
-        obj.setStatusTransacaoItem (EM_ANALISE);
 
         return agendamentoRepository.save (obj);
     }
