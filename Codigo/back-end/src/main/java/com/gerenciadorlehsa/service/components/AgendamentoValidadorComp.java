@@ -5,6 +5,7 @@ import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.ItensAgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.SolicitantesAgendamentoException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_VALIDA
 @Slf4j(topic = AGENDAMENTO_VALIDADOR_COMP)
 @Component
 @AllArgsConstructor
+@Schema(description = "validações relacionadas aos solicitantes e itens do agendamento")
 public class AgendamentoValidadorComp {
 
     public void validate(AgendamentoDTO agendamentoDTO) {

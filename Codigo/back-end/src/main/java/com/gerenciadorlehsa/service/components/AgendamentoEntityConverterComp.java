@@ -8,6 +8,7 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 @Slf4j(topic = AGENDAMENTO_ENTITY_CONVERTER_COMP)
 @Component
 @AllArgsConstructor
+@Schema(description = "Responsável por converter DTO para objeto agendamento")
 public class AgendamentoEntityConverterComp {
 
     private final AgendamentoValidadorComp agendamentoValidator;
