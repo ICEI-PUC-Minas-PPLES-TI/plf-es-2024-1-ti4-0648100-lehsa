@@ -6,9 +6,12 @@ import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.ItensAgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.SolicitantesAgendamentoException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.List;
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_VALIDADOR_COMP;
 
+@Slf4j(topic = AGENDAMENTO_VALIDADOR_COMP)
 @Component
 @AllArgsConstructor
 public class AgendamentoValidadorComp {

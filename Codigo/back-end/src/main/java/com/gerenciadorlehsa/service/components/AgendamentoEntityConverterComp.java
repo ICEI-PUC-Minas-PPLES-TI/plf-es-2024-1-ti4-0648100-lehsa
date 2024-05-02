@@ -9,13 +9,15 @@ import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
+@Slf4j(topic = AGENDAMENTO_ENTITY_CONVERTER_COMP)
 @Component
 @AllArgsConstructor
 public class AgendamentoEntityConverterComp {
