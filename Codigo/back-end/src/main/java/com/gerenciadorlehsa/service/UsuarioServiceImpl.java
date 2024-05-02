@@ -33,7 +33,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
 
     private final UsuarioRepository usuarioRepository;
 
-    private final PasswordEncoderImpl passwordEncoder;
+    private final PasswordEncoderServiceImpl passwordEncoder;
 
     /**
      * Encontra um usuário a partir do seu id

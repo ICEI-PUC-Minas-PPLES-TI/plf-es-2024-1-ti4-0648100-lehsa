@@ -5,15 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d13086a4-242b-4621-a004-3a2ebb51a70b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/components/AgendamentoEntityConverterComp.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/components/AgendamentoValidadorComp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/AgendamentoControllerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/controller/AgendamentoControllerImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/dto/AgendamentoDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/dto/AgendamentoDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoConverterService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/config/SegurancaConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/config/SegurancaConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/PasswordEncoderImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/PasswordEncoderServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/UsuarioServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/UsuarioServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +134,7 @@
       <workItem from="1714408045546" duration="769000" />
       <workItem from="1714412349639" duration="5096000" />
       <workItem from="1714427950429" duration="1793000" />
-      <workItem from="1714576059773" duration="13356000" />
+      <workItem from="1714576059773" duration="14228000" />
     </task>
     <servers />
   </component>

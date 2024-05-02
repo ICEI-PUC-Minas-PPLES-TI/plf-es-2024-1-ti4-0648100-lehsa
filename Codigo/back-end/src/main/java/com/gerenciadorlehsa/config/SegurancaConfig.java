@@ -3,7 +3,7 @@ package com.gerenciadorlehsa.config;
 import com.gerenciadorlehsa.security.JWTFiltroAutenticacao;
 import com.gerenciadorlehsa.security.JWTFiltroAutorizacao;
 import com.gerenciadorlehsa.security.UsuarioDetailsService;
-import com.gerenciadorlehsa.service.PasswordEncoderImpl;
+import com.gerenciadorlehsa.service.PasswordEncoderServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.SEGURANCA_CONFIG;
-import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
 
 
@@ -42,7 +41,7 @@ public class SegurancaConfig {
     public SecurityFilterChain filterChain(@NotNull HttpSecurity httpSecurity) throws Exception {
         log.info(">>> filterChain: iniciando camada de segurança Filter Chain");
         AuthenticationManagerBuilder authenticationManagerBuilder = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(usuarioDetailsService).passwordEncoder(new PasswordEncoderImpl());
+        authenticationManagerBuilder.userDetailsService(usuarioDetailsService).passwordEncoder(new PasswordEncoderServiceImpl ());
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
