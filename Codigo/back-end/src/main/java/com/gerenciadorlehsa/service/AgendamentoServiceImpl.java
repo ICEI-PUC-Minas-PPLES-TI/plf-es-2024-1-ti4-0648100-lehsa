@@ -147,6 +147,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         return this.agendamentoRepository.findAll();
     }
 
+    // Esse método tem que ficar na classe Usuario
     @Override
     public List<Agendamento> listarAgendamentoUsuario (@NotNull User usuario) {
         log.info(">>> listarAgendamentoUsuario: listando todos agendamentos do usuario de id: " + usuario.getId());

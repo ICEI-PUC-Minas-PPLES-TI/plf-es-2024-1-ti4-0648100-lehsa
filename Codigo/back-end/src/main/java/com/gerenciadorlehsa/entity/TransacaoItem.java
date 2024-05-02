@@ -11,11 +11,8 @@ import java.util.UUID;
 
 
 @MappedSuperclass
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
 public abstract class TransacaoItem implements Serializable {
 
     @Serial
