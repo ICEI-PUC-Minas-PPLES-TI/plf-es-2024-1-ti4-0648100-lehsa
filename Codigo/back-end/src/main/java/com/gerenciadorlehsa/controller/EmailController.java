@@ -2,7 +2,6 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.entity.MensagemEmail;
 import com.gerenciadorlehsa.service.EmailService;
-import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;

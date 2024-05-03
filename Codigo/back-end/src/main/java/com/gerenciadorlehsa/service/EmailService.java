@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.MensagemEmail;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
 
+    @Operation(description = "Envia e-mail a um destinatário")
     public void sendEmail(MensagemEmail mensagemEmail) throws MessagingException {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage ();
