@@ -27,6 +27,8 @@ public class ConstantesTopicosUtil {
 
     public static final String USUARIO_CONTROLLER = "USUARIO_CONTROLLER";
 
+    public static final String EMAIL_CONTROLLER = "EMAIL_CONTROLLER";
+
     public static final String AGENDAMENTO_CONTROLLER = "AGENDAMENTO_CONTROLLER";
 
     public static final String ITEM_CONTROLLER = "ITEM_CONTROLLER";

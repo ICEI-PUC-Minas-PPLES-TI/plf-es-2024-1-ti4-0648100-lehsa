@@ -240,6 +240,16 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
                         dataHoraFimNovo.isEqual(dataHoraInicioExistente));
     }
 
+    public void verificarConflitoData(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+        log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
+                "confirmado ou aprovado");
+        List<Agendamento> agendamentosConflitantes =
+                agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
+
+        if(!agendamentosConflitantes.isEmpty ())
+            throw new DataConflitanteAgendamentoException ("Já existe um agendamento para essa data");
+    }
+
 
 
     private void verificarLimiteAgendamentosEmAnaliseDosParticipantes(List<User> solicitantes) {
@@ -258,16 +268,6 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
     }
 
-
-    public void verificarConflitoData(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
-        log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
-                "confirmado ou aprovado");
-        List<Agendamento> agendamentosConflitantes =
-                agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
-
-        if(!agendamentosConflitantes.isEmpty ())
-            throw new DataConflitanteAgendamentoException ("Já existe um agendamento para essa data");
-    }
 
 
     /**
