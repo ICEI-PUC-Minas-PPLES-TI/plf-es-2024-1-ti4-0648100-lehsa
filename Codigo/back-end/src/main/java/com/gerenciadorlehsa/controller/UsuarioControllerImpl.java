@@ -2,6 +2,11 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.components.JWTComp;
 import com.gerenciadorlehsa.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +20,7 @@ import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
@@ -47,6 +53,15 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
      */
     @Override
     @GetMapping("/{id}")
+    @Operation(summary = "Obter usuário por Id", description = "O usuário deve existir")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content =
+                    { @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = UsuarioDTO.class)) }),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content ={@Content(mediaType = "application/json", schema =
+                    @Schema(implementation = ErrorResponse.class)) })
+    })
     public ResponseEntity<UsuarioDTO> encontrarPorId(@PathVariable UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar usuário por id");
         User usuario = operacoesCRUDService.encontrarPorId(id);
