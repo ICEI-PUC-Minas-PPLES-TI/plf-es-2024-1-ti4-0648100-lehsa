@@ -11,11 +11,8 @@ import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.*;
 
 @MappedSuperclass
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
 public abstract class Pessoa implements Serializable {
 
     @Serial
