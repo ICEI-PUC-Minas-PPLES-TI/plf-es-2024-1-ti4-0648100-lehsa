@@ -12,6 +12,8 @@ public class ConstantesTopicosUtil {
 
     public static final String AGENDAMENTO_SERVICE = "AGENDAMENTO_SERVICE";
 
+    public static final String TRANSACAO_ITEM_SERVICE = "TRANSACAO_ITEM_SERVICE";
+
     public static final String AGENDAMENTO_ENTITY_CONVERTER_COMP = "AGENDAMENTO_ENTITY_CONVERTER_COMP";
 
     public static final String AGENDAMENTO_VALIDADOR_COMP = "AGENDAMENTO_VALIDADOR_COMP";

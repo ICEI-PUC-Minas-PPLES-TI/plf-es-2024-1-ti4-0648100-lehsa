@@ -4,6 +4,7 @@ import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.service.TransacaoItemService;
 import com.gerenciadorlehsa.service.components.AgendamentoEntityConverterComp;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
@@ -37,6 +38,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
     private final AgendamentoService agendamentoService;
     private final AgendamentoEntityConverterComp agendamentoEntityConverterComp;
+    private final TransacaoItemService<Agendamento> transacaoItemService;
 
 
     @Override
@@ -102,7 +104,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
                                                                 @PathVariable String status) {
         log.info(">>> atualizarStatus: recebendo requisição para atualizar status do agendamento");
 
-        agendamentoService.atualizarStatus(status, id);
+        transacaoItemService.atualizarStatus(status, id);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
     }

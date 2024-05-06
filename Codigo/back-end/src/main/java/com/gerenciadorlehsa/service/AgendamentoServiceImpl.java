@@ -12,7 +12,6 @@ import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
-import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -31,13 +30,10 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
 @AllArgsConstructor
-public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>, AgendamentoService {
+public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
 
 
     private final AgendamentoRepository agendamentoRepository;
-
-    private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
-
 
     /**
      * Procura um agendamento por id
@@ -73,8 +69,8 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
         DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
-        verificarConflitoData (dataHoraInicio, dataHoraFim);
-        verificarLimiteAgendamentosEmAnaliseDosParticipantes (obj.getSolicitantes ());
+        verificarConflitoComTransacoesAprovadasOuConfirmadas (dataHoraInicio, dataHoraFim);
+        verificarLimiteTransacaoEmAnalise (obj.getSolicitantes ());
         verificarAgendamentosDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
 
         obj.setId (null);
@@ -82,15 +78,6 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         return agendamentoRepository.save (obj);
     }
 
-    private void checkTecnicoNaoSolicita(Agendamento agendamento) {
-        log.info(">>> Verificar solicitação de técnico: Barrando solicitação de agendamento do técnico");
-        if(agendamento.getTecnico () != null)
-            if(agendamento.getSolicitantes ().contains (agendamento.getTecnico ()))
-                throw new AgendamentoException ("O técnico encarregado não pode ser solicitante");
-    }
-
-
-    // nao atualiza o status
     @Override
     public Agendamento atualizar (Agendamento obj) {
         log.info(">>> atualizar: atualizando agendamento");
@@ -112,7 +99,7 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
         if (!(atributosIguais.contains("dataHoraInicio") && atributosIguais.contains("dataHoraFim"))) {
             DataHoraUtil.dataValida(dataHoraInicio, dataHoraFim);
-            verificarConflitoData(dataHoraInicio, dataHoraFim);
+            verificarConflitoComTransacoesAprovadasOuConfirmadas(dataHoraInicio, dataHoraFim);
             verificarAgendamentosDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
         }
         atributosIguais.add("tecnico");
@@ -129,6 +116,13 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     }
 
     @Override
+    public List<Agendamento> listarTodos () {
+        log.info(">>> listarTodos: listando todos agendamentos");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        return this.agendamentoRepository.findAll();
+    }
+
+    @Override
     public void deletar (UUID id) {
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         encontrarPorId(id);
@@ -140,12 +134,13 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         }
     }
 
-    @Override
-    public List<Agendamento> listarTodos () {
-        log.info(">>> listarTodos: listando todos agendamentos");
-        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
-        return this.agendamentoRepository.findAll();
+    private void checkTecnicoNaoSolicita(Agendamento agendamento) {
+        log.info(">>> Verificar solicitação de técnico: Barrando solicitação de agendamento do técnico");
+        if(agendamento.getTecnico () != null)
+            if(agendamento.getSolicitantes ().contains (agendamento.getTecnico ()))
+                throw new AgendamentoException ("O técnico encarregado não pode ser solicitante");
     }
+
 
     // Esse método tem que ficar na classe Usuario
     @Override
@@ -209,6 +204,26 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
 
 
 
+    @Override
+    public void verificarConflitoComTransacoesAprovadasOuConfirmadas(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+        log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
+                "confirmado ou aprovado");
+        List<Agendamento> agendamentosConflitantes =
+                agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
+
+        if(!agendamentosConflitantes.isEmpty ())
+            throw new DataConflitanteAgendamentoException ("Já existe um agendamento para essa data");
+    }
+
+    @Override
+    public void verificarLimiteTransacaoEmAnalise(User participante) {
+        long agendamentosEmAnalise = participante.getAgendamentosRealizados ()
+                .stream ()
+                .filter(agendamento -> agendamento.getStatusTransacaoItem() == EM_ANALISE)
+                .count();
+        if(agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE)
+            throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
+    }
 
     private void verificarAgendamentosDeMesmaDataDoUsuario(List<User> solicitantes, Agendamento agendamento) {
         log.info(">>> Verificar conflito de data de um solicitante: barrando agendamento de mesma data de um solicitante");
@@ -222,50 +237,11 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
         }
     }
 
-    // Método para verificar se há conflito de datas entre dois agendamentos
-    private boolean temConflitoDeData(Agendamento agendamentoExistente, Agendamento novoAgendamento) {
-        log.info(">>> Verificando datas conflitantes: barrando agendamento solicitado em uma mesma data");
-
-        if (agendamentoExistente.getId() == novoAgendamento.getId())
-            return false;
-
-        LocalDateTime dataHoraInicioExistente = agendamentoExistente.getDataHoraInicio();
-        LocalDateTime dataHoraFimExistente = agendamentoExistente.getDataHoraFim();
-        LocalDateTime dataHoraInicioNovo = novoAgendamento.getDataHoraInicio();
-        LocalDateTime dataHoraFimNovo = novoAgendamento.getDataHoraFim();
-
-        return (dataHoraInicioNovo.isBefore(dataHoraFimExistente) ||
-                dataHoraInicioNovo.isEqual(dataHoraFimExistente)) &&
-                (dataHoraFimNovo.isAfter(dataHoraInicioExistente) ||
-                        dataHoraFimNovo.isEqual(dataHoraInicioExistente));
-    }
-
-    public void verificarConflitoData(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
-        log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
-                "confirmado ou aprovado");
-        List<Agendamento> agendamentosConflitantes =
-                agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
-
-        if(!agendamentosConflitantes.isEmpty ())
-            throw new DataConflitanteAgendamentoException ("Já existe um agendamento para essa data");
-    }
-
-
-
-    private void verificarLimiteAgendamentosEmAnaliseDosParticipantes(List<User> solicitantes) {
+    private void verificarLimiteTransacaoEmAnalise(List<User> solicitantes) {
         log.info(">>> Verificar limite de solicitação: Barrando limite excedente de solicitação");
-        long agendamentosEmAnalise;
-
         for (User solicitante : solicitantes) {
-
-            agendamentosEmAnalise = solicitante.getAgendamentosRealizados().stream()
-                    .filter(agendamento -> agendamento.getStatusTransacaoItem() == EM_ANALISE)
-                    .count();
-
-            if(agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE)
-                throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
+            verificarLimiteTransacaoEmAnalise (solicitante);
         }
-
     }
 
 
