@@ -1,7 +1,7 @@
 package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.entity.MensagemEmail;
-import com.gerenciadorlehsa.service.EmailService;
+import com.gerenciadorlehsa.service.MensagemEmailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,17 +13,17 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMAIL_CONTROLLER;
 @Slf4j(topic = EMAIL_CONTROLLER)
 @RestController
 @AllArgsConstructor
-@RequestMapping("/email")
-public class EmailController {
+@RequestMapping("/mensagem-email")
+public class MensagemEmailController {
 
-    private final EmailService emailService;
+    private final MensagemEmailService mensagemEmailService;
 
     @PostMapping
     public String sendEmail(@RequestBody MensagemEmail mensagemEmail) {
         log.info(">>> enviando e-mail...");
 
         try {
-            emailService.sendEmail (mensagemEmail);
+            mensagemEmailService.sendEmail (mensagemEmail);
             return "Deu Certo!";
         } catch (Exception e) {
             e.printStackTrace ();

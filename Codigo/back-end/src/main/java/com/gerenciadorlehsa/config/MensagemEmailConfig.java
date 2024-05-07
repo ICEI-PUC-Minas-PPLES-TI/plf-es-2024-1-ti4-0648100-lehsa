@@ -12,7 +12,7 @@ import java.util.Properties;
 
 @Configuration
 @PropertySource ("classpath:envi/mail.properties")
-public class EmailConfig {
+public class MensagemEmailConfig {
 
     @Autowired
     private Environment env;

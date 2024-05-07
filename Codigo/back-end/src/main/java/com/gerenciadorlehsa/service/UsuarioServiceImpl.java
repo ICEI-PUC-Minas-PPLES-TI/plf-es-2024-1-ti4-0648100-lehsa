@@ -69,6 +69,12 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         return usuario;
     }
 
+    // Verificar se o e-mail existe no banco, implementando um método encontrarEmail em EmailService. Caso não existe,
+    // chama o
+    // método criar do EmailService para criar esse
+    // e-mail. Caso exista o e-mail e nenhum usuário (não professor) esteja vinculado a esse e-mail, vincula o e-mail
+    // ao usuário criado. Caso já exista um usuário vinculado, uma exceção deve ser lançada.
+
     /**
      * Atualiza um usuário previamente cadastrado
      *

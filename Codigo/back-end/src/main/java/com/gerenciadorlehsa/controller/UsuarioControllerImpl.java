@@ -54,14 +54,6 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
     @Override
     @GetMapping("/{id}")
     @Operation(summary = "Obter usuário por Id", description = "O usuário deve existir")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content =
-                    { @Content(mediaType = "application/json", schema =
-                    @Schema(implementation = UsuarioDTO.class)) }),
-            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Internal server error", content ={@Content(mediaType = "application/json", schema =
-                    @Schema(implementation = ErrorResponse.class)) })
-    })
     public ResponseEntity<UsuarioDTO> encontrarPorId(@PathVariable UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar usuário por id");
         User usuario = operacoesCRUDService.encontrarPorId(id);
