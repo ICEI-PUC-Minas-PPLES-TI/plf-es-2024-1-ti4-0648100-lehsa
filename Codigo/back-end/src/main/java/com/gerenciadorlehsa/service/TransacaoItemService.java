@@ -15,12 +15,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_ITEM_SER
 
 @Slf4j(topic = TRANSACAO_ITEM_SERVICE)
 @Service
-@AllArgsConstructor
-@NoArgsConstructor(force = true)
 public abstract class TransacaoItemService<T extends TransacaoItem> {
-
-    protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
-
 
     public abstract void atualizarStatus (@NotNull String status, @NotNull UUID id);
 

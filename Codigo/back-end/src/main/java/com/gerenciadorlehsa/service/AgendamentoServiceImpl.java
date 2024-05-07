@@ -12,6 +12,7 @@ import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
+import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,8 @@ public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> im
 
 
     private final AgendamentoRepository agendamentoRepository;
+
+    private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
     /**
      * Procura um agendamento por id
