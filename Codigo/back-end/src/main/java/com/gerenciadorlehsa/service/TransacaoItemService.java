@@ -1,7 +1,9 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.TransacaoItem;
 import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -45,5 +47,12 @@ public abstract class TransacaoItemService<T extends TransacaoItem> {
 
     public abstract void verificarLimiteTransacaoEmAnalise(User participante);
 
+
+    public abstract boolean ehSolicitante(T transacao, UsuarioDetails usuarioDetails);
+
+    public abstract boolean ehUsuarioAutorizado(T transacao, UsuarioDetails usuarioLogado);
+
+
+    public abstract void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, T transacao);
 
 }
