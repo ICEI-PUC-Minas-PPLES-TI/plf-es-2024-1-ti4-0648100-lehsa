@@ -16,6 +16,7 @@ import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoSer
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
@@ -30,13 +31,18 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
-@AllArgsConstructor
 public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
 
 
     private final AgendamentoRepository agendamentoRepository;
 
-    private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
+    @Autowired
+    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
+                              AgendamentoRepository agendamentoRepository) {
+        super (validadorAutorizacaoRequisicaoService);
+        this.agendamentoRepository = agendamentoRepository;
+    }
+
 
     /**
      * Procura um agendamento por id

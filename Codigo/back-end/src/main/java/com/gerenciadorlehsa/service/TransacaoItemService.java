@@ -4,8 +4,6 @@ import com.gerenciadorlehsa.entity.TransacaoItem;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -16,6 +14,12 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_ITEM_SER
 @Slf4j(topic = TRANSACAO_ITEM_SERVICE)
 @Service
 public abstract class TransacaoItemService<T extends TransacaoItem> {
+
+    protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
+
+    public TransacaoItemService (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
+        this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
+    }
 
     public abstract void atualizarStatus (@NotNull String status, @NotNull UUID id);
 
