@@ -19,8 +19,7 @@ public class Agendamento extends TransacaoItem {
     @JoinColumn(name = "tecnico_id")
     private User tecnico;
 
-    // CascadeType.PERSIST = operações de persistência (criação)
-    // CascadeType.MERGE = operações de mesclagem (atualização)
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "agendamento_usuario",
@@ -29,14 +28,7 @@ public class Agendamento extends TransacaoItem {
     )
     private List<User> solicitantes;
 
-
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "agendamento_item",
-            joinColumns = @JoinColumn(name = "agendamento_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
-    private List<Item> itens;
-
-
 }
+
+// CascadeType.PERSIST = operações de persistência (criação)
+// CascadeType.MERGE = operações de mesclagem (atualização)
