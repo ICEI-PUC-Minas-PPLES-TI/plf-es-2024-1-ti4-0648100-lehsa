@@ -1,15 +1,14 @@
 package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
+import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.exceptions.lancaveis.*;
+import com.gerenciadorlehsa.security.UsuarioDetails;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.dto.SenhaDTO;
 import com.gerenciadorlehsa.entity.enums.PerfilUsuario;
-import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarSenhaException;
-import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
-import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.repository.UsuarioRepository;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
@@ -171,6 +170,15 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         usuarioAtulizado.setPerfilUsuario (code);
         usuarioRepository.save (usuarioAtulizado);
     }
-    
 
+    @Override
+    public List<Agendamento> listarAgendamentoUsuario (@NotNull UUID id) {
+        User usuario = encontrarPorId(id);
+        log.info(">>> listarAgendamentoUsuario: listando todos agendamentos do usuario de id: " + usuario.getId());
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
+            return this.usuarioRepository.findAgendamentosRealizadosById(id);
+
+        throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses agendamentos");
+    }
 }
