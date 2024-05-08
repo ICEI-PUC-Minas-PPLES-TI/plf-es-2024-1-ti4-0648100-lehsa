@@ -1,10 +1,10 @@
 package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.TransacaoItem;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,8 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_ITEM_SER
 
 @Slf4j(topic = TRANSACAO_ITEM_SERVICE)
 @Service
+@Schema(description = "Superclasse abstrata que contém métodos e atributos em comum para qualquer tipo que é subtipo " +
+        "de TransacaoItem")
 public abstract class TransacaoItemService<T extends TransacaoItem> {
 
     protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
