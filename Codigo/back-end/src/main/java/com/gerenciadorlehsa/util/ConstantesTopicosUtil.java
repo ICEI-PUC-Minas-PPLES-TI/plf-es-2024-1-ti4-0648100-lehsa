@@ -12,11 +12,17 @@ public class ConstantesTopicosUtil {
 
     public static final String AGENDAMENTO_SERVICE = "AGENDAMENTO_SERVICE";
 
+    public static final String EMPRESTIMO_SERVICE = "EMPRESTIMO_SERVICE";
+
     public static final String TRANSACAO_ITEM_SERVICE = "TRANSACAO_ITEM_SERVICE";
 
     public static final String AGENDAMENTO_ENTITY_CONVERTER_COMP = "AGENDAMENTO_ENTITY_CONVERTER_COMP";
 
+    public static final String EMPRESTIMO_ENTITY_CONVERTER_COMP = "EMPRESTIMO_ENTITY_CONVERTER_COMP";
+
     public static final String AGENDAMENTO_VALIDADOR_COMP = "AGENDAMENTO_VALIDADOR_COMP";
+
+    public static final String EMPRESTIMO_VALIDADOR_COMP = "EMPRESTIMO_VALIDADOR_COMP";
 
     public static final String ITEM_SERVICE = "ITEM_SERVICE";
 
@@ -32,6 +38,8 @@ public class ConstantesTopicosUtil {
     public static final String EMAIL_CONTROLLER = "EMAIL_CONTROLLER";
 
     public static final String AGENDAMENTO_CONTROLLER = "AGENDAMENTO_CONTROLLER";
+
+    public static final String EMPRESTIMO_CONTROLLER = "EMPRESTIMO_CONTROLLER";
 
     public static final String ITEM_CONTROLLER = "ITEM_CONTROLLER";
 

@@ -1,6 +1,8 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
+import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import jakarta.transaction.Transactional;
@@ -29,6 +31,8 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService{
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
+
+    private final AgendamentoService agendamentoService;
 
     private final UsuarioRepository usuarioRepository;
 
@@ -68,11 +72,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         return usuario;
     }
 
-    // Verificar se o e-mail existe no banco, implementando um método encontrarEmail em EmailService. Caso não existe,
-    // chama o
-    // método criar do EmailService para criar esse
-    // e-mail. Caso exista o e-mail e nenhum usuário (não professor) esteja vinculado a esse e-mail, vincula o e-mail
-    // ao usuário criado. Caso já exista um usuário vinculado, uma exceção deve ser lançada.
 
     /**
      * Atualiza um usuário previamente cadastrado
@@ -100,9 +99,11 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
      * @param id id do usuário
      */
     @Override
+    @Transactional
     public void deletar(@NotNull UUID id) {
         log.info(">>> deletar: deletando usuário");
-        encontrarPorId(id);
+        User user = encontrarPorId(id);
+        removerUsuarioDaListaDeAgendamentos (user);
         try {
             this.usuarioRepository.deleteById(id);
             log.info(format(">>> deletar: usuário deletado, id: %s", id));
@@ -110,6 +111,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
             throw new DeletarEntidadeException(format("existem entidades relacionadas: %s", e));
         }
     }
+
 
     /**
      * Encontra um usuário a partir do seu email
@@ -160,6 +162,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     }
 
 
+    @Override
     public void atualizarPerfil(@NotNull UUID id, Integer code) {
         log.info(">>> atualizarStatus: atualizando status");
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
@@ -170,6 +173,25 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         usuarioAtulizado.setPerfilUsuario (code);
         usuarioRepository.save (usuarioAtulizado);
     }
+
+
+
+    public void removerUsuarioDaListaDeAgendamentos(User user) {
+        List<Agendamento> agendamentos = user.getAgendamentosRealizados();
+
+        if(agendamentos != null && !agendamentos.isEmpty ()) {
+
+            for (Agendamento agendamento : agendamentos) {
+
+                agendamento.getSolicitantes().remove(user);
+
+                if (agendamento.getSolicitantes().isEmpty()) {
+                    agendamentoService.deletarAgendamentoSeVazio (agendamento.getId ());
+                }
+            }
+        }
+    }
+    
 
     @Override
     public List<Agendamento> listarAgendamentoUsuario (@NotNull UUID id) {

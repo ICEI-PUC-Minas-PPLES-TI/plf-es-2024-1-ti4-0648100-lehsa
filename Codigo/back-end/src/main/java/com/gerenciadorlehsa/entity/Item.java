@@ -52,7 +52,7 @@ public class Item {
     @Column(name = "caminho_img", nullable = false)
     private String nomeImg;
 
-    @ManyToMany(mappedBy = "itens")
+    @ManyToMany(mappedBy = "itens", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Agendamento> agendamentos;
 
 

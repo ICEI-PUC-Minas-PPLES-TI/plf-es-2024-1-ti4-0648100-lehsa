@@ -1,11 +1,14 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
 import com.gerenciadorlehsa.repository.ItemRepository;
+import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +35,9 @@ public class ItemService {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private AgendamentoService agendamentoService;
 
     private final String DIRETORIO_IMGS = "Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs";
 
@@ -139,6 +145,7 @@ public class ItemService {
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
+        removerItemDaListaDeAgendamentos(item);
         try {
             deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
@@ -176,4 +183,22 @@ public class ItemService {
         log.info(">>> encontrarPorNome: encontrando itens com o nome especificado");
         return this.itemRepository.findByNome(nome);
     }
+
+
+    public void removerItemDaListaDeAgendamentos(Item item) {
+        List<Agendamento> agendamentos = item.getAgendamentos ();
+
+        if(agendamentos != null && !agendamentos.isEmpty ()) {
+
+            for (Agendamento agendamento : agendamentos) {
+
+                agendamento.getItens ().remove (item);
+
+                if (agendamento.getSolicitantes().isEmpty()) {
+                    agendamentoService.deletarAgendamentoSeVazio (agendamento.getId ());
+                }
+            }
+        }
+    }
+
 }

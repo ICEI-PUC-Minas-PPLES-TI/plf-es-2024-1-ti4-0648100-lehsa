@@ -2,21 +2,22 @@ package com.gerenciadorlehsa.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
 @Entity
 @Table(name = "TB_AGENDAMENTO")
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Agendamento extends TransacaoItem {
+public class Agendamento extends Transacao {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "tecnico_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private User tecnico;
 
 
@@ -30,5 +31,3 @@ public class Agendamento extends TransacaoItem {
 
 }
 
-// CascadeType.PERSIST = operações de persistência (criação)
-// CascadeType.MERGE = operações de mesclagem (atualização)

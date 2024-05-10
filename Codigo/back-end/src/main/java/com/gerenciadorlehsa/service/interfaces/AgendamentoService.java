@@ -10,4 +10,7 @@ import java.util.UUID;
 public interface AgendamentoService {
     List<Agendamento>  listarAgendamentoUsuario (@NotNull User usuario);
     void atualizarTecnico (User tecnico, @NotNull UUID id);
+
+    void deletarAgendamentoSeVazio(UUID id);
+
 }

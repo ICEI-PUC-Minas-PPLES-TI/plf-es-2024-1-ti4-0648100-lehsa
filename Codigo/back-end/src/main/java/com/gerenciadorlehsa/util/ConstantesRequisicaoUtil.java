@@ -15,6 +15,8 @@ public class ConstantesRequisicaoUtil {
 
     public static final String ENDPOINT_AGENDAMENTO = "/agendamento";
 
+    public static final String ENDPOINT_EMPRESTIMO = "/emprestimo";
+
     public static final String ENDPOINT_ITEM = "/item";
 
     public static final String[] CAMINHOS_PUBLICOS = {"/", "/actuator/health", "/usuario/verificar-token"};

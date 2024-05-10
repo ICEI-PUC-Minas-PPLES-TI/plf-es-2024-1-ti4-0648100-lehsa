@@ -1,21 +1,18 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
-import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.DataConflitanteAgendamentoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
-import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +24,12 @@ import java.util.UUID;
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
+import static java.lang.String.format;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
-public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
-
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
 
     private final AgendamentoRepository agendamentoRepository;
 
@@ -64,6 +61,7 @@ public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> im
 
 
     @Override
+    @Transactional
     public Agendamento criar (Agendamento obj) {
         log.info(">>> criando: criando agendamento");
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
@@ -127,14 +125,17 @@ public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> im
     }
 
     @Override
+    @Transactional
     public void deletar (UUID id) {
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
-        encontrarPorId(id);
+        Agendamento agendamento = encontrarPorId(id);
+        deletarAgendamentoDaListaDosUsuarios (agendamento);
+        deletarAgendamentoDaListaDosItens(agendamento);
         log.info(">>> deletar: deletando agendamento");
         try{
             this.agendamentoRepository.deleteById(id);
-        } catch (Exception e){
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new DeletarEntidadeException (format("existem entidades relacionadas: %s", e));
         }
     }
 
@@ -165,11 +166,23 @@ public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> im
         this.agendamentoRepository.save(agendamento);
     }
 
+    @Override
+    @Transactional
+    public void deletarAgendamentoSeVazio(UUID id) {
+        encontrarPorId(id);
+        log.info(">>> deletar: deletando agendamento sem solicitantes");
+        try{
+            this.agendamentoRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new DeletarEntidadeException (format("existem entidades relacionadas: %s", e));
+        }
+    }
+
 
 //----------------AgendamentoService - FIM ---------------------------
 
 
-//----------------TransacaoItemService - INÍCIO ---------------------------
+//----------------TransacaoService - INÍCIO ---------------------------
     @Override
     public void atualizarStatus (@NotNull String status, @NotNull UUID id) {
         log.info(">>> atualizarStatus: atualizando status do agendamento");
@@ -247,7 +260,7 @@ public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> im
     }
 
 
-//----------------TransacaoItemService - FIM ---------------------------
+//----------------TransacaoService - FIM ---------------------------
 
     private void verificarLimiteTransacaoEmAnalise(List<User> solicitantes) {
         log.info(">>> Verificar limite de solicitação: Barrando limite excedente de solicitação");
@@ -301,6 +314,23 @@ public class AgendamentoServiceImpl extends TransacaoItemService<Agendamento> im
             atributosIguais.add("observacaoSolicitacao");
 
         return atributosIguais;
+    }
+
+
+    public void deletarAgendamentoDaListaDosUsuarios(Agendamento agendamento) {
+
+        if(agendamento.getSolicitantes () != null && !agendamento.getSolicitantes ().isEmpty ())
+            for (User solicitante : agendamento.getSolicitantes()) {
+                solicitante.getAgendamentosRealizados ().remove (agendamento);
+            }
+    }
+
+    public void deletarAgendamentoDaListaDosItens(Agendamento agendamento) {
+
+        if(agendamento.getItens () != null && !agendamento.getItens ().isEmpty ())
+            for (Item item : agendamento.getItens ()) {
+                item.getAgendamentos ().remove (agendamento);
+            }
     }
 
 

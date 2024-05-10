@@ -126,6 +126,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
      * @param token objeto String passado como parâmetro da requisição
      * @return mensagem de validação ou bad request caso o token seja inválido
      */
+    @Override
     @GetMapping("/verificar-token")
     public ResponseEntity<?> verificarToken(@RequestParam("token") String token) {
         log.info("Verificando se o token é de um usuário cadastrado");
@@ -161,6 +162,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
      * @param codigoPerfil código referente ao perfil do usuário
      * @return id do usuário cujo perfil foi atualizado
      */
+    @Override
     @PutMapping("/perfil/{id}")
     public ResponseEntity<Map<String, Object>> atualizarPerfil(
             @PathVariable("id") UUID id,
