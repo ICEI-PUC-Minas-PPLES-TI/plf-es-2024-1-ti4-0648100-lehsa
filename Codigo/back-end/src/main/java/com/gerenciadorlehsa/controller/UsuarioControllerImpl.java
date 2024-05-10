@@ -1,12 +1,10 @@
 package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.components.JWTComp;
+import com.gerenciadorlehsa.dto.AgendamentoDTORes;
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +18,6 @@ import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
@@ -179,5 +176,12 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
 
     }
 
+    @GetMapping("/agendamento/{id}")
+    public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoUsuario (@PathVariable UUID id) {
+        log.info(">>> listarAgendamentoUsuario: recebendo requisição para listar todos agendamentos de um usuario");
+        List<Agendamento> agendamentos =
+                this.usuarioService.listarAgendamentoUsuario(id);
 
+        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
+    }
 }
