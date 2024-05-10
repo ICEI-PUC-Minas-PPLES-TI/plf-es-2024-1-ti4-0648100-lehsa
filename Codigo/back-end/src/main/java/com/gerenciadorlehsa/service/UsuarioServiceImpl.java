@@ -1,6 +1,8 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
+import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,8 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService{
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
+
+    private final AgendamentoService agendamentoService;
 
     private final UsuarioRepository usuarioRepository;
 
@@ -101,14 +105,35 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
      * @param id id do usuário
      */
     @Override
+    @Transactional
     public void deletar(@NotNull UUID id) {
         log.info(">>> deletar: deletando usuário");
-        encontrarPorId(id);
+        User user = encontrarPorId(id);
+        removerUsuarioDaListaDeAgendamentos (user);
         try {
             this.usuarioRepository.deleteById(id);
             log.info(format(">>> deletar: usuário deletado, id: %s", id));
         } catch (Exception e) {
             throw new DeletarEntidadeException(format("existem entidades relacionadas: %s", e));
+        }
+    }
+
+    /*
+    Se você não tiver a lógica para lidar com isso, poderá acabar com agendamentos órfãos no banco de dados, o que pode levar a inconsistências nos dados.
+    */
+    public void removerUsuarioDaListaDeAgendamentos(User user) {
+        List<Agendamento> agendamentos = user.getAgendamentosRealizados();
+
+        if(agendamentos != null && !agendamentos.isEmpty ()) {
+
+            for (Agendamento agendamento : agendamentos) {
+
+                agendamento.getSolicitantes().remove(user);
+
+                if (agendamento.getSolicitantes().isEmpty()) {
+                    agendamentoService.deletarAgendamentoSemSolicitantes (agendamento.getId ());
+                }
+            }
         }
     }
 

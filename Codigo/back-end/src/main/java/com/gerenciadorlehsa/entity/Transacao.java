@@ -14,7 +14,7 @@ import java.util.UUID;
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class TransacaoItem implements Serializable {
+public abstract class Transacao implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

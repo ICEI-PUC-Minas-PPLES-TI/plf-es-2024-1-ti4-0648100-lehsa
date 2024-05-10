@@ -33,6 +33,8 @@ public class ConstantesTopicosUtil {
 
     public static final String AGENDAMENTO_CONTROLLER = "AGENDAMENTO_CONTROLLER";
 
+    public static final String EMPRESTIMO_CONTROLLER = "EMPRESTIMO_CONTROLLER";
+
     public static final String ITEM_CONTROLLER = "ITEM_CONTROLLER";
 
 

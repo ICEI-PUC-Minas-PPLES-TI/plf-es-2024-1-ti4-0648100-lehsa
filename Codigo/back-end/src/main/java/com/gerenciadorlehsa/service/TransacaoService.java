@@ -1,6 +1,6 @@
 package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.entity.TransacaoItem;
+import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
@@ -17,11 +17,11 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_ITEM_SER
 @Service
 @Schema(description = "Superclasse abstrata que contém métodos e atributos em comum para qualquer tipo que é subtipo " +
         "de TransacaoItem")
-public abstract class TransacaoItemService<T extends TransacaoItem> {
+public abstract class TransacaoService<T extends Transacao> {
 
     protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
-    public TransacaoItemService (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
+    public TransacaoService (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
         this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
     }
 
