@@ -17,7 +17,7 @@ public class Emprestimo extends Transacao {
     private User solicitante;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH,CascadeType.DETACH})
-    @JoinColumn(name = "endereco_id", referencedColumnName = "ID")
+    @JoinColumn(name = "endereco_id", referencedColumnName = "ID", nullable = false)
     private Endereco localUso;
 
     @Transient

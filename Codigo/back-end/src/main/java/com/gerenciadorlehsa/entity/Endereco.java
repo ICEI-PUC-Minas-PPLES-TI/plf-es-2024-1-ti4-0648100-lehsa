@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.entity;
 
 
+import com.gerenciadorlehsa.entity.enums.UF;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,9 +34,9 @@ public class Endereco implements Serializable {
     @NotBlank
     private String bairro;
 
-    @Column(name = "uf", length = 45, nullable = false)
-    @NotBlank
-    private String uf;
+    @Column(name = "home_state", length = 45, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UF uf;
 
     @Column(name = "cidade", length = 45, nullable = false)
     @NotBlank

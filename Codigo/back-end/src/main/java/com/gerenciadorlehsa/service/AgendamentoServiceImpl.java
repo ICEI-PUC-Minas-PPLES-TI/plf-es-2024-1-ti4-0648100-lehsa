@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
@@ -29,7 +30,6 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
 public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
-
 
     private final AgendamentoRepository agendamentoRepository;
 
@@ -130,6 +130,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         Agendamento agendamento = encontrarPorId(id);
         deletarAgendamentoDaListaDosUsuarios (agendamento);
+        deletarAgendamentoDaListaDosItens(agendamento);
         log.info(">>> deletar: deletando agendamento");
         try{
             this.agendamentoRepository.deleteById(id);
@@ -167,7 +168,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     @Override
     @Transactional
-    public void deletarAgendamentoSemSolicitantes(UUID id) {
+    public void deletarAgendamentoSeVazio(UUID id) {
         encontrarPorId(id);
         log.info(">>> deletar: deletando agendamento sem solicitantes");
         try{
@@ -317,9 +318,19 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
 
     public void deletarAgendamentoDaListaDosUsuarios(Agendamento agendamento) {
-        for (User solicitante : agendamento.getSolicitantes()) {
-            solicitante.getAgendamentosRealizados ().remove (agendamento);
-        }
+
+        if(agendamento.getSolicitantes () != null && !agendamento.getSolicitantes ().isEmpty ())
+            for (User solicitante : agendamento.getSolicitantes()) {
+                solicitante.getAgendamentosRealizados ().remove (agendamento);
+            }
+    }
+
+    public void deletarAgendamentoDaListaDosItens(Agendamento agendamento) {
+
+        if(agendamento.getItens () != null && !agendamento.getItens ().isEmpty ())
+            for (Item item : agendamento.getItens ()) {
+                item.getAgendamentos ().remove (agendamento);
+            }
     }
 
 

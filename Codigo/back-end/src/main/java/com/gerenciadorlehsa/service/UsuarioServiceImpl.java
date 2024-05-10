@@ -73,11 +73,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         return usuario;
     }
 
-    // Verificar se o e-mail existe no banco, implementando um método encontrarEmail em EmailService. Caso não existe,
-    // chama o
-    // método criar do EmailService para criar esse
-    // e-mail. Caso exista o e-mail e nenhum usuário (não professor) esteja vinculado a esse e-mail, vincula o e-mail
-    // ao usuário criado. Caso já exista um usuário vinculado, uma exceção deve ser lançada.
 
     /**
      * Atualiza um usuário previamente cadastrado
@@ -118,24 +113,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         }
     }
 
-    /*
-    Se você não tiver a lógica para lidar com isso, poderá acabar com agendamentos órfãos no banco de dados, o que pode levar a inconsistências nos dados.
-    */
-    public void removerUsuarioDaListaDeAgendamentos(User user) {
-        List<Agendamento> agendamentos = user.getAgendamentosRealizados();
-
-        if(agendamentos != null && !agendamentos.isEmpty ()) {
-
-            for (Agendamento agendamento : agendamentos) {
-
-                agendamento.getSolicitantes().remove(user);
-
-                if (agendamento.getSolicitantes().isEmpty()) {
-                    agendamentoService.deletarAgendamentoSemSolicitantes (agendamento.getId ());
-                }
-            }
-        }
-    }
 
     /**
      * Encontra um usuário a partir do seu email
@@ -186,6 +163,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     }
 
 
+    @Override
     public void atualizarPerfil(@NotNull UUID id, Integer code) {
         log.info(">>> atualizarStatus: atualizando status");
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
@@ -195,6 +173,23 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
             throw new AtualizarStatusException ("O Código de perfil do usuário não existe");
         usuarioAtulizado.setPerfilUsuario (code);
         usuarioRepository.save (usuarioAtulizado);
+    }
+
+
+    public void removerUsuarioDaListaDeAgendamentos(User user) {
+        List<Agendamento> agendamentos = user.getAgendamentosRealizados();
+
+        if(agendamentos != null && !agendamentos.isEmpty ()) {
+
+            for (Agendamento agendamento : agendamentos) {
+
+                agendamento.getSolicitantes().remove(user);
+
+                if (agendamento.getSolicitantes().isEmpty()) {
+                    agendamentoService.deletarAgendamentoSeVazio (agendamento.getId ());
+                }
+            }
+        }
     }
     
 

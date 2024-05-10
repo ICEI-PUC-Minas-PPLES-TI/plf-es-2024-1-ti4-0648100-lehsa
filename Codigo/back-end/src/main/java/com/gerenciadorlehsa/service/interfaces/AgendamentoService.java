@@ -11,6 +11,6 @@ public interface AgendamentoService {
     List<Agendamento>  listarAgendamentoUsuario (@NotNull User usuario);
     void atualizarTecnico (User tecnico, @NotNull UUID id);
 
-    void deletarAgendamentoSemSolicitantes(UUID id);
+    void deletarAgendamentoSeVazio(UUID id);
 
 }
