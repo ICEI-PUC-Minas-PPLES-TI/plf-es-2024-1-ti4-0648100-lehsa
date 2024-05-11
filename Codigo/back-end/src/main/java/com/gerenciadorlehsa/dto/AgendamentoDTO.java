@@ -1,13 +1,12 @@
 package com.gerenciadorlehsa.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Builder
 @JsonPropertyOrder({"id","dataHoraInicio","dataHoraFim", "solicitantes", "itens","itensQuantidade", "observacaoSolicitacao"})

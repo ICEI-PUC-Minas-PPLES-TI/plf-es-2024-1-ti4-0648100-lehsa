@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import jakarta.persistence.*;
@@ -52,6 +53,7 @@ public abstract class Transacao implements Serializable {
 
 
     @ElementCollection
+    @JsonIgnore
     @CollectionTable(name = "TRANSACAO_ITEM_QUANTIDADE", joinColumns = @JoinColumn(name = "TRANSACAO_ID"))
     @MapKeyJoinColumn(name = "ITEM_ID")
     @Column(name = "QUANTIDADE")
