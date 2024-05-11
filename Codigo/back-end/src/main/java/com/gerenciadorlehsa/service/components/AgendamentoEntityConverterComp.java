@@ -12,7 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
@@ -44,8 +48,28 @@ public class AgendamentoEntityConverterComp {
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
         agendamento.setItens(acharItens (agendamentoDTO.itens()));
+        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itensQuantidade ()));
+
+
         return agendamento;
     }
+
+
+    private Map<Item, Integer> convertMapa(Map<ItemDTO, Integer> map) {
+        List<Item> chaves = acharItens (new ArrayList<> (map.keySet ()));
+        List<Integer> quantidade = new ArrayList<>(map.values ());
+
+        Map<Item, Integer> mapa = new HashMap<> ();
+        if (chaves.size() == quantidade.size()) {
+            for (int i = 0; i < chaves.size (); i++) {
+                Item chave = chaves.get (i);
+                Integer valor = quantidade.get (i);
+                mapa.put (chave, valor);
+            }
+        }
+        return mapa;
+    }
+
 
 
     private List<User> acharSolicitantes(List<UsuarioDTO> solicitantesDTO) {

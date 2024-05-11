@@ -7,7 +7,9 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -47,5 +49,13 @@ public abstract class Transacao implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "item_id")
     )
     private List<Item> itens;
+
+
+    @ElementCollection
+    @CollectionTable(name = "TRANSACAO_ITEM_QUANTIDADE", joinColumns = @JoinColumn(name = "TRANSACAO_ID"))
+    @MapKeyJoinColumn(name = "ITEM_ID")
+    @Column(name = "QUANTIDADE")
+    private Map<Item, Integer> itensQuantidade = new HashMap<> ();
+
 
 }

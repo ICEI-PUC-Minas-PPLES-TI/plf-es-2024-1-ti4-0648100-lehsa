@@ -116,6 +116,17 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TransacaoException.class)
+    public ResponseEntity<Object> capturarTransacaoException(@NotNull TransacaoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] AtualizarSenhaException: falha para atualizar a senha: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+
+
     /**
      * Captura exceções do tipo DataIntegrityViolationException
      *
@@ -279,6 +290,15 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         log.error(format("[ERRO] %s: %s", e.getClass().getSimpleName(),msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EmprestimoException.class)
+    public ResponseEntity<Object> capturarEmprestimoException(@NotNull EmprestimoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] EmprestimoException: erro no empréstimo: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
 
     /**
      * Constrói mensagem de erro (4 parâmetros)
