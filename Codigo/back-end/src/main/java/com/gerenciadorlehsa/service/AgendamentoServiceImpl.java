@@ -75,8 +75,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         if(!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty ())
             throw new AgendamentoException ("Já existe agendamento para essa data");
 
-        verificarItensNoMapa (obj);
-        verificarQtdDeItens(obj);
         verificarLimiteTransacaoEmAnalise (obj.getSolicitantes ());
         verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
 
@@ -96,9 +94,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         if (!ehSolicitante(obj, usuarioLogado)) {
             throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
         }
-
-        verificarItensNoMapa (obj);
-        verificarQtdDeItens(obj);
 
         List<String> atributosIguais = atributosIguais(agendamentoAtt, obj);
 
@@ -351,16 +346,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     }
 
 
-    public void verificarItensNoMapa(Agendamento agendamento) {
-        if(!temTodosOsItensNoMapa (agendamento))
-            throw new AgendamentoException ("O mapa possui itens diferentes");
-    }
-
-
-    public void verificarQtdDeItens(Agendamento agendamento) {
-        if(!temQuantidadeDeItemInValida (agendamento.getItensQuantidade ()))
-            throw new AgendamentoException ("A quantidade de item é inválida");
-    }
 
 
 

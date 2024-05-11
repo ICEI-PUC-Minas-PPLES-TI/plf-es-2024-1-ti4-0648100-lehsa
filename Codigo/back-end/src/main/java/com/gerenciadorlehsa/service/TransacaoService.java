@@ -1,6 +1,5 @@
 package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_ITEM_SERVICE;
 
@@ -66,41 +64,6 @@ public abstract class TransacaoService<T extends Transacao> {
                         dataHoraFimNovo.isEqual(dataHoraInicioExistente));
     }
 
-
-    protected boolean temQuantidadeDeItemInValida(Map<Item, Integer> itensQuantidade) {
-
-        for (Map.Entry<Item, Integer> entrada : itensQuantidade.entrySet()) {
-            Item item = entrada.getKey();
-            Integer quantidadeInformada = entrada.getValue();
-
-            if (quantidadeInformada < 0) {
-                return true;
-            }
-
-            if (quantidadeInformada > item.getQuantidade()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    protected boolean temTodosOsItensNoMapa(T transacao) {
-
-        List<Item> itens = transacao.getItens();
-        Map<Item, Integer> itensQuantidade = transacao.getItensQuantidade();
-
-        if (itens.size() != itensQuantidade.size()) {
-            return false;
-        }
-
-        for (Item item : itens) {
-            if (!itensQuantidade.containsKey(item)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
 
 }

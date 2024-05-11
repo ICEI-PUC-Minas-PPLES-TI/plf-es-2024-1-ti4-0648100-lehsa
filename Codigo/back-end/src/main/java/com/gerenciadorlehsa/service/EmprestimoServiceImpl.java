@@ -3,25 +3,16 @@ package com.gerenciadorlehsa.service;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
-import com.gerenciadorlehsa.exceptions.lancaveis.EmprestimoException;
 import com.gerenciadorlehsa.repository.EmprestimoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.APROVADO;
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.CONFIRMADO;
-//import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_SERVICE;
-
-//@Slf4j(topic = EMPRESTIMO_SERVICE)
 @Service
 public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>, EmprestimoService {
 
@@ -70,7 +61,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         return emprestimoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
     }
 
-    public void verificarConflitoComTransacoesAprovadasOuConfirmadas (Emprestimo emprestimo){
+/*    public void verificarConflitoComTransacoesAprovadasOuConfirmadas (Emprestimo emprestimo){
         List<Item> itens = emprestimo.getItens ();
         List<Emprestimo> emprestimosAprovadosOuConfirmadosConflitantes =
                 transacoesAprovadasOuConfirmadasConflitantes (emprestimo.getDataHoraInicio (), emprestimo.getDataHoraFim ());
@@ -88,7 +79,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
 
         }
-    }
+    }*/
 
     @Override
     public int calcularQuantidadeTransacao(Item item, List<Emprestimo> emprestimos) {

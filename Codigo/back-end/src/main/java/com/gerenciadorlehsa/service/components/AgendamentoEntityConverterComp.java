@@ -29,13 +29,16 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 public class AgendamentoEntityConverterComp {
 
     private final AgendamentoValidadorComp agendamentoValidator;
+    private final ValidadorTransacaoComp<Agendamento> validadorTransacaoComp;
     private final UsuarioService usuarioService;
     private final ItemService itemService;
 
 
     public Agendamento convertToEntity(AgendamentoDTO agendamentoDTO) {
         agendamentoValidator.validate(agendamentoDTO);
-        return convert(agendamentoDTO);
+        Agendamento agendamento = convert (agendamentoDTO);
+        validadorTransacaoComp.validarTransacao (agendamento);
+        return agendamento;
     }
 
     public Agendamento convert(AgendamentoDTO agendamentoDTO) {
