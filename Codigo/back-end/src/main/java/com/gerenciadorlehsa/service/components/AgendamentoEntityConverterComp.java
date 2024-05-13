@@ -12,8 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +27,7 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 public class AgendamentoEntityConverterComp {
 
     private final AgendamentoValidadorComp agendamentoValidator;
-    private final ValidadorTransacaoComp<Agendamento> validadorTransacaoComp;
+    private final ValidadorTransacaoComp validadorTransacaoComp;
     private final UsuarioService usuarioService;
     private final ItemService itemService;
 
@@ -51,16 +49,17 @@ public class AgendamentoEntityConverterComp {
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
         agendamento.setItens(acharItens (agendamentoDTO.itens()));
-        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itensQuantidade ()));
+        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens (), agendamento.getItens ()));
 
 
         return agendamento;
     }
 
-
-    private Map<Item, Integer> convertMapa(Map<ItemDTO, Integer> map) {
-        List<Item> chaves = acharItens (new ArrayList<> (map.keySet ()));
-        List<Integer> quantidade = new ArrayList<>(map.values ());
+    private Map<Item, Integer> convertMapa(List<ItemDTO> itemDTOS, List<Item> chaves) {
+        List<Integer> quantidade = itemDTOS
+                .stream ()
+                .map (ItemDTO::quantidadeTransacao)
+                .toList ();
 
         Map<Item, Integer> mapa = new HashMap<> ();
         if (chaves.size() == quantidade.size()) {
@@ -72,7 +71,6 @@ public class AgendamentoEntityConverterComp {
         }
         return mapa;
     }
-
 
 
     private List<User> acharSolicitantes(List<UsuarioDTO> solicitantesDTO) {

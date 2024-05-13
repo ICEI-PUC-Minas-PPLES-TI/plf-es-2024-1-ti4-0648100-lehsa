@@ -16,19 +16,19 @@ import java.util.Map;
 
 @Component
 @AllArgsConstructor
-public class ValidadorTransacaoComp<T extends Transacao> {
+public class ValidadorTransacaoComp {
 
     private final TransacaoService<Emprestimo> transacaoEmprestimoService;
     private final TransacaoService<Agendamento> transacaoAgendamentoService;
 
-    public void validarTransacao(T transacao) {
+    public void validarTransacao(Agendamento transacao) {
         verificarItensNoMapa(transacao);
-        verificarQtdDeItens(transacao);
+        verificarQuantidadeDeItemInValida(transacao.getItensQuantidade ());
         verificarQuantidadeSelecionada(transacao);
     }
 
 
-    public void verificarQuantidadeSelecionada(T transacao) {
+    public void verificarQuantidadeSelecionada(Agendamento transacao) {
 
         for (Map.Entry<Item, Integer> entry : transacao.getItensQuantidade().entrySet()) {
             Item item = entry.getKey();
@@ -65,52 +65,41 @@ public class ValidadorTransacaoComp<T extends Transacao> {
         return transacaoAgendamentoService.transacoesAprovadasOuConfirmadasConflitantes (inicio,fim);
     }
 
-    protected boolean temQuantidadeDeItemInValida(Map<Item, Integer> itensQuantidade) {
+    private void verificarQuantidadeDeItemInValida(Map<Item, Integer> itensQuantidade) {
 
         for (Map.Entry<Item, Integer> entrada : itensQuantidade.entrySet()) {
             Item item = entrada.getKey();
             Integer quantidadeInformada = entrada.getValue();
 
             if (quantidadeInformada < 0) {
-                return true;
+                throw new AgendamentoException ("A quantidade informada é menor que zero");
             }
 
             if (quantidadeInformada > item.getQuantidade()) {
-                return true;
+                throw new AgendamentoException ("A quantidade informada é maior do que a quantidade existe em estoque");
             }
         }
-        return false;
+
     }
 
 
-    protected boolean temTodosOsItensNoMapa(T transacao) {
+    private void verificarItensNoMapa(Agendamento transacao) {
 
         List<Item> itens = transacao.getItens();
         Map<Item, Integer> itensQuantidade = transacao.getItensQuantidade();
 
         if (itens.size() != itensQuantidade.size()) {
-            return false;
+            throw new AgendamentoException ("A quantidade de itens e quantidade de unidades de cada item diferem!");
         }
 
         for (Item item : itens) {
             if (!itensQuantidade.containsKey(item)) {
-                return false;
+               throw new AgendamentoException ("O item " + item.getNome () + " não é chave do mapa de itens " +
+                       "quantidade");
             }
         }
-        return true;
     }
 
-
-    public void verificarItensNoMapa(T transacao) {
-        if(!temTodosOsItensNoMapa (transacao))
-            throw new AgendamentoException ("O mapa possui itens diferentes");
-    }
-
-
-    public void verificarQtdDeItens(T transacao) {
-        if(!temQuantidadeDeItemInValida (transacao.getItensQuantidade ()))
-            throw new AgendamentoException ("A quantidade de item é inválida");
-    }
 
 
 }

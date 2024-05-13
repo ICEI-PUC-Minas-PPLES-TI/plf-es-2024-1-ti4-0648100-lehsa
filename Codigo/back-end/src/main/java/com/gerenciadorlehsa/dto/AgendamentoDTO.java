@@ -11,7 +11,6 @@ public record AgendamentoDTO(
         UUID id,
         List<UsuarioDTO> solicitantes,
         List<ItemDTO> itens,
-        Map<ItemDTO, Integer> itensQuantidade,
         String dataHoraInicio,
         String dataHoraFim,
         String observacaoSolicitacao

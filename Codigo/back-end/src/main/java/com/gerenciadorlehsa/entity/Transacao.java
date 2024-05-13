@@ -43,21 +43,4 @@ public abstract class Transacao implements Serializable {
     private StatusTransacaoItem statusTransacaoItem;
 
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "transacao_item",
-            joinColumns = @JoinColumn(name = "transacao_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
-    private List<Item> itens;
-
-
-    @ElementCollection
-    @JsonIgnore
-    @CollectionTable(name = "TRANSACAO_ITEM_QUANTIDADE", joinColumns = @JoinColumn(name = "TRANSACAO_ID"))
-    @MapKeyJoinColumn(name = "ITEM_ID")
-    @Column(name = "QUANTIDADE")
-    private Map<Item, Integer> itensQuantidade = new HashMap<> ();
-
-
 }
