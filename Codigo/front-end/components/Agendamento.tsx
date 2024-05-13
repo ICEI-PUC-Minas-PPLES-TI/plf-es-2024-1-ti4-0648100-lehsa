@@ -13,7 +13,7 @@ interface AgendamentoProps {
 
 const Agendamento: React.FC<AgendamentoProps> = ({ items, tecnico, dataHoraFim, dataHoraInicio }) => {
   return (
-    <div className="pl-[8rem]">
+    <div className="flex justify-center">
       {items.map((item) => (
         <AgendamentoInfoRow key={item.id} item={item} tecnico={tecnico} dataHoraFim={dataHoraFim} dataHoraInicio={dataHoraInicio}/>
       ))}

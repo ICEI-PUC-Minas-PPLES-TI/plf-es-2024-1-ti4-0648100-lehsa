@@ -1,10 +1,12 @@
 package com.gerenciadorlehsa.controller;
 
+import com.gerenciadorlehsa.controller.interfaces.AgendamentoController;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.service.AgendamentoConverterService;
+import com.gerenciadorlehsa.service.TransacaoService;
+import com.gerenciadorlehsa.service.components.AgendamentoEntityConverterComp;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
@@ -32,11 +34,12 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_AGENDAMENTO)
 @AllArgsConstructor
-public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes> {
+public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>, AgendamentoController {
 
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
     private final AgendamentoService agendamentoService;
-    private final AgendamentoConverterService agendamentoConverterService;
+    private final AgendamentoEntityConverterComp agendamentoEntityConverterComp;
+    private final TransacaoService<Agendamento> transacaoService;
 
 
     @Override
@@ -52,7 +55,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     @PostMapping
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody AgendamentoDTO agendamentoDTO) {
         log.info(">>> criar: recebendo requisição para criar agendamento");
-        Agendamento agendamento = agendamentoConverterService.convertToEntity (agendamentoDTO);
+        Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (agendamentoDTO);
         Agendamento agendamentoCriado = operacoesCRUDService.criar (agendamento);
 
         return ResponseEntity.created (URI.create("/agendamento/" + agendamentoCriado.getId())).body (construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(CREATED.value(), MSG_AGENDAMENTO_CRIADO, agendamentoCriado.getId())));
@@ -63,7 +66,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
                                                           @Valid @RequestBody AgendamentoDTO obj) {
         log.info(">>> atualizar: recebendo requisição para atualizar agendamento");
-        Agendamento agendamento = agendamentoConverterService.convertToEntity (obj);
+        Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (obj);
         agendamento.setId(id);
         Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
 
@@ -88,31 +91,37 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 
-    @GetMapping("/usuario/{email}")
-    public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoUsuario (@PathVariable String email) {
-        log.info(">>> listarAgendamentoUsuario: recebendo requisição para listar todos agendamentos de um usuario");
-        List<Agendamento> agendamentos = this.agendamentoService.listarAgendamentoUsuario(this.agendamentoConverterService.encontrarUsuario(email));
-
-        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
-    }
-
+    @Override
     @PatchMapping("/{id}/{status}")
     public ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
                                                                 @PathVariable String status) {
         log.info(">>> atualizarStatus: recebendo requisição para atualizar status do agendamento");
 
-        agendamentoService.atualizarStatus(status, id);
+        transacaoService.atualizarStatus(status, id);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
     }
 
+    @Override
     @PatchMapping("/tecnico/{id}/{email}")
     public ResponseEntity<Map<String, Object>> atualizarTecnico (@PathVariable UUID id,
-                                                                @PathVariable String email) {
+                                                                 @PathVariable String email) {
         log.info(">>> atualizarTecnico: recebendo requisição para atualizar tecnico do agendamento");
 
-        agendamentoService.atualizarTecnico(agendamentoConverterService.encontrarUsuario(email), id);
+        agendamentoService.atualizarTecnico(agendamentoEntityConverterComp.encontrarUsuario(email), id);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
     }
+
+    @GetMapping("/usuario/{email}")
+    public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoUsuario (@PathVariable String email) {
+        log.info(">>> listarAgendamentoUsuario: recebendo requisição para listar todos agendamentos de um usuario");
+        List<Agendamento> agendamentos =
+                this.agendamentoService.listarAgendamentoUsuario(this.agendamentoEntityConverterComp.encontrarUsuario(email));
+
+        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
+    }
+
+
+
 }

@@ -5,12 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d13086a4-242b-4621-a004-3a2ebb51a70b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/app/admin/agendamentos/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/admin/agendamentos/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/app/user/FormAgendamento.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/user/FormAgendamento.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front-end/app/user/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/app/user/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/dto/EmprestimoDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/dto/EmprestimoDTORes.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/dto/EnderecoDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/AgendamentoServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/ItemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/ItemService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/UsuarioServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/UsuarioServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/interfaces/AgendamentoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gerenciadorlehsa/service/interfaces/AgendamentoService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,9 +22,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Record" />
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Interface" />
+        <option value="Record" />
       </list>
     </option>
   </component>
@@ -44,6 +45,7 @@
     <option name="showMembers" value="true" />
     <option name="showVisibilityIcons" value="true" />
   </component>
+ 
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Application.GerenciadorLehsaApplication.executor&quot;: &quot;Run&quot;,
@@ -70,7 +72,13 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
+
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="L:\repositories\plf-es-2024-1-ti4-0648100-lehsa\Codigo\back-end\src\main\resources\envi" />
+    </key>
+  </component>
   <component name="RunManager" selected="Application.GerenciadorLehsaApplication">
     <configuration name="GerenciadorLehsaApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.gerenciadorlehsa.GerenciadorLehsaApplication" />
@@ -136,6 +144,16 @@
       <workItem from="1714408045546" duration="769000" />
       <workItem from="1714412349639" duration="5096000" />
       <workItem from="1714427950429" duration="1793000" />
+      <workItem from="1714576059773" duration="16042000" />
+      <workItem from="1714632784499" duration="9204000" />
+      <workItem from="1714654541701" duration="4526000" />
+      <workItem from="1714737166837" duration="13533000" />
+      <workItem from="1714764227574" duration="1896000" />
+      <workItem from="1714777407646" duration="3878000" />
+      <workItem from="1714937269616" duration="4648000" />
+      <workItem from="1715029874047" duration="5141000" />
+      <workItem from="1715090993903" duration="898000" />
+      <workItem from="1715293422238" duration="11152000" />
     </task>
     <servers />
   </component>

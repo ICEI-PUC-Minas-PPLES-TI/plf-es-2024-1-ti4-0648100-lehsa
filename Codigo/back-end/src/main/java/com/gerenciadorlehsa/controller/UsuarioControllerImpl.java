@@ -1,7 +1,10 @@
 package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.components.JWTComp;
+import com.gerenciadorlehsa.dto.AgendamentoDTORes;
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +50,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
      */
     @Override
     @GetMapping("/{id}")
+    @Operation(summary = "Obter usuário por Id", description = "O usuário deve existir")
     public ResponseEntity<UsuarioDTO> encontrarPorId(@PathVariable UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar usuário por id");
         User usuario = operacoesCRUDService.encontrarPorId(id);
@@ -122,6 +126,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
      * @param token objeto String passado como parâmetro da requisição
      * @return mensagem de validação ou bad request caso o token seja inválido
      */
+    @Override
     @GetMapping("/verificar-token")
     public ResponseEntity<?> verificarToken(@RequestParam("token") String token) {
         log.info("Verificando se o token é de um usuário cadastrado");
@@ -157,6 +162,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
      * @param codigoPerfil código referente ao perfil do usuário
      * @return id do usuário cujo perfil foi atualizado
      */
+    @Override
     @PutMapping("/perfil/{id}")
     public ResponseEntity<Map<String, Object>> atualizarPerfil(
             @PathVariable("id") UUID id,
@@ -170,5 +176,12 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
 
     }
 
+    @GetMapping("/agendamento/{id}")
+    public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoUsuario (@PathVariable UUID id) {
+        log.info(">>> listarAgendamentoUsuario: recebendo requisição para listar todos agendamentos de um usuario");
+        List<Agendamento> agendamentos =
+                this.usuarioService.listarAgendamentoUsuario(id);
 
+        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
+    }
 }

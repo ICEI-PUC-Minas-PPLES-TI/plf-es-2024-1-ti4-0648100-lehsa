@@ -45,7 +45,7 @@ const UserPage = () => {
       <div className="flex space-x-5">
         <div className="w-full bg-white h-auto rounded-2xl p-5">
           <h2 className="font-semibold text-xl mb-4">Seus Agendamentos</h2>
-          <div className="grid gap-4 justify-center lg:grid-cols-2">
+          <div className="flex flex-col justify-center">
             {agendamentos.map(agendamento => (
               <Agendamento key={agendamento.id} items={agendamento.itens} dataHoraFim={agendamento.dataHoraFim} dataHoraInicio={agendamento.dataHoraInicio} tecnico={agendamento.tecnico}/>
             ))}

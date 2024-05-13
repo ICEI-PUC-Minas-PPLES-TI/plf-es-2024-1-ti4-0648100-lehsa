@@ -49,11 +49,18 @@ public class User extends Pessoa {
     private StatusCurso statusCurso;
 
 
-    @OneToMany(mappedBy = "tecnico")
+    @OneToMany(mappedBy = "tecnico", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Agendamento> agendamentosComoTecnico;
 
 
-    @ManyToMany(mappedBy = "solicitantes")
+    @ManyToMany(mappedBy = "solicitantes", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Agendamento> agendamentosRealizados;
 
+
+    @OneToMany(mappedBy = "solicitante", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Emprestimo> emprestimos;
+
+
 }
+
+

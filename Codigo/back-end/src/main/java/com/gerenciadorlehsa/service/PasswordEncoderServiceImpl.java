@@ -10,11 +10,11 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ENCRIPTADOR_SENHA_
 @Slf4j(topic = ENCRIPTADOR_SENHA_SERVICE)
 @Service
 @AllArgsConstructor
-public class PasswordEncoderImpl implements PasswordEncoder {
+public class PasswordEncoderServiceImpl implements PasswordEncoder {
 
     private final BCryptPasswordEncoder encoder;
 
-    public PasswordEncoderImpl() {
+    public PasswordEncoderServiceImpl () {
         this.encoder = new BCryptPasswordEncoder();
     }
 
