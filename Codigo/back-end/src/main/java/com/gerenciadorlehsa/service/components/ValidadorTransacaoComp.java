@@ -76,7 +76,8 @@ public class ValidadorTransacaoComp {
             }
 
             if (quantidadeInformada > item.getQuantidade()) {
-                throw new AgendamentoException ("A quantidade informada é maior do que a quantidade existe em estoque");
+                throw new AgendamentoException ("A quantidade informada é maior do que a quantidade que existe em " +
+                        "estoque");
             }
         }
 
@@ -94,8 +95,7 @@ public class ValidadorTransacaoComp {
 
         for (Item item : itens) {
             if (!itensQuantidade.containsKey(item)) {
-               throw new AgendamentoException ("O item " + item.getNome () + " não é chave do mapa de itens " +
-                       "quantidade");
+               throw new AgendamentoException ("O item " + item.getNome () + " não é chave do mapa de item/quantidade");
             }
         }
     }

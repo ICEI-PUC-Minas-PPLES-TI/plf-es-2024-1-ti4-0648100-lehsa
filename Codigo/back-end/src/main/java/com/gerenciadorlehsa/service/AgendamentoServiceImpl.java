@@ -11,6 +11,7 @@ import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
+import jakarta.transaction.Status;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
+
+import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
 import static java.lang.String.format;
@@ -198,8 +200,14 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
             Agendamento agendamento = encontrarPorId(id);
 
+            if(!agendamentoRepository.buscarConflitosDeAgendamento (agendamento.getDataHoraInicio (),
+                    agendamento.getDataHoraFim ()).isEmpty () && (statusUpperCase == APROVADO || statusUpperCase == CONFIRMADO)) {
+                throw new AgendamentoException ("Um agendamento para essa data já foi aprovado ou confirmado.");
+            }
+
+
             if (statusUpperCase.equals(StatusTransacaoItem.CANCELADO) ||
-                    statusUpperCase.equals(StatusTransacaoItem.CONFIRMADO)) {
+                    statusUpperCase.equals(CONFIRMADO)) {
                 UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
                 if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
                     throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
