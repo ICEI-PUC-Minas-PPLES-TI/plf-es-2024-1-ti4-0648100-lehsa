@@ -4,14 +4,14 @@ import React from "react";
 import ImageComp from "./ImageComp";
 import { Item, Tecnico } from "./types";
 
-interface AgendamentoInfoRowProps {
+interface EmprestimoInfoRowProps {
   item: Item;
   tecnico: Tecnico;
   dataHoraFim: string;
   dataHoraInicio: string;
 }
 
-const AgendamentoInfoRow: React.FC<AgendamentoInfoRowProps> = ({
+const EmprestimoInfoRow: React.FC<EmprestimoInfoRowProps> = ({
   item,
   tecnico,
   dataHoraFim,
@@ -73,4 +73,4 @@ const AgendamentoInfoRow: React.FC<AgendamentoInfoRowProps> = ({
   );
 };
 
-export default AgendamentoInfoRow;
+export default EmprestimoInfoRow;
