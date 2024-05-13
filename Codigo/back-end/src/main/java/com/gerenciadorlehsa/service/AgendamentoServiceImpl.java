@@ -75,7 +75,9 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
 
         if(!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty ())
-            throw new AgendamentoException ("Já existe agendamento para essa data");
+            throw new AgendamentoException ("Já existe agendamento aprovado pelo administrador ou confirmado pelo " +
+                    "usuário" +
+                    "para essa data");
 
         verificarLimiteTransacaoEmAnalise (obj.getSolicitantes ());
         verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
@@ -200,8 +202,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
             Agendamento agendamento = encontrarPorId(id);
 
-            if(!agendamentoRepository.buscarConflitosDeAgendamento (agendamento.getDataHoraInicio (),
-                    agendamento.getDataHoraFim ()).isEmpty () && (statusUpperCase == APROVADO || statusUpperCase == CONFIRMADO)) {
+            if(!agendamentoRepository.findAprovadosOuConfirmadosConflitantes (agendamento.getDataHoraInicio (), agendamento.getDataHoraFim ()).isEmpty () && (statusUpperCase == APROVADO || statusUpperCase == CONFIRMADO)) {
                 throw new AgendamentoException ("Um agendamento para essa data já foi aprovado ou confirmado.");
             }
 
