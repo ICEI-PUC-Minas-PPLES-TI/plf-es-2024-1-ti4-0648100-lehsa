@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.security.UsuarioDetails;
@@ -9,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_ITEM_SERVICE;
 
@@ -25,7 +27,24 @@ public abstract class TransacaoService<T extends Transacao> {
         this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
     }
 
+
+    public abstract int calcularQuantidadeTransacao(Item item, List<T> transacao);
+
     public abstract void atualizarStatus (@NotNull String status, @NotNull UUID id);
+
+
+    public abstract List<T> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim);
+
+    public abstract void verificarLimiteTransacaoEmAnalise(User participante);
+
+
+    public abstract boolean ehSolicitante(T transacao, UsuarioDetails usuarioDetails);
+
+    public abstract boolean ehUsuarioAutorizado(T transacao, UsuarioDetails usuarioLogado);
+
+
+    public abstract void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, T transacao);
+
 
 
     protected boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
@@ -45,16 +64,6 @@ public abstract class TransacaoService<T extends Transacao> {
                         dataHoraFimNovo.isEqual(dataHoraInicioExistente));
     }
 
-    public abstract void verificarConflitoComTransacoesAprovadasOuConfirmadas(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim);
 
-    public abstract void verificarLimiteTransacaoEmAnalise(User participante);
-
-
-    public abstract boolean ehSolicitante(T transacao, UsuarioDetails usuarioDetails);
-
-    public abstract boolean ehUsuarioAutorizado(T transacao, UsuarioDetails usuarioLogado);
-
-
-    public abstract void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, T transacao);
 
 }

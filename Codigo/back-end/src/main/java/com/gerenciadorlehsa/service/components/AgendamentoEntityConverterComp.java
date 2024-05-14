@@ -12,7 +12,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
@@ -25,13 +27,16 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 public class AgendamentoEntityConverterComp {
 
     private final AgendamentoValidadorComp agendamentoValidator;
+    private final ValidadorTransacaoComp validadorTransacaoComp;
     private final UsuarioService usuarioService;
     private final ItemService itemService;
 
 
     public Agendamento convertToEntity(AgendamentoDTO agendamentoDTO) {
         agendamentoValidator.validate(agendamentoDTO);
-        return convert(agendamentoDTO);
+        Agendamento agendamento = convert (agendamentoDTO);
+        validadorTransacaoComp.validarTransacao (agendamento);
+        return agendamento;
     }
 
     public Agendamento convert(AgendamentoDTO agendamentoDTO) {
@@ -44,7 +49,27 @@ public class AgendamentoEntityConverterComp {
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
         agendamento.setItens(acharItens (agendamentoDTO.itens()));
+        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens (), agendamento.getItens ()));
+
+
         return agendamento;
+    }
+
+    private Map<Item, Integer> convertMapa(List<ItemDTO> itemDTOS, List<Item> chaves) {
+        List<Integer> quantidade = itemDTOS
+                .stream ()
+                .map (ItemDTO::quantidadeTransacao)
+                .toList ();
+
+        Map<Item, Integer> mapa = new HashMap<> ();
+        if (chaves.size() == quantidade.size()) {
+            for (int i = 0; i < chaves.size (); i++) {
+                Item chave = chaves.get (i);
+                Integer valor = quantidade.get (i);
+                mapa.put (chave, valor);
+            }
+        }
+        return mapa;
     }
 
 

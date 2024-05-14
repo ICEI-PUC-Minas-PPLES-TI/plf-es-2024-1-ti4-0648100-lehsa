@@ -1,23 +1,18 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Emprestimo;
+import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.repository.EmprestimoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_SERVICE;
-
-@Slf4j(topic = EMPRESTIMO_SERVICE)
 @Service
 public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>, EmprestimoService {
 
@@ -36,6 +31,8 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public Emprestimo criar (Emprestimo obj) {
+        //validadorAutorizacaoRequisicaoService.getUsuarioLogado ();
+
         return null;
     }
 
@@ -60,9 +57,40 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     }
 
     @Override
-    public void verificarConflitoComTransacoesAprovadasOuConfirmadas (LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
-
+    public List<Emprestimo> transacoesAprovadasOuConfirmadasConflitantes (LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+        return emprestimoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
     }
+
+/*    public void verificarConflitoComTransacoesAprovadasOuConfirmadas (Emprestimo emprestimo){
+        List<Item> itens = emprestimo.getItens ();
+        List<Emprestimo> emprestimosAprovadosOuConfirmadosConflitantes =
+                transacoesAprovadasOuConfirmadasConflitantes (emprestimo.getDataHoraInicio (), emprestimo.getDataHoraFim ());
+
+        for (Item item : itens) {
+            List<Emprestimo> emprestimosDoItem = item.getEmprestimos ();
+
+            if(emprestimosDoItem != null && !emprestimosDoItem.isEmpty ()) {
+                for (Emprestimo emprestimoDoItem : emprestimosDoItem) {
+                    if(emprestimosAprovadosOuConfirmadosConflitantes.contains (emprestimoDoItem))
+                        throw new EmprestimoException ("O item " + item.getNome () + " já possui um empréstimo nessa " +
+                                "data e hora!");
+                }
+            }
+
+
+        }
+    }*/
+
+    @Override
+    public int calcularQuantidadeTransacao(Item item, List<Emprestimo> emprestimos) {
+        int quantidadeEmprestada = 0;
+        for (Emprestimo emprestimo : emprestimos) {
+            Integer quantidade = emprestimo.getItensQuantidade().getOrDefault(item, 0);
+            quantidadeEmprestada += quantidade;
+        }
+        return quantidadeEmprestada;
+    }
+
 
     @Override
     public void verificarLimiteTransacaoEmAnalise (User participante) {

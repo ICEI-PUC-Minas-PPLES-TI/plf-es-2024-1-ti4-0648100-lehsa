@@ -11,6 +11,7 @@ import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
+import jakarta.transaction.Status;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
+
+import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
 import static java.lang.String.format;
@@ -29,13 +31,13 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
-public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService{
 
     private final AgendamentoRepository agendamentoRepository;
 
+
     @Autowired
-    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
-                              AgendamentoRepository agendamentoRepository) {
+    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, AgendamentoRepository agendamentoRepository) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
     }
@@ -71,7 +73,12 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
         DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
-        verificarConflitoComTransacoesAprovadasOuConfirmadas (dataHoraInicio, dataHoraFim);
+
+        if(!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty ())
+            throw new AgendamentoException ("Já existe agendamento aprovado pelo administrador ou confirmado pelo " +
+                    "usuário" +
+                    "para essa data");
+
         verificarLimiteTransacaoEmAnalise (obj.getSolicitantes ());
         verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
 
@@ -101,7 +108,10 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         if (!(atributosIguais.contains("dataHoraInicio") && atributosIguais.contains("dataHoraFim"))) {
             DataHoraUtil.dataValida(dataHoraInicio, dataHoraFim);
-            verificarConflitoComTransacoesAprovadasOuConfirmadas(dataHoraInicio, dataHoraFim);
+
+            if(!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty ())
+                throw new AgendamentoException ("Já existe agendamento para essa data");
+
             verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
         }
         atributosIguais.add("tecnico");
@@ -192,8 +202,13 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
             Agendamento agendamento = encontrarPorId(id);
 
+            if(!agendamentoRepository.findAprovadosOuConfirmadosConflitantes (agendamento.getDataHoraInicio (), agendamento.getDataHoraFim ()).isEmpty () && (statusUpperCase == APROVADO || statusUpperCase == CONFIRMADO)) {
+                throw new AgendamentoException ("Um agendamento para essa data já foi aprovado ou confirmado.");
+            }
+
+
             if (statusUpperCase.equals(StatusTransacaoItem.CANCELADO) ||
-                    statusUpperCase.equals(StatusTransacaoItem.CONFIRMADO)) {
+                    statusUpperCase.equals(CONFIRMADO)) {
                 UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
                 if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
                     throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
@@ -212,14 +227,10 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     }
 
     @Override
-    public void verificarConflitoComTransacoesAprovadasOuConfirmadas(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+    public List<Agendamento> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
         log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
                 "confirmado ou aprovado");
-        List<Agendamento> agendamentosConflitantes =
-                agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
-
-        if(!agendamentosConflitantes.isEmpty ())
-            throw new DataConflitanteAgendamentoException ("Já existe um agendamento para essa data");
+        return agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
     }
 
     @Override
@@ -257,6 +268,16 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         log.info(">>> ehSolicitante: Verificando se o usuário logado é o solicitante do agendamento procurado");
         return agendamento.getSolicitantes().stream()
                 .anyMatch(solicitante -> Objects.equals(solicitante.getEmail(), usuarioLogado.getEmail()));
+    }
+
+    @Override
+    public int calcularQuantidadeTransacao(Item item, List<Agendamento> agendamentos) {
+        int quantidadeAgendada = 0;
+        for (Agendamento agendamento : agendamentos) {
+            Integer quantidade = agendamento.getItensQuantidade().getOrDefault(item, 0);
+            quantidadeAgendada += quantidade;
+        }
+        return quantidadeAgendada;
     }
 
 
@@ -332,6 +353,9 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
                 item.getAgendamentos ().remove (agendamento);
             }
     }
+
+
+
 
 
 }

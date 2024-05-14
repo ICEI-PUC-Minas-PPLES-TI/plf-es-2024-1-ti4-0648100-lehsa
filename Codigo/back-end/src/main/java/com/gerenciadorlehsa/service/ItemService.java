@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
@@ -200,5 +201,6 @@ public class ItemService {
             }
         }
     }
+
 
 }
