@@ -146,7 +146,7 @@ public class ItemService {
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
-        removerItemDaListaDeAgendamentos(item);
+        //removerItemDaListaDeAgendamentos(item);
         try {
             deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
@@ -186,7 +186,12 @@ public class ItemService {
     }
 
 
-    public void removerItemDaListaDeAgendamentos(Item item) {
+    public List<Agendamento> findAgendamentosByItem(Item item) {
+        return agendamentoService.findByItem(item);
+    }
+
+
+   /* public void removerItemDaListaDeAgendamentos(Item item) {
         List<Agendamento> agendamentos = item.getAgendamentos ();
 
         if(agendamentos != null && !agendamentos.isEmpty ()) {
@@ -200,7 +205,7 @@ public class ItemService {
                 }
             }
         }
-    }
+    }*/
 
 
 }

@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.service.interfaces;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import jakarta.validation.constraints.NotNull;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 public interface AgendamentoService {
     List<Agendamento>  listarAgendamentoUsuario (@NotNull User usuario);
     void atualizarTecnico (User tecnico, @NotNull UUID id);
+    List<Agendamento> findByItem(Item item);
 
     void deletarAgendamentoSeVazio(UUID id);
 

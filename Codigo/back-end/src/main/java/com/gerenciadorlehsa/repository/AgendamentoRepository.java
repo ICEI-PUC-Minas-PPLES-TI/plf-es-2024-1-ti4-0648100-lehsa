@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.repository;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,8 +18,8 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, UUID> 
             "(a.dataHoraInicio >= :novaDataHoraInicio AND a.dataHoraInicio <= :novaDataHoraFim) OR " +
             "(a.dataHoraFim >= :novaDataHoraInicio AND a.dataHoraFim <= :novaDataHoraFim))")
     List<Agendamento> findAprovadosOuConfirmadosConflitantes(LocalDateTime novaDataHoraInicio, LocalDateTime novaDataHoraFim);
-
-
-
     List<Agendamento> findBySolicitantes(User usuario);
+
+    @Query("SELECT a FROM Agendamento a JOIN a.itensQuantidade iq WHERE KEY(iq) = :item")
+    List<Agendamento> findByItem(@Param("item") Item item);
 }

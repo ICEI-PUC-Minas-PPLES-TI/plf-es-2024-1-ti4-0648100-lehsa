@@ -3,12 +3,14 @@ package com.gerenciadorlehsa.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.hibernate.annotations.CascadeType.ALL;
 
 @Entity
 @Table(name = "TB_AGENDAMENTO")
@@ -32,13 +34,13 @@ public class Agendamento extends Transacao {
     )
     private List<User> solicitantes;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  /*  @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "agendamento_item",
             joinColumns = @JoinColumn(name = "agendamento_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id")
     )
-    private List<Item> itens;
+    private List<Item> itens;*/
 
     @ElementCollection
     @JsonIgnore
@@ -46,6 +48,12 @@ public class Agendamento extends Transacao {
     @MapKeyJoinColumn(name = "ITEM_ID")
     @Column(name = "QUANTIDADE")
     private Map<Item, Integer> itensQuantidade = new HashMap<> ();
+
+
+    @PreRemove
+    private void preRemove() {
+        itensQuantidade.clear();
+    }
 
 }
 

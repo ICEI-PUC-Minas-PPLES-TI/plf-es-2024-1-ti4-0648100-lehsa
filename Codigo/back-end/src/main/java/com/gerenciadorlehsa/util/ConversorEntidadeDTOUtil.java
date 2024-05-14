@@ -70,11 +70,11 @@ public class ConversorEntidadeDTOUtil {
                 null;
 
 
-        List<ItemDTORes> itensDTO = agendamento.getItens() != null ?
+      /*  List<ItemDTORes> itensDTO = agendamento.getItens() != null ?
                 agendamento.getItens().stream()
                         .map(ConversorEntidadeDTOUtil::converterItemParaDTORes)
                         .collect(Collectors.toList()) :
-                null;
+                null;*/
 
 
         UsuarioShortDTORes tecnicoDTO = agendamento.getTecnico() != null ?
@@ -88,7 +88,7 @@ public class ConversorEntidadeDTOUtil {
                 .observacaoSolicitacao(agendamento.getObservacaoSolicitacao())
                 .statusTransacaoItem(agendamento.getStatusTransacaoItem())
                 .solicitantes(solicitantesDTO)
-                .itens(itensDTO)
+                //.itens(itensDTO)
                 .tecnico(tecnicoDTO)
                 .build();
     }

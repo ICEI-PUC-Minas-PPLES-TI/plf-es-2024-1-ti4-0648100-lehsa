@@ -48,8 +48,8 @@ public class AgendamentoEntityConverterComp {
         agendamento.setStatusTransacaoItem(EM_ANALISE);
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
-        agendamento.setItens(acharItens (agendamentoDTO.itens()));
-        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens (), agendamento.getItens ()));
+       /* agendamento.setItens(acharItens (agendamentoDTO.itens()));
+        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens (), agendamento.getItens ()));*/
 
 
         return agendamento;
