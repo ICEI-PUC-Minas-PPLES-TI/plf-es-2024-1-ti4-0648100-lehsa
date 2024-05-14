@@ -42,5 +42,4 @@ public abstract class Transacao implements Serializable {
     @Enumerated(EnumType.STRING)
     private StatusTransacaoItem statusTransacaoItem;
 
-
 }
