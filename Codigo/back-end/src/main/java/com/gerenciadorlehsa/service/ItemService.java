@@ -40,7 +40,7 @@ public class ItemService {
     @Autowired
     private AgendamentoService agendamentoService;
 
-    private final String DIRETORIO_IMGS = "Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs";
+    private final String DIRETORIO_IMGS = "src/main/java/com/gerenciadorlehsa/util/imgs";
 
     public byte[] encontrarImagemPorId(@NotNull UUID id) {
         log.info(">>> encontrarImagemPorId: encontrando imagem por id");
