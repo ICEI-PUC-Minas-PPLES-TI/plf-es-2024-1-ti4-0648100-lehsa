@@ -8,7 +8,10 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -51,13 +54,5 @@ public class Item {
 
     @Column(name = "caminho_img", nullable = false)
     private String nomeImg;
-
-    @ManyToMany(mappedBy = "itens", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Agendamento> agendamentos;
-
-
-    @ManyToMany(mappedBy = "itens", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Emprestimo> emprestimos;
-
 
 }

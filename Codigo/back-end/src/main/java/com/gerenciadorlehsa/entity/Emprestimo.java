@@ -24,13 +24,13 @@ public class Emprestimo extends Transacao {
     @JoinColumn(name = "endereco_id", referencedColumnName = "ID", nullable = false)
     private Endereco localUso;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+/*    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "emprestimo_item",
             joinColumns = @JoinColumn(name = "emprestimo_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id")
     )
-    private List<Item> itens;
+    private List<Item> itens;*/
 
     @ElementCollection
     @JsonIgnore

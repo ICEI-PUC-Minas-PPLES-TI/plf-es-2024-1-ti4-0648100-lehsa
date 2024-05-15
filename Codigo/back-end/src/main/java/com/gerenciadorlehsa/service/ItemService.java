@@ -8,10 +8,15 @@ import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.ItemException;
 import com.gerenciadorlehsa.repository.ItemRepository;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
@@ -32,13 +37,18 @@ import static java.lang.String.format;
 
 @Service
 @Slf4j(topic = ITEM_SERVICE)
+@AllArgsConstructor
 public class ItemService {
 
-    @Autowired
-    private ItemRepository itemRepository;
 
-    @Autowired
-    private AgendamentoService agendamentoService;
+    private final ItemRepository itemRepository;
+    private final AgendamentoService agendamentoService;
+    @PersistenceContext
+    private final EntityManager entityManager;
+
+
+
+
 
     private final String DIRETORIO_IMGS = "src/main/java/com/gerenciadorlehsa/util/imgs";
 
@@ -143,10 +153,11 @@ public class ItemService {
         return emptyNames.stream().toList();
     }
 
+    @Transactional
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
-        removerItemDaListaDeAgendamentos(item);
+        agendamentoService.deletarItensAssociados (item);
         try {
             deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
@@ -186,7 +197,44 @@ public class ItemService {
     }
 
 
-    public void removerItemDaListaDeAgendamentos(Item item) {
+
+    public void deletarItemComTransacao(Item item) {
+        if (!entityManager.contains(item))
+            throw new ItemException("O item não é gerenciado pelo EntityManager");
+
+        deletarReferenciaEmItensQuantidade(item);
+    }
+
+    public void deletarReferenciaEmItensQuantidade(Item item) {
+        String itemId = item.getId().toString();
+
+        if(!isUUIDValid (itemId))
+            throw new ItemException ("ID de item inválido.");
+
+        String sql = "DELETE FROM AGENDAMENTO_ITEM_QUANTIDADE WHERE ITEM_ID = '" + itemId + "'";
+        log.info ("Escrita do comando");
+        Query query = entityManager.createNativeQuery(sql);
+        log.info ("Criação da query nativa");
+        query.executeUpdate();
+        log.info ("Executando a consulta");
+    }
+
+    private boolean isUUIDValid(String id) {
+        try {
+            UUID.fromString(id);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+
+
+
+
+
+
+    /* public void removerItemDaListaDeAgendamentos(Item item) {
         List<Agendamento> agendamentos = item.getAgendamentos ();
 
         if(agendamentos != null && !agendamentos.isEmpty ()) {
@@ -200,7 +248,7 @@ public class ItemService {
                 }
             }
         }
-    }
+    }*/
 
 
 }

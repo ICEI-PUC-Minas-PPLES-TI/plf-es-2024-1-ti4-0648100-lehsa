@@ -121,7 +121,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         propriedadesIgnoradas = atributosIguais.toArray(propriedadesIgnoradas);
 
         copyProperties(obj, agendamentoAtt, propriedadesIgnoradas);
-        log.info("Tencnic " + (agendamentoAtt.getTecnico()==null));
+        log.info("Técnico " + (agendamentoAtt.getTecnico()==null));
 
         log.info("Teste");
         return this.agendamentoRepository.save(agendamentoAtt);
@@ -140,7 +140,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         Agendamento agendamento = encontrarPorId(id);
         deletarAgendamentoDaListaDosUsuarios (agendamento);
-        deletarAgendamentoDaListaDosItens(agendamento);
+        //deletarAgendamentoDaListaDosItens(agendamento);
         log.info(">>> deletar: deletando agendamento");
         try{
             this.agendamentoRepository.deleteById(id);
@@ -346,13 +346,27 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
             }
     }
 
-    public void deletarAgendamentoDaListaDosItens(Agendamento agendamento) {
+
+    //---------------MÉTODOS DO MAPA------------
+
+    public void deletarItensAssociados(Item item) {
+        List<Agendamento> agendamentos = agendamentoRepository.findByItem(item);
+
+        for (Agendamento agendamento : agendamentos) {
+            agendamento.getItensQuantidade().remove(item);
+            agendamentoRepository.save(agendamento);
+        }
+    }
+
+
+
+  /*  public void deletarAgendamentoDaListaDosItens(Agendamento agendamento) {
 
         if(agendamento.getItens () != null && !agendamento.getItens ().isEmpty ())
             for (Item item : agendamento.getItens ()) {
                 item.getAgendamentos ().remove (agendamento);
             }
-    }
+    }*/
 
 
 

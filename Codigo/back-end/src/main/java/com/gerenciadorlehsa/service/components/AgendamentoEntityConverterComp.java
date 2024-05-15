@@ -48,18 +48,20 @@ public class AgendamentoEntityConverterComp {
         agendamento.setStatusTransacaoItem(EM_ANALISE);
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
-        agendamento.setItens(acharItens (agendamentoDTO.itens()));
-        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens (), agendamento.getItens ()));
+        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens ()));
+       /* agendamento.setItens(acharItens (agendamentoDTO.itens()));
+        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens (), agendamento.getItens ()));*/
 
 
         return agendamento;
     }
 
-    private Map<Item, Integer> convertMapa(List<ItemDTO> itemDTOS, List<Item> chaves) {
+    private Map<Item, Integer> convertMapa(List<ItemDTO> itemDTOS) {
         List<Integer> quantidade = itemDTOS
                 .stream ()
                 .map (ItemDTO::quantidadeTransacao)
                 .toList ();
+        List<Item> chaves = acharItens (itemDTOS);
 
         Map<Item, Integer> mapa = new HashMap<> ();
         if (chaves.size() == quantidade.size()) {
