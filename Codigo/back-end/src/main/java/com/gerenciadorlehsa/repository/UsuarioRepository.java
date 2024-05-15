@@ -49,6 +49,9 @@ public interface UsuarioRepository extends JpaRepository<User, UUID> {
     @Query("UPDATE User u SET u.password = :senha WHERE u.id = :id")
     void atualizarSenhaUsuario(String senha, UUID id);
 
+    @Query("SELECT u.email FROM User u WHERE u.perfilUsuario = 2")
+    List<String> findEmailUsuarios();
+
     @Query("SELECT u.agendamentosRealizados FROM User u WHERE u.id = :id")
     List<Agendamento> findAgendamentosRealizadosById(UUID id);
 }

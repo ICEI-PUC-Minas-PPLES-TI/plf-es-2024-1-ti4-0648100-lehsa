@@ -184,4 +184,13 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
 
         return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
+
+    @GetMapping("/emails")
+    public ResponseEntity<List<String>> listarEmails () {
+        log.info(">>> listarEmails: recebendo requisição para listar todos emails de usuarios");
+        List<String> emails =
+                this.usuarioService.listarEmailUsuarios();
+
+        return ResponseEntity.ok().body(emails);
+    }
 }
