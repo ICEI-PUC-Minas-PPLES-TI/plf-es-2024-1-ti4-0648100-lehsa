@@ -10,6 +10,7 @@ import java.util.UUID;
 public record ItemDTORes(
         UUID id,
         @JsonProperty("tipo_item")String tipoItem,
+        Integer quantidade,
         String nome
 ){
 }

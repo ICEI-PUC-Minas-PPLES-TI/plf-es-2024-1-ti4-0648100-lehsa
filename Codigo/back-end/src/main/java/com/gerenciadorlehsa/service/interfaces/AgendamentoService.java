@@ -11,8 +11,9 @@ import java.util.UUID;
 public interface AgendamentoService {
     List<Agendamento>  listarAgendamentoUsuario (@NotNull User usuario);
     void atualizarTecnico (User tecnico, @NotNull UUID id);
-    List<Agendamento> findByItem(Item item);
 
     void deletarAgendamentoSeVazio(UUID id);
+
+    void deletarItensAssociados(Item item);
 
 }

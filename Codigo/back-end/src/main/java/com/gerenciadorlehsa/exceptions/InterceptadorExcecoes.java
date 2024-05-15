@@ -121,7 +121,15 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
     @ExceptionHandler(TransacaoException.class)
     public ResponseEntity<Object> capturarTransacaoException(@NotNull TransacaoException e, WebRequest request) {
         String msgErro = e.getMessage();
-        log.error(format("[ERRO] AtualizarSenhaException: falha para atualizar a senha: %s", msgErro));
+        log.error(format("[ERRO] TransacaoException: falha em transação: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ItemException.class)
+    public ResponseEntity<Object> capturarTransacaoException(@NotNull ItemException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ItemException: falha no item: %s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
 

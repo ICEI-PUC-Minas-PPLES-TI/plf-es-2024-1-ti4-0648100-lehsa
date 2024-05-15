@@ -69,12 +69,16 @@ public class ConversorEntidadeDTOUtil {
                         .collect(Collectors.toList()) :
                 null;
 
-
-      /*  List<ItemDTORes> itensDTO = agendamento.getItens() != null ?
-                agendamento.getItens().stream()
-                        .map(ConversorEntidadeDTOUtil::converterItemParaDTORes)
+        List<ItemDTORes> itensDTO = agendamento.getItensQuantidade() != null ?
+                agendamento.getItensQuantidade().entrySet().stream()
+                        .map(entry -> {
+                            Item item = entry.getKey();
+                            Integer quantidade = entry.getValue();
+                            ItemDTORes itemDTO = ConversorEntidadeDTOUtil.converterItemParaDTORes(item, quantidade);
+                            return itemDTO;
+                        })
                         .collect(Collectors.toList()) :
-                null;*/
+                null;
 
 
         UsuarioShortDTORes tecnicoDTO = agendamento.getTecnico() != null ?
@@ -88,7 +92,7 @@ public class ConversorEntidadeDTOUtil {
                 .observacaoSolicitacao(agendamento.getObservacaoSolicitacao())
                 .statusTransacaoItem(agendamento.getStatusTransacaoItem())
                 .solicitantes(solicitantesDTO)
-                //.itens(itensDTO)
+                .itens(itensDTO)
                 .tecnico(tecnicoDTO)
                 .build();
     }
@@ -103,11 +107,12 @@ public class ConversorEntidadeDTOUtil {
                 .build ();
     }
 
-    public static ItemDTORes converterItemParaDTORes (@NotNull Item item) {
+    public static ItemDTORes converterItemParaDTORes (@NotNull Item item, Integer qtd) {
         return ItemDTORes.builder ()
                 .id (item.getId ())
                 .nome (item.getNome ())
                 .tipoItem (item.getTipoItem () != null ? String.valueOf (item.getTipoItem ()) : null)
+                .quantidade (qtd)
                 .build ();
     }
 

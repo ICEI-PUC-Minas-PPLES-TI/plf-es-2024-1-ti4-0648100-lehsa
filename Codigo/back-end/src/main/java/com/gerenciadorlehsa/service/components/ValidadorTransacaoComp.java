@@ -22,7 +22,6 @@ public class ValidadorTransacaoComp {
     private final TransacaoService<Agendamento> transacaoAgendamentoService;
 
     public void validarTransacao(Agendamento transacao) {
-        //verificarItensNoMapa(transacao);
         verificarQuantidadeDeItemInValida(transacao.getItensQuantidade ());
         verificarQuantidadeSelecionada(transacao);
     }
@@ -83,22 +82,6 @@ public class ValidadorTransacaoComp {
 
     }
 
-
-  /*  private void verificarItensNoMapa(Agendamento transacao) {
-
-        List<Item> itens = transacao.getItens();
-        Map<Item, Integer> itensQuantidade = transacao.getItensQuantidade();
-
-        if (itens.size() != itensQuantidade.size()) {
-            throw new AgendamentoException ("A quantidade de itens e quantidade de unidades de cada item diferem!");
-        }
-
-        for (Item item : itens) {
-            if (!itensQuantidade.containsKey(item)) {
-               throw new AgendamentoException ("O item " + item.getNome () + " não é chave do mapa de item/quantidade");
-            }
-        }
-    }*/
 
 
 

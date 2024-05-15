@@ -349,9 +349,15 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     //---------------MÉTODOS DO MAPA------------
 
-    public List<Agendamento> findByItem(Item item) {
-        return agendamentoRepository.findByItem(item);
+    public void deletarItensAssociados(Item item) {
+        List<Agendamento> agendamentos = agendamentoRepository.findByItem(item);
+
+        for (Agendamento agendamento : agendamentos) {
+            agendamento.getItensQuantidade().remove(item);
+            agendamentoRepository.save(agendamento);
+        }
     }
+
 
 
   /*  public void deletarAgendamentoDaListaDosItens(Agendamento agendamento) {

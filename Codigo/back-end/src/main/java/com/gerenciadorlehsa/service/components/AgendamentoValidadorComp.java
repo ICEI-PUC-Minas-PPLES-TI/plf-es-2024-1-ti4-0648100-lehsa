@@ -48,5 +48,7 @@ public class AgendamentoValidadorComp {
             throw new ItensAgendamentoException ("O máximo de itens é 10");
     }
 
+    // VALIDAR O MAPA
+
 
 }
