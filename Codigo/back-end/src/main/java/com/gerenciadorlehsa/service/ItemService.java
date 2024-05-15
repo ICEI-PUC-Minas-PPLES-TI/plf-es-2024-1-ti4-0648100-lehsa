@@ -1,9 +1,6 @@
 package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
@@ -21,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,10 +41,6 @@ public class ItemService {
     private final AgendamentoService agendamentoService;
     @PersistenceContext
     private final EntityManager entityManager;
-
-
-
-
 
     private final String DIRETORIO_IMGS = "src/main/java/com/gerenciadorlehsa/util/imgs";
 
@@ -100,6 +92,13 @@ public class ItemService {
     }
 
     public String saveImageToStorage(MultipartFile imageFile) throws IOException {
+        if (!(imageFile.getContentType().equals("image/jpeg") || imageFile.getContentType().equals("image/png"))) {
+            throw new RuntimeException("Arquivo para imagem de item é um tipo não aceito");
+        }
+        if (imageFile.getSize() > 500 * 1024) {
+            throw new RuntimeException("Tamanho do arquivo para imagem de item excede 500 KB");
+        }
+
         String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
 
         Path uploadPath = Path.of(DIRETORIO_IMGS);
