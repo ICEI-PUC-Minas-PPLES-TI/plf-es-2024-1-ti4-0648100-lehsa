@@ -17,13 +17,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_CONTROLLER;
 import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirRespostaJSON;
 import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDtoRes;
+import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -111,6 +114,24 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         agendamentoService.atualizarTecnico(agendamentoEntityConverterComp.encontrarUsuario(email), id);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
+    }
+
+
+    @GetMapping("/datasOcupadas")
+    public ResponseEntity<List<String[]>> listarDatasOcupadas () {
+        log.info(">>> listarDatasOcupadas: recebendo requisição para listar datas ocupadas de agendamento");
+        List<Object[]> datas = this.agendamentoService.listarDatasOcupadas();
+        List<String[]> datasFormatadas = new ArrayList<>(datas.size());
+
+        for (Object[] data : datas) {
+            LocalDateTime dataHoraInicio = (LocalDateTime) data[0];
+            LocalDateTime dataHoraFim = (LocalDateTime) data[1];
+            String[] arrayTemp = new String[2];
+            arrayTemp[0] = converterDataHora(dataHoraInicio);
+            arrayTemp[1] = converterDataHora(dataHoraFim);
+            datasFormatadas.add(arrayTemp);
+        }
+        return ResponseEntity.ok().body(datasFormatadas);
     }
 
     @GetMapping("/usuario/{email}")

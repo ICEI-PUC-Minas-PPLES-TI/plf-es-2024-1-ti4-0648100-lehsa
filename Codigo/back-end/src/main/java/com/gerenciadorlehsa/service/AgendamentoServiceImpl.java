@@ -188,6 +188,11 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         }
     }
 
+    @Override
+    public List<Object[]> listarDatasOcupadas () {
+        log.info(">>> listarDatasOcupadas: listando datas ocupadas de agendamento");
+        return this.agendamentoRepository.findDataHoraInicioAndFim();
+    }
 
 //----------------AgendamentoService - FIM ---------------------------
 

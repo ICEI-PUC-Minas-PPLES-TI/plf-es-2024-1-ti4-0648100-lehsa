@@ -16,4 +16,5 @@ public interface AgendamentoService {
 
     void deletarItensAssociados(Item item);
 
+    List<Object[]> listarDatasOcupadas();
 }
