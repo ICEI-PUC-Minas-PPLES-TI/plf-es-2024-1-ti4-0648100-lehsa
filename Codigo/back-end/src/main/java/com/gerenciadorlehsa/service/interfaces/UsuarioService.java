@@ -21,4 +21,6 @@ public interface UsuarioService{
     void atualizarPerfil(@NotNull UUID id, Integer code);
 
     List<Agendamento> listarAgendamentoUsuario(@NotNull UUID id);
+
+    List<String> listarEmailUsuarios();
 }

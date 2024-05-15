@@ -1,7 +1,5 @@
 package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
@@ -37,7 +35,6 @@ public class ItemService {
     private final ItemRepository itemRepository;
     TransacaoService<Agendamento> agendamentoTransacaoService;
     TransacaoService<Emprestimo> emprestimoTransacaoService;
-
 
 
     private final String DIRETORIO_IMGS = "src/main/java/com/gerenciadorlehsa/util/imgs";
@@ -90,6 +87,13 @@ public class ItemService {
     }
 
     public String saveImageToStorage(MultipartFile imageFile) throws IOException {
+        if (!(imageFile.getContentType().equals("image/jpeg") || imageFile.getContentType().equals("image/png"))) {
+            throw new RuntimeException("Arquivo para imagem de item é um tipo não aceito");
+        }
+        if (imageFile.getSize() > 500 * 1024) {
+            throw new RuntimeException("Tamanho do arquivo para imagem de item excede 500 KB");
+        }
+
         String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
 
         Path uploadPath = Path.of(DIRETORIO_IMGS);

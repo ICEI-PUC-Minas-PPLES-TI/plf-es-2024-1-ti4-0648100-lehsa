@@ -174,8 +174,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         usuarioRepository.save (usuarioAtulizado);
     }
 
-
-
     public void removerUsuarioDaListaDeAgendamentos(User user) {
         List<Agendamento> agendamentos = user.getAgendamentosRealizados();
 
@@ -191,7 +189,12 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
             }
         }
     }
-    
+
+    @Override
+    public List<String> listarEmailUsuarios () {
+        log.info(">>> listarEmailUsuarios: listando email de usuarios");
+        return this.usuarioRepository.findEmailUsuarios();
+    }
 
     @Override
     public List<Agendamento> listarAgendamentoUsuario (@NotNull UUID id) {

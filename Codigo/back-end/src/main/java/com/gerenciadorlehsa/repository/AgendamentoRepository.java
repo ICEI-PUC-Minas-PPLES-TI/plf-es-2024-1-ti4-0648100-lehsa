@@ -28,6 +28,11 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, UUID> 
 
     List<Agendamento> findBySolicitantes(User usuario);
 
+    @Query("SELECT a.dataHoraInicio, a.dataHoraFim FROM Agendamento a " +
+            "WHERE (a.statusTransacaoItem = 'APROVADO' OR a.statusTransacaoItem = 'CONFIRMADO'" +
+            "AND a.dataHoraInicio >= CURRENT_TIMESTAMP) ORDER BY a.dataHoraInicio")
+    List<Object[]> findDataHoraInicioAndFim();
+
     default List<Agendamento> findByItem(Item item) {
         List<Agendamento> allAgendamentos = findAll();
         List<Agendamento> agendamentosComItem = new ArrayList<> ();

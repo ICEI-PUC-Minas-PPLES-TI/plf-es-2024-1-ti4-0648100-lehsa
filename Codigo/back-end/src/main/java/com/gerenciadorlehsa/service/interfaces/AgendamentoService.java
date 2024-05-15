@@ -14,4 +14,5 @@ public interface AgendamentoService {
 
     void deletarAgendamentoSeVazio(UUID id);
 
+    List<Object[]> listarDatasOcupadas();
 }
