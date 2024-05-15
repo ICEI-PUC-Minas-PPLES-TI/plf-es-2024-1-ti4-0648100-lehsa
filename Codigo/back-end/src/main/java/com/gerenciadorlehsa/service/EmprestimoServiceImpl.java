@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 @Service
-public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>, EmprestimoService {
+public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>,
+        EmprestimoService{
 
     private final EmprestimoRepository emprestimoRepository;
 
@@ -110,5 +111,10 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     @Override
     public void verificarTransacaoDeMesmaDataDoUsuario (User solicitante, Emprestimo transacao) {
 
+    }
+
+    @Override
+    public void deletarItensAssociados (Item item) {
+        // Implementar método de deletar itens associados ao empréstimo
     }
 }

@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components;
+package com.gerenciadorlehsa.components.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

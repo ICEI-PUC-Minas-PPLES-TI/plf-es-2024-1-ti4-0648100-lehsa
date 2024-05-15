@@ -1,6 +1,6 @@
 package com.gerenciadorlehsa.controller;
 
-import com.gerenciadorlehsa.components.JWTComp;
+import com.gerenciadorlehsa.components.security.JWTComp;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.User;
