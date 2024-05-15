@@ -27,7 +27,6 @@ public abstract class TransacaoService<T extends Transacao> {
         this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
     }
 
-
     public abstract int calcularQuantidadeTransacao(Item item, List<T> transacao);
 
     public abstract void atualizarStatus (@NotNull String status, @NotNull UUID id);
@@ -63,6 +62,8 @@ public abstract class TransacaoService<T extends Transacao> {
                 (dataHoraFimNovo.isAfter(dataHoraInicioExistente) ||
                         dataHoraFimNovo.isEqual(dataHoraInicioExistente));
     }
+
+    public abstract void deletarItensAssociados(Item item);
 
 
 

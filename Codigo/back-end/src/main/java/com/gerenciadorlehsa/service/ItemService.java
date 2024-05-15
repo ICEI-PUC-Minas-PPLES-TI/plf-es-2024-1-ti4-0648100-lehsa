@@ -1,13 +1,13 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
 import com.gerenciadorlehsa.repository.ItemRepository;
-import com.gerenciadorlehsa.service.interfaces.OperationsMapTransacaoItemService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -35,10 +35,8 @@ public class ItemService {
 
 
     private final ItemRepository itemRepository;
-    private final MapTransacaoItemService mapTransacaoItemService;
-
-
-
+    TransacaoService<Agendamento> agendamentoTransacaoService;
+    TransacaoService<Emprestimo> emprestimoTransacaoService;
 
 
 
@@ -149,7 +147,8 @@ public class ItemService {
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
-        mapTransacaoItemService.deletarItensAssociados (item);
+        agendamentoTransacaoService.deletarItensAssociados (item);
+        emprestimoTransacaoService.deletarItensAssociados (item);
         try {
             deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);

@@ -39,6 +39,8 @@ public class Agendamento extends Transacao {
     @CollectionTable(name = "AGENDAMENTO_ITEM_QUANTIDADE", joinColumns = @JoinColumn(name = "AGENDAMENTO_ID"))
     @MapKeyJoinColumn(name = "ITEM_ID")
     @Column(name = "QUANTIDADE")
+    /*@Getter(onMethod_={@Override})
+    @Setter(onMethod_={@Override})*/
     private Map<Item, Integer> itensQuantidade = new HashMap<> ();
 
 
@@ -46,6 +48,18 @@ public class Agendamento extends Transacao {
     private void preRemove() {
         itensQuantidade.clear();
     }
+
+
+    @Override
+    public Map<Item, Integer> getItensQuantidade() {
+        return itensQuantidade;
+    }
+
+    @Override
+    public void setItensQuantidade (Map<Item, Integer> itensQuantidade) {
+        this.itensQuantidade = itensQuantidade;
+    }
+
 
 }
 

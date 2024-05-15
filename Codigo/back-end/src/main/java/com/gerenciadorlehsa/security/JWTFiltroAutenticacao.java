@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import com.gerenciadorlehsa.components.JWTComp;
+import com.gerenciadorlehsa.components.security.JWTComp;
 import com.gerenciadorlehsa.exceptions.InterceptadorExcecoes;
 import com.gerenciadorlehsa.entity.User;
 import org.springframework.security.authentication.AuthenticationManager;

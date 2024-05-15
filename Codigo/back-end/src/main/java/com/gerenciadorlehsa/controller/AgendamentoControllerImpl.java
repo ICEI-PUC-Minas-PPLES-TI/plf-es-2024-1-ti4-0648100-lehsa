@@ -6,7 +6,8 @@ import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.service.TransacaoService;
-import com.gerenciadorlehsa.service.components.AgendamentoEntityConverterComp;
+import com.gerenciadorlehsa.components.AgendamentoEntityConverterComp;
+import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
@@ -36,10 +37,11 @@ import static org.springframework.http.HttpStatus.OK;
 @AllArgsConstructor
 public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>, AgendamentoController {
 
+    private final TransacaoService<Agendamento> transacaoService;
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
     private final AgendamentoService agendamentoService;
     private final AgendamentoEntityConverterComp agendamentoEntityConverterComp;
-    private final TransacaoService<Agendamento> transacaoService;
+    private final MapaTransacaoItemService<Agendamento> mapaTransacaoItemService;
 
 
     @Override
@@ -56,6 +58,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody AgendamentoDTO agendamentoDTO) {
         log.info(">>> criar: recebendo requisição para criar agendamento");
         Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (agendamentoDTO);
+        mapaTransacaoItemService.validarMapa (agendamento);
         Agendamento agendamentoCriado = operacoesCRUDService.criar (agendamento);
 
         return ResponseEntity.created (URI.create("/agendamento/" + agendamentoCriado.getId())).body (construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(CREATED.value(), MSG_AGENDAMENTO_CRIADO, agendamentoCriado.getId())));
@@ -67,6 +70,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
                                                           @Valid @RequestBody AgendamentoDTO obj) {
         log.info(">>> atualizar: recebendo requisição para atualizar agendamento");
         Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (obj);
+        mapaTransacaoItemService.validarMapa (agendamento);
         agendamento.setId(id);
         Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
 

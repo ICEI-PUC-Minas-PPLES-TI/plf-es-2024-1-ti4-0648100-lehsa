@@ -7,7 +7,7 @@ import com.gerenciadorlehsa.service.PasswordEncoderServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import com.gerenciadorlehsa.components.JWTComp;
+import com.gerenciadorlehsa.components.security.JWTComp;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

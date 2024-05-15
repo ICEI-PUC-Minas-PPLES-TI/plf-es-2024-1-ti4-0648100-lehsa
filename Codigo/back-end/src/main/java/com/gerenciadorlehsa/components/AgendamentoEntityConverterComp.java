@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.service.components;
+package com.gerenciadorlehsa.components;
 
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.ItemDTO;
@@ -26,17 +26,15 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 @Schema(description = "Responsável por converter DTO para objeto agendamento")
 public class AgendamentoEntityConverterComp {
 
-    private final AgendamentoValidadorComp agendamentoValidator;
-    private final ValidadorTransacaoComp validadorTransacaoComp;
+    private final AgendamentoDTOValidadorComp agendamentoValidator;
     private final UsuarioService usuarioService;
     private final ItemService itemService;
 
 
     public Agendamento convertToEntity(AgendamentoDTO agendamentoDTO) {
         agendamentoValidator.validate(agendamentoDTO);
-        Agendamento agendamento = convert (agendamentoDTO);
-        validadorTransacaoComp.validarTransacao (agendamento);
-        return agendamento;
+        log.info (" >>> Convertendo objeto AgendamentoDTO para entidade Agendamento");
+        return convert (agendamentoDTO);
     }
 
     public Agendamento convert(AgendamentoDTO agendamentoDTO) {
@@ -49,10 +47,6 @@ public class AgendamentoEntityConverterComp {
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
         agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens ()));
-       /* agendamento.setItens(acharItens (agendamentoDTO.itens()));
-        agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens (), agendamento.getItens ()));*/
-
-
         return agendamento;
     }
 

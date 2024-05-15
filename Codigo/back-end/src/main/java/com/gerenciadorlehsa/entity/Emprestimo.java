@@ -46,4 +46,15 @@ public class Emprestimo extends Transacao {
     @Transient
     private Integer diasRestantes;
 
+
+    @Override
+    public Map<Item, Integer> getItensQuantidade() {
+        return itensQuantidade;
+    }
+
+    @Override
+    public void setItensQuantidade (Map<Item, Integer> itensQuantidade) {
+        this.itensQuantidade = itensQuantidade;
+    }
+
 }

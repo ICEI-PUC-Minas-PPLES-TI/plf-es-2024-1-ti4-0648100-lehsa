@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.service.components;
+package com.gerenciadorlehsa.components;
 
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.ItemDTO;
@@ -10,15 +10,18 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.List;
+
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_DTO_VALIDADOR_COMP;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_VALIDADOR_COMP;
 
-@Slf4j(topic = AGENDAMENTO_VALIDADOR_COMP)
+@Slf4j(topic = AGENDAMENTO_DTO_VALIDADOR_COMP)
 @Component
 @AllArgsConstructor
 @Schema(description = "validações relacionadas aos solicitantes e itens do agendamento")
-public class AgendamentoValidadorComp {
+public class AgendamentoDTOValidadorComp {
 
     public void validate(AgendamentoDTO agendamentoDTO) {
+        log.info (" >>> Validando objeto AgendamentoDTO");
         validarSolicitantes(agendamentoDTO.solicitantes ());
         validarItens(agendamentoDTO.itens ());
     }
@@ -47,8 +50,5 @@ public class AgendamentoValidadorComp {
         if (itensDTO.size() > 10)
             throw new ItensAgendamentoException ("O máximo de itens é 10");
     }
-
-    // VALIDAR O MAPA
-
 
 }
