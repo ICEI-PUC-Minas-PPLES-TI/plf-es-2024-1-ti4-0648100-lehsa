@@ -39,8 +39,6 @@ public class Agendamento extends Transacao {
     @CollectionTable(name = "AGENDAMENTO_ITEM_QUANTIDADE", joinColumns = @JoinColumn(name = "AGENDAMENTO_ID"))
     @MapKeyJoinColumn(name = "ITEM_ID")
     @Column(name = "QUANTIDADE")
-    /*@Getter(onMethod_={@Override})
-    @Setter(onMethod_={@Override})*/
     private Map<Item, Integer> itensQuantidade = new HashMap<> ();
 
 

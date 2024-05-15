@@ -14,8 +14,6 @@ public class ConstantesTopicosUtil {
 
     public static final String MAPA_TRANSACAO_ITEM_SERVICE = "MAPA_TRANSACAO_ITEM_SERVICE";
 
-    public static final String VALIDADOR_MAPA_TRANSACAO_SERVICE = "VALIDADOR_MAPA_TRANSACAO_SERVICE";
-
     public static final String EMPRESTIMO_SERVICE = "EMPRESTIMO_SERVICE";
 
     public static final String TRANSACAO_ITEM_SERVICE = "TRANSACAO_ITEM_SERVICE";

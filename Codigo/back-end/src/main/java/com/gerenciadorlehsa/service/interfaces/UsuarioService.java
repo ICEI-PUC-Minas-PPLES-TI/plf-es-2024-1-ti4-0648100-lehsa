@@ -4,7 +4,6 @@ import com.gerenciadorlehsa.entity.Agendamento;
 import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.dto.SenhaDTO;
-
 import java.util.List;
 import java.util.UUID;
 

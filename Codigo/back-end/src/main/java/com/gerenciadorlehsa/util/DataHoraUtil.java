@@ -16,7 +16,6 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.DATA_HORA_UTIL;
 public class DataHoraUtil {
     public static final DateTimeFormatter FORMATAR_DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-
     public static String converterDataHora(LocalDateTime dataHora) {
         return dataHora.format (FORMATAR_DATA_HORA);
     }

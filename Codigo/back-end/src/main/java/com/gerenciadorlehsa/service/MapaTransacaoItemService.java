@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.VALIDADOR_MAPA_TRANSACAO_SERVICE;
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.MAPA_TRANSACAO_ITEM_SERVICE;
 
-@Slf4j(topic = VALIDADOR_MAPA_TRANSACAO_SERVICE)
+@Slf4j(topic = MAPA_TRANSACAO_ITEM_SERVICE)
 @Service
 @AllArgsConstructor
 public class MapaTransacaoItemService<T extends Transacao> {
