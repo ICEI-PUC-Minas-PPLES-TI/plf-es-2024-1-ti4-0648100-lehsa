@@ -8,10 +8,10 @@ import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
+import com.gerenciadorlehsa.service.interfaces.OperationsMapTransacaoItemService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
-import jakarta.transaction.Status;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
-public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService{
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService, OperationsMapTransacaoItemService<Agendamento> {
 
     private final AgendamentoRepository agendamentoRepository;
 
@@ -283,6 +283,32 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
 //----------------TransacaoService - FIM ---------------------------
 
+
+
+
+//----------------MapItemTransacaoService - INICIO ---------------------------
+
+    @Override
+    public void deletarItensAssociados(Item item) {
+        List<Agendamento> agendamentos = agendamentoRepository.findByItem(item);
+
+        if(agendamentos != null && !agendamentos.isEmpty ()) {
+            for (Agendamento agendamento : agendamentos) {
+                agendamento.getItensQuantidade().remove(item);
+                agendamentoRepository.save(agendamento);
+            }
+        }
+    }
+
+
+
+
+
+
+//----------------MapItemTransacaoService - FIM ---------------------------
+
+
+
     private void verificarLimiteTransacaoEmAnalise(List<User> solicitantes) {
         log.info(">>> Verificar limite de solicitação: Barrando limite excedente de solicitação");
         for (User solicitante : solicitantes) {
@@ -345,19 +371,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
                 solicitante.getAgendamentosRealizados ().remove (agendamento);
             }
     }
-
-
-    //---------------MÉTODOS DO MAPA------------
-
-    public void deletarItensAssociados(Item item) {
-        List<Agendamento> agendamentos = agendamentoRepository.findByItem(item);
-
-        for (Agendamento agendamento : agendamentos) {
-            agendamento.getItensQuantidade().remove(item);
-            agendamentoRepository.save(agendamento);
-        }
-    }
-
 
 
   /*  public void deletarAgendamentoDaListaDosItens(Agendamento agendamento) {

@@ -23,11 +23,10 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, UUID> 
             "(a.dataHoraFim >= :novaDataHoraInicio AND a.dataHoraFim <= :novaDataHoraFim))")
     List<Agendamento> findAprovadosOuConfirmadosConflitantes(LocalDateTime novaDataHoraInicio, LocalDateTime novaDataHoraFim);
 
-    @Query("SELECT a FROM Agendamento a WHERE :itemKey MEMBER OF a.itensQuantidade")
-    List<Agendamento> findByItemKey(@Param("itemKey") UUID itemKey);
+  /*  @Query("SELECT a FROM Agendamento a WHERE :itemKey MEMBER OF a.itensQuantidade")
+    List<Agendamento> findByItemKey(@Param("itemKey") UUID itemKey);*/
 
     List<Agendamento> findBySolicitantes(User usuario);
-
 
     default List<Agendamento> findByItem(Item item) {
         List<Agendamento> allAgendamentos = findAll();

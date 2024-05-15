@@ -1,19 +1,13 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.ItemException;
 import com.gerenciadorlehsa.repository.ItemRepository;
-import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import com.gerenciadorlehsa.service.interfaces.OperationsMapTransacaoItemService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,9 +35,8 @@ public class ItemService {
 
 
     private final ItemRepository itemRepository;
-    private final AgendamentoService agendamentoService;
-    @PersistenceContext
-    private final EntityManager entityManager;
+    private final MapTransacaoItemService mapTransacaoItemService;
+
 
 
 
@@ -157,7 +149,7 @@ public class ItemService {
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
-        agendamentoService.deletarItensAssociados (item);
+        mapTransacaoItemService.deletarItensAssociados (item);
         try {
             deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
@@ -195,60 +187,6 @@ public class ItemService {
         log.info(">>> encontrarPorNome: encontrando itens com o nome especificado");
         return this.itemRepository.findByNome(nome);
     }
-
-
-
-    public void deletarItemComTransacao(Item item) {
-        if (!entityManager.contains(item))
-            throw new ItemException("O item não é gerenciado pelo EntityManager");
-
-        deletarReferenciaEmItensQuantidade(item);
-    }
-
-    public void deletarReferenciaEmItensQuantidade(Item item) {
-        String itemId = item.getId().toString();
-
-        if(!isUUIDValid (itemId))
-            throw new ItemException ("ID de item inválido.");
-
-        String sql = "DELETE FROM AGENDAMENTO_ITEM_QUANTIDADE WHERE ITEM_ID = '" + itemId + "'";
-        log.info ("Escrita do comando");
-        Query query = entityManager.createNativeQuery(sql);
-        log.info ("Criação da query nativa");
-        query.executeUpdate();
-        log.info ("Executando a consulta");
-    }
-
-    private boolean isUUIDValid(String id) {
-        try {
-            UUID.fromString(id);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-
-
-
-
-
-
-    /* public void removerItemDaListaDeAgendamentos(Item item) {
-        List<Agendamento> agendamentos = item.getAgendamentos ();
-
-        if(agendamentos != null && !agendamentos.isEmpty ()) {
-
-            for (Agendamento agendamento : agendamentos) {
-
-                agendamento.getItens ().remove (item);
-
-                if (agendamento.getSolicitantes().isEmpty()) {
-                    agendamentoService.deletarAgendamentoSeVazio (agendamento.getId ());
-                }
-            }
-        }
-    }*/
 
 
 }
