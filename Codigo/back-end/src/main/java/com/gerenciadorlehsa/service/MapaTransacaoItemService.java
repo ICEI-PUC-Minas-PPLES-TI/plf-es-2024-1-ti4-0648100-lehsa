@@ -77,5 +77,10 @@ public class MapaTransacaoItemService<T extends Transacao> {
         }
     }
 
+    public void deletarItensAssociados(Item item) {
+        transacaoAgendamentoService.deletarItensAssociados (item);
+        transacaoEmprestimoService.deletarItensAssociados (item);
+    }
+
 
 }

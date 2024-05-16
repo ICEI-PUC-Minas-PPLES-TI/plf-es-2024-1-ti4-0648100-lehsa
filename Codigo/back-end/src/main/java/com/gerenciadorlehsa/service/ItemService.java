@@ -1,7 +1,6 @@
 package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Emprestimo;
+
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
@@ -17,7 +16,6 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,8 +33,7 @@ public class ItemService {
 
 
     private final ItemRepository itemRepository;
-    TransacaoService<Agendamento> agendamentoTransacaoService;
-    TransacaoService<Emprestimo> emprestimoTransacaoService;
+    private final MapaTransacaoItemService<?> mapaTransacaoItemService;
 
 
     private final String DIRETORIO_IMGS = "src/main/java/com/gerenciadorlehsa/util/imgs";
@@ -153,8 +150,7 @@ public class ItemService {
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
-        agendamentoTransacaoService.deletarItensAssociados (item);
-        emprestimoTransacaoService.deletarItensAssociados (item);
+        mapaTransacaoItemService.deletarItensAssociados (item);
         try {
             deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
