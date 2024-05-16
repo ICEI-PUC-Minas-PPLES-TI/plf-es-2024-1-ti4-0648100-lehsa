@@ -13,7 +13,7 @@ import ImageComp from "./ImageComp";
 import SingleItemCard from "./SingleItemCard";
 
 type Props = {
-    id: number;
+    id: string;
     img: File;
     nome: string;
     quantidade: number;
