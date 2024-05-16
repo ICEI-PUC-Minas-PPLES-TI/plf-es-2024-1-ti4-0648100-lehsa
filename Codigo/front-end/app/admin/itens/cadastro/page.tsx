@@ -54,7 +54,7 @@ const CadastroItem = () => {
   };
 
   return (
-    <div className='bg-white rounded-xl w-full h-full flex flex-col '>
+    <div className='bg-white rounded-xl w-fit h-fit flex flex-col m-auto'>
       <div className='bg-primary h-14 content-center p-6 rounded-t-xl'>
         <h3 className='text-xl font-semibold flex-none text-white'>Cadastro</h3>
       </div>
