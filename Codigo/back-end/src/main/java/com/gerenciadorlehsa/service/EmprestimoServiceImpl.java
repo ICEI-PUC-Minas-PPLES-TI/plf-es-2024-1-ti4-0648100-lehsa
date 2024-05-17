@@ -14,8 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 @Service
-public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>,
-        EmprestimoService{
+public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>, EmprestimoService{
 
     private final EmprestimoRepository emprestimoRepository;
 
