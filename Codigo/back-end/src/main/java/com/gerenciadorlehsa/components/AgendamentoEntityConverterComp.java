@@ -6,6 +6,7 @@ import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
 import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -57,13 +58,14 @@ public class AgendamentoEntityConverterComp {
                 .toList ();
         List<Item> chaves = acharItens (itemDTOS);
 
+        if(chaves.size () != quantidade.size ())
+            throw new TransacaoException ("Quantidade de itens e número de unidades de cada item difere");
+
         Map<Item, Integer> mapa = new HashMap<> ();
-        if (chaves.size() == quantidade.size()) {
-            for (int i = 0; i < chaves.size (); i++) {
-                Item chave = chaves.get (i);
-                Integer valor = quantidade.get (i);
-                mapa.put (chave, valor);
-            }
+        for (int i = 0; i < chaves.size (); i++) {
+            Item chave = chaves.get (i);
+            Integer valor = quantidade.get (i);
+            mapa.put (chave, valor);
         }
         return mapa;
     }
