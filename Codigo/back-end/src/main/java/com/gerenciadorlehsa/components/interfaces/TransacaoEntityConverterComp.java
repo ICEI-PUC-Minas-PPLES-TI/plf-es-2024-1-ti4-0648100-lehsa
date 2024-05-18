@@ -35,16 +35,15 @@ public abstract class TransacaoEntityConverterComp<T extends Transacao,DTO> {
             throw new TransacaoException ("Quantidade de itens e número de unidades de cada item difere");
 
         Map<Item, Integer> mapa = new HashMap<> ();
-        for (int i = 0; i < chaves.size (); i++) {
-            Item chave = chaves.get (i);
-            Integer valor = quantidade.get (i);
-            mapa.put (chave, valor);
+        for (int i = 0; i < chaves.size(); i++) {
+            mapa.put(chaves.get(i), quantidade.get(i));
         }
         return mapa;
     }
 
 
     protected List<Item> acharItens(List<ItemDTO> itensDTO) {
+
         return itensDTO.stream()
                 .map(itemDTO -> itemService.encontrarPorId(itemDTO.id()))
                 .collect(Collectors.toList());

@@ -2,19 +2,14 @@ package com.gerenciadorlehsa.components;
 
 import com.gerenciadorlehsa.components.interfaces.TransacaoDTOValidadadorComp;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
-import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.ItensAgendamentoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.SolicitantesAgendamentoException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.List;
-
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_DTO_VALIDADOR_COMP;
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_VALIDADOR_COMP;
 
 @Slf4j(topic = AGENDAMENTO_DTO_VALIDADOR_COMP)
 @Component

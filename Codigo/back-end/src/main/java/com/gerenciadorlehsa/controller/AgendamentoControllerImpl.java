@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.controller;
 
+import com.gerenciadorlehsa.components.interfaces.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.controller.interfaces.AgendamentoController;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
@@ -44,9 +45,9 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     private final TransacaoService<Agendamento> transacaoService;
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
     private final AgendamentoService agendamentoService;
-    private final AgendamentoEntityConverterComp agendamentoEntityConverterComp;
     private final MapaTransacaoItemService<Agendamento> mapaTransacaoItemService;
     private final UsuarioService usuarioService;
+    TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> agendamentoEntityConverterComp;
 
 
     @Override
@@ -61,10 +62,15 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     @Override
     @PostMapping
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody AgendamentoDTO agendamentoDTO) {
-        log.info(">>> criar: recebendo requisição para criar agendamento");
-        Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (agendamentoDTO);
-        mapaTransacaoItemService.validarMapa (agendamento);
-        Agendamento agendamentoCriado = operacoesCRUDService.criar (agendamento);
+
+        log.info (">>> Convertendo DTO para entidade");
+        Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity(agendamentoDTO);
+
+        log.info (">>> Validar o mapa que rege a relação entre itens e agendamento");
+        mapaTransacaoItemService.validarMapa(agendamento);
+
+        log.info (">>> Criar um agendamento");
+        Agendamento agendamentoCriado = operacoesCRUDService.criar(agendamento);
 
         return ResponseEntity.created (URI.create("/agendamento/" + agendamentoCriado.getId())).body (construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(CREATED.value(), MSG_AGENDAMENTO_CRIADO, agendamentoCriado.getId())));
     }

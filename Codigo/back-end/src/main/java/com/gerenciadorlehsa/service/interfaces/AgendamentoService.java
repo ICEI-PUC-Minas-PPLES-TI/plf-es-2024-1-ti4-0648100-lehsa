@@ -1,6 +1,5 @@
 package com.gerenciadorlehsa.service.interfaces;
 
-import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.User;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

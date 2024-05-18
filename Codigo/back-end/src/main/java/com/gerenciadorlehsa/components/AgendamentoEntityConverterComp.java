@@ -29,7 +29,6 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 @Slf4j(topic = AGENDAMENTO_ENTITY_CONVERTER_COMP)
 @Component
 @Schema(description = "Responsável por converter DTO para objeto agendamento")
-
 public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> {
 
     TransacaoDTOValidadadorComp<AgendamentoDTO> agendamentoDTOValidadadorComp;
@@ -44,7 +43,7 @@ public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp
     public Agendamento convertToEntity(AgendamentoDTO agendamentoDTO) {
         agendamentoDTOValidadadorComp.validate (agendamentoDTO);
 
-        log.info (" >>> Convertendo objeto AgendamentoDTO para entidade Agendamento");
+        log.info (" >>> Convertendo...");
         Agendamento agendamento = new Agendamento();
         agendamento.setId(agendamentoDTO.id());
         agendamento.setDataHoraInicio(converterDataHora (agendamentoDTO.dataHoraInicio ()));

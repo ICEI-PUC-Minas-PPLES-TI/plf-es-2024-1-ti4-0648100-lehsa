@@ -175,33 +175,6 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
 
 
 
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(DataConflitanteAgendamentoException.class)
-    public ResponseEntity<Object> capturarDataConflitanteAgendamentoException(@NotNull DataConflitanteAgendamentoException e, WebRequest request) {
-        String msgErro = e.getMessage();
-        log.error(format("[ERRO] DataConflitanteAgendamenteException: conflito de data: %s", msgErro));
-        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(SolicitantesAgendamentoException.class)
-    public ResponseEntity<Object> capturarSolicitantesAgendamentoException(@NotNull SolicitantesAgendamentoException e, WebRequest request) {
-        String msgErro = e.getMessage();
-        log.error(format("[ERRO] SolicitantesAgendamentoException: erro ao atribuir solicitantes para o agendamento: " +
-                "%s", msgErro));
-        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
-    }
-
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ItensAgendamentoException.class)
-    public ResponseEntity<Object> capturarItensAgendamentoException(@NotNull ItensAgendamentoException e, WebRequest request) {
-        String msgErro = e.getMessage();
-        log.error(format("[ERRO] ItemAgendamentoException: erro ao escolher item: " +
-                "%s", msgErro));
-        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
-    }
-
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AgendamentoException.class)
