@@ -1,27 +1,21 @@
 package com.gerenciadorlehsa.components;
 
-import com.gerenciadorlehsa.components.interfaces.TransacaoDTOValidadadorComp;
-import com.gerenciadorlehsa.components.interfaces.TransacaoEntityConverterComp;
+import com.gerenciadorlehsa.components.abstracts.TransacaoDTOValidadadorComp;
+import com.gerenciadorlehsa.components.abstracts.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
-import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
 import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;

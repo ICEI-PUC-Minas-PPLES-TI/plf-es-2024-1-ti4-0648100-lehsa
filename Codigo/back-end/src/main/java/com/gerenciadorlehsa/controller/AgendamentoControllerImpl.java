@@ -1,13 +1,12 @@
 package com.gerenciadorlehsa.controller;
 
-import com.gerenciadorlehsa.components.interfaces.TransacaoEntityConverterComp;
+import com.gerenciadorlehsa.components.abstracts.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.controller.interfaces.AgendamentoController;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.service.TransacaoService;
-import com.gerenciadorlehsa.components.AgendamentoEntityConverterComp;
 import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;

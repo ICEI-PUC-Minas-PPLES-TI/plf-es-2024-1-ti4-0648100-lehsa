@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components.interfaces;
+package com.gerenciadorlehsa.components.abstracts;
 
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
