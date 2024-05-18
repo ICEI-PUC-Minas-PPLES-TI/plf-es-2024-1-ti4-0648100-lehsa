@@ -17,7 +17,7 @@ public abstract class TransacaoDTOValidadadorComp<DTO> {
         if(solicitante == null)
             throw new TransacaoException ("A transação não pode ter solicitante nulo");
         if (solicitante.email () == null)
-            throw new TransacaoException ("A lista de solicitantes contém e-mails nulos");
+            throw new TransacaoException ("Um solicitante tem id nulo");
     }
 
 
