@@ -43,15 +43,14 @@ public class Agendamento extends Transacao {
 
 
     @PreRemove
-    private void preRemove() {
+    @Override
+    public void preRemove() {
         itensQuantidade.clear();
     }
 
 
     @Override
-    public Map<Item, Integer> getItensQuantidade() {
-        return itensQuantidade;
-    }
+    public Map<Item, Integer> getItensQuantidade() {return itensQuantidade;}
 
     @Override
     public void setItensQuantidade (Map<Item, Integer> itensQuantidade) {

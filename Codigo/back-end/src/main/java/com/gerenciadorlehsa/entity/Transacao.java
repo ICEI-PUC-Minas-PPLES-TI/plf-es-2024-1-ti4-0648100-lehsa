@@ -40,6 +40,9 @@ public abstract class Transacao implements Serializable {
     @Enumerated(EnumType.STRING)
     private StatusTransacaoItem statusTransacaoItem;
 
+
+    public abstract void preRemove();
+
     public abstract Map<Item, Integer> getItensQuantidade();
 
     public abstract void setItensQuantidade(Map<Item, Integer> itensQuantidade);

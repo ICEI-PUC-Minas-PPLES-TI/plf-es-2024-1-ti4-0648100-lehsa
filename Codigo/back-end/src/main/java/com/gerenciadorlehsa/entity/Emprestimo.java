@@ -31,13 +31,17 @@ public class Emprestimo extends Transacao {
     @Column(name = "QUANTIDADE")
     private Map<Item, Integer> itensQuantidade = new HashMap<> ();
 
-
     @Transient
     private Integer diasAtrasado;
 
     @Transient
     private Integer diasRestantes;
 
+    @PreRemove
+    @Override
+    public void preRemove() {
+        itensQuantidade.clear();
+    }
 
     @Override
     public Map<Item, Integer> getItensQuantidade() {
