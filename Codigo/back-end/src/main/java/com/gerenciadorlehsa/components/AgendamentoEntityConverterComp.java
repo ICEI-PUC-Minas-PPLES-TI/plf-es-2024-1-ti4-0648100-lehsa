@@ -1,5 +1,7 @@
 package com.gerenciadorlehsa.components;
 
+import com.gerenciadorlehsa.components.interfaces.TransacaoDTOValidadadorComp;
+import com.gerenciadorlehsa.components.interfaces.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
@@ -12,7 +14,10 @@ import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,21 +28,27 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
 @Slf4j(topic = AGENDAMENTO_ENTITY_CONVERTER_COMP)
 @Component
-@AllArgsConstructor
 @Schema(description = "Responsável por converter DTO para objeto agendamento")
-public class AgendamentoEntityConverterComp {
 
-    private final AgendamentoDTOValidadorComp agendamentoValidator;
-    private final UsuarioService usuarioService;
-    private final ItemService itemService;
+public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> {
+
+    TransacaoDTOValidadadorComp<AgendamentoDTO> agendamentoDTOValidadadorComp;
+
+    @Autowired
+    public AgendamentoEntityConverterComp (UsuarioService usuarioService, ItemService itemService, TransacaoDTOValidadadorComp<AgendamentoDTO> agendamentoDTOValidadadorComp) {
+        super (usuarioService, itemService);
+        this.agendamentoDTOValidadadorComp = agendamentoDTOValidadadorComp;
+    }
 
 
+    @Override
     public Agendamento convertToEntity(AgendamentoDTO agendamentoDTO) {
-        agendamentoValidator.validate(agendamentoDTO);
         log.info (" >>> Convertendo objeto AgendamentoDTO para entidade Agendamento");
+        agendamentoDTOValidadadorComp.validate (agendamentoDTO);
         return convert (agendamentoDTO);
     }
 
+    @Override
     public Agendamento convert(AgendamentoDTO agendamentoDTO) {
         Agendamento agendamento = new Agendamento();
         agendamento.setId(agendamentoDTO.id());
@@ -51,43 +62,15 @@ public class AgendamentoEntityConverterComp {
         return agendamento;
     }
 
-    private Map<Item, Integer> convertMapa(List<ItemDTO> itemDTOS) {
-        List<Integer> quantidade = itemDTOS
-                .stream ()
-                .map (ItemDTO::quantidadeTransacao)
-                .toList ();
-        List<Item> chaves = acharItens (itemDTOS);
-
-        if(chaves.size () != quantidade.size ())
-            throw new TransacaoException ("Quantidade de itens e número de unidades de cada item difere");
-
-        Map<Item, Integer> mapa = new HashMap<> ();
-        for (int i = 0; i < chaves.size (); i++) {
-            Item chave = chaves.get (i);
-            Integer valor = quantidade.get (i);
-            mapa.put (chave, valor);
-        }
-        return mapa;
-    }
 
 
     private List<User> acharSolicitantes(List<UsuarioDTO> solicitantesDTO) {
-        return solicitantesDTO.stream()
-                .map(UsuarioDTO::email)
-                .map(usuarioService::encontrarPorEmail)
-                .collect(Collectors.toList());
+        List<User> usuarios = new ArrayList<> ();
+        for (UsuarioDTO usuarioDTO : solicitantesDTO) {
+            usuarios.add (acharSolicitante (usuarioDTO));
+        }
+        return usuarios;
     }
 
-
-    private List<Item> acharItens(List<ItemDTO> itensDTO) {
-        return itensDTO.stream()
-                .map(itemDTO -> itemService.encontrarPorId(itemDTO.id()))
-                .collect(Collectors.toList());
-    }
-
-    public User encontrarUsuario(String email){
-
-        return  usuarioService.encontrarPorEmail(email);
-    }
 
 }

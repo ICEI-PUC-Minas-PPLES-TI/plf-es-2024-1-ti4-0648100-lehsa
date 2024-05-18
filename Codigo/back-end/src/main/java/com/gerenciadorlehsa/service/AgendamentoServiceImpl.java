@@ -154,16 +154,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
 //----------------AgendamentoService - INÍCIO ---------------------------
 
-    @Override
-    public List<Agendamento> listarAgendamentoUsuario (@NotNull User usuario) {
-        log.info(">>> listarAgendamentoUsuario: listando todos agendamentos do usuario de id: " + usuario.getId());
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-        log.info(""+usuarioLogado.getId());
-        if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
-            return this.agendamentoRepository.findBySolicitantes(usuario);
-
-        throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses agendamentos");
-    }
 
     @Override
     public void atualizarTecnico (User tecnico, @NotNull UUID id) {

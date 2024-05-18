@@ -10,6 +10,7 @@ import com.gerenciadorlehsa.components.AgendamentoEntityConverterComp;
 import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
+import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     private final AgendamentoService agendamentoService;
     private final AgendamentoEntityConverterComp agendamentoEntityConverterComp;
     private final MapaTransacaoItemService<Agendamento> mapaTransacaoItemService;
+    private final UsuarioService usuarioService;
 
 
     @Override
@@ -115,7 +117,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
                                                                  @PathVariable String email) {
         log.info(">>> atualizarTecnico: recebendo requisição para atualizar tecnico do agendamento");
 
-        agendamentoService.atualizarTecnico(agendamentoEntityConverterComp.encontrarUsuario(email), id);
+        agendamentoService.atualizarTecnico(usuarioService.encontrarPorEmail (email), id);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
     }
@@ -136,15 +138,6 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
             datasFormatadas.add(arrayTemp);
         }
         return ResponseEntity.ok().body(datasFormatadas);
-    }
-
-    @GetMapping("/usuario/{email}")
-    public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoUsuario (@PathVariable String email) {
-        log.info(">>> listarAgendamentoUsuario: recebendo requisição para listar todos agendamentos de um usuario");
-        List<Agendamento> agendamentos =
-                this.agendamentoService.listarAgendamentoUsuario(this.agendamentoEntityConverterComp.encontrarUsuario(email));
-
-        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 
 
