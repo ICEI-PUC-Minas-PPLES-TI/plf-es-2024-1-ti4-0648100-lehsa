@@ -22,10 +22,7 @@ public abstract class TransacaoEntityConverterComp<T extends Transacao,DTO> {
     protected final UsuarioService usuarioService;
     protected final ItemService itemService;
 
-    public abstract T convert(DTO dto);
-
     public abstract T convertToEntity(DTO dto);
-
 
     protected Map<Item, Integer> convertMapa(List<ItemDTO> itemDTOS) {
         List<Integer> quantidade = itemDTOS

@@ -22,6 +22,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_VALIDA
 @Schema(description = "validações relacionadas aos solicitantes e itens do agendamento")
 public class AgendamentoDTOValidadorComp extends TransacaoDTOValidadadorComp<AgendamentoDTO> {
 
+    @Override
     public void validate(AgendamentoDTO agendamentoDTO) {
         log.info (" >>> Validando objeto AgendamentoDTO");
         validarSolicitantes(agendamentoDTO.solicitantes ());

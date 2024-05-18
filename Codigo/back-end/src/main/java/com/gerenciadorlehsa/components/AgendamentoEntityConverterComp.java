@@ -40,16 +40,11 @@ public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp
         this.agendamentoDTOValidadadorComp = agendamentoDTOValidadadorComp;
     }
 
-
     @Override
     public Agendamento convertToEntity(AgendamentoDTO agendamentoDTO) {
-        log.info (" >>> Convertendo objeto AgendamentoDTO para entidade Agendamento");
         agendamentoDTOValidadadorComp.validate (agendamentoDTO);
-        return convert (agendamentoDTO);
-    }
 
-    @Override
-    public Agendamento convert(AgendamentoDTO agendamentoDTO) {
+        log.info (" >>> Convertendo objeto AgendamentoDTO para entidade Agendamento");
         Agendamento agendamento = new Agendamento();
         agendamento.setId(agendamentoDTO.id());
         agendamento.setDataHoraInicio(converterDataHora (agendamentoDTO.dataHoraInicio ()));
@@ -61,7 +56,6 @@ public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp
         agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens ()));
         return agendamento;
     }
-
 
 
     private List<User> acharSolicitantes(List<UsuarioDTO> solicitantesDTO) {
