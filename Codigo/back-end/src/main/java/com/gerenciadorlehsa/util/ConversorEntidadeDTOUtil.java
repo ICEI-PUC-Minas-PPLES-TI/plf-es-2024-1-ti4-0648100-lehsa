@@ -3,6 +3,7 @@ package com.gerenciadorlehsa.util;
 import com.gerenciadorlehsa.dto.*;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.entity.Professor;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +38,24 @@ public class ConversorEntidadeDTOUtil {
                 .nota (usuario.getNota ())
                 .curso (usuario.getCurso ())
                 .email(usuario.getEmail())
+                .build();
+    }
+
+
+    public static ProfessorDTO converterParaDTO(@NotNull Professor professor) {
+        log.info(format(">>> converterParaDTO: convertendo Professor (id: %s) para DTO", professor.getId()));
+        return ProfessorDTO.builder()
+                .campus (professor.getCampus ())
+                .areaAtuacao (professor.getAreaAtuacao ())
+                .confirmaCadastro (professor.getConfirmaCadastro () ? "Cadastro confirmado" : "Cadastro sem " +
+                        "confirmação")
+                .lotacao (professor.getLotacao ())
+                .matricula (professor.getMatricula ())
+                .nome (professor.getNome ())
+                .id (professor.getId ())
+                .laboratorio (professor.getLaboratorio ())
+                .email (professor.getEmail ())
+                .dataHoraCadastro (converterDataHora (professor.getDataHoraCriacao ()))
                 .build();
     }
 

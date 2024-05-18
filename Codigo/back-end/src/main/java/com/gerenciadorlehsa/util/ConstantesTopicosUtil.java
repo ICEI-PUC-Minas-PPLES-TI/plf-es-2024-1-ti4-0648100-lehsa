@@ -12,6 +12,8 @@ public class ConstantesTopicosUtil {
 
     public static final String AGENDAMENTO_SERVICE = "AGENDAMENTO_SERVICE";
 
+    public static final String PROFESSOR_SERVICE = "PROFESSOR_SERVICE";
+
     public static final String MAPA_TRANSACAO_ITEM_SERVICE = "MAPA_TRANSACAO_ITEM_SERVICE";
 
     public static final String EMPRESTIMO_SERVICE = "EMPRESTIMO_SERVICE";
@@ -36,6 +38,8 @@ public class ConstantesTopicosUtil {
 
     public static final String USUARIO_CONTROLLER = "USUARIO_CONTROLLER";
 
+    public static final String PROFESSOR_CONTROLLER = "PROFESSOR_CONTROLLER";
+
     public static final String EMAIL_CONTROLLER = "EMAIL_CONTROLLER";
 
     public static final String AGENDAMENTO_CONTROLLER = "AGENDAMENTO_CONTROLLER";
@@ -58,4 +62,6 @@ public class ConstantesTopicosUtil {
     public static final String CONVERSOR_ENTIDADE_DTO_UTIL = "CONVERSOR_ENTIDADE_DTO_UTIL";
 
     public static final String DATA_HORA_UTIL = "DATA_HORA_UTIL";
+
+    public static final String ESTILIZAR_EMAIL_UTIL = "ESTILIZAR_EMAIL_UTIL";
 }

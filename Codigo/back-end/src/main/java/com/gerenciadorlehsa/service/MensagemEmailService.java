@@ -33,6 +33,20 @@ public class MensagemEmailService {
     }
 
 
+    public void enviarEmailConfirmacaoCadastro(String to, String emailBody) throws MessagingException {
+
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+        helper.setTo(to);
+        helper.setSubject("Confirmação de Cadastro");
+
+        helper.setText(emailBody, true);
+
+        javaMailSender.send(mimeMessage);
+    }
+
+
 
 
 }

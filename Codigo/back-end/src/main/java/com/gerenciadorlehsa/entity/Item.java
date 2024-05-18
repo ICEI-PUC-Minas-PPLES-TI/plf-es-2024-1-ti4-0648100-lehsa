@@ -24,7 +24,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class Item {
 
-    public static final String NOME_TABELA = "item";
+    public static final String NOME_TABELA = "TB_ITEM";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

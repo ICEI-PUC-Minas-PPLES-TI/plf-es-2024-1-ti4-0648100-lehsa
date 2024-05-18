@@ -173,6 +173,14 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(MensagemEmailException.class)
+    public ResponseEntity<Object> capturarMensagemEmailException(@NotNull DataException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] MensagemEmailExeption: falha no envio de e-mail: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
 
 
 
