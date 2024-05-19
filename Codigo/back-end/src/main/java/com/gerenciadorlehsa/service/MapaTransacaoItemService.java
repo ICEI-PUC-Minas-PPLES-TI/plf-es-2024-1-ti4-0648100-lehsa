@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.MAPA_TRANSACAO_ITEM_SERVICE;
 
 @Slf4j(topic = MAPA_TRANSACAO_ITEM_SERVICE)
@@ -22,18 +24,18 @@ public class MapaTransacaoItemService<T extends Transacao> {
     private final TransacaoService<Emprestimo> transacaoEmprestimoService;
     private final TransacaoService<Agendamento> transacaoAgendamentoService;
 
-    public void validarMapa(T transacao) {
+    public void validarMapa(UUID id, T transacao) {
         log.info (">>> Validando Mapa da relação entre Transacao e Item");
         verificarQuantidadeDeItemInValida(transacao.getItensQuantidade());
-        verificarQuantidadeSelecionada(transacao);
+        verificarQuantidadeSelecionada(id, transacao);
     }
 
-    public void verificarQuantidadeSelecionada(T transacao) {
+    public void verificarQuantidadeSelecionada(UUID id, T transacao) {
         log.info (">>> Verificando disponibilidade do número de itens");
         for (Map.Entry<Item, Integer> entry : transacao.getItensQuantidade().entrySet()) {
             Item item = entry.getKey();
             int quantidadeSelecionada = entry.getValue();
-            int quantidadeDisponivel = calcularQuantidadeDisponivelParaItem(item, transacao.getDataHoraInicio(), transacao.getDataHoraFim());
+            int quantidadeDisponivel = calcularQuantidadeDisponivelParaItem(transacao, id, item, transacao.getDataHoraInicio(), transacao.getDataHoraFim());
 
             if (quantidadeSelecionada > quantidadeDisponivel) {
                 throw new TransacaoException ("Quantidade selecionada para o item " + item.getNome() + " excede a quantidade disponível.");
@@ -41,9 +43,18 @@ public class MapaTransacaoItemService<T extends Transacao> {
         }
     }
 
-    public int calcularQuantidadeDisponivelParaItem(Item item, LocalDateTime inicio, LocalDateTime fim) {
+    public int calcularQuantidadeDisponivelParaItem(T transacao, UUID id, Item item, LocalDateTime inicio,
+                                                    LocalDateTime fim) {
         List<Emprestimo> emprestimosEmConflito = buscarEmprestimosEmConflito(inicio, fim);
         List<Agendamento> agendamentosEmConflito = buscarAgendamentosEmConflito(inicio, fim);
+
+        if (id != null) {
+            if (transacao instanceof Emprestimo)
+                emprestimosEmConflito.removeIf(emprestimo -> emprestimo.getId().equals(id));
+            else if (transacao instanceof Agendamento)
+                agendamentosEmConflito.removeIf(agendamento -> agendamento.getId().equals(id));
+        }
+
 
         int quantidadeEmprestada = transacaoEmprestimoService.calcularQuantidadeTransacao(item, emprestimosEmConflito);
         int quantidadeAgendada = transacaoAgendamentoService.calcularQuantidadeTransacao(item, agendamentosEmConflito);
