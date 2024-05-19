@@ -50,7 +50,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     @Override
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody EmprestimoDTO obj) {
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
-        mapaTransacaoItemService.validarMapa(null, emprestimo);
+        mapaTransacaoItemService.validarMapaParaCriacao (emprestimo);
         Emprestimo emprestimoCriado = operacoesCRUDService.criar(emprestimo);
         return ResponseEntity.created (URI.create("/emprestimo/" + emprestimoCriado.getId())).body (construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(CREATED.value(), MSG_EMPRESTIMO_CRIADO, emprestimoCriado.getId())));
     }
