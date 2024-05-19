@@ -176,7 +176,7 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
 
     }
 
-    @GetMapping("/agendamento/{id}")
+    @GetMapping("/{id}/agendamentos")
     public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoUsuario (@PathVariable UUID id) {
         log.info(">>> listarAgendamentoUsuario: recebendo requisição para listar todos agendamentos de um usuario");
         List<Agendamento> agendamentos =

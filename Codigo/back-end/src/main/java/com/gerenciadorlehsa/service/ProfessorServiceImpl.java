@@ -1,16 +1,17 @@
 package com.gerenciadorlehsa.service;
 
+import ch.qos.logback.core.model.processor.ProcessorException;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Professor;
-import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.MensagemEmailException;
+import com.gerenciadorlehsa.exceptions.lancaveis.ProfessorException;
 import com.gerenciadorlehsa.repository.ProfessorRepository;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
-import com.gerenciadorlehsa.util.EstilizarEmailUtil;
+import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +42,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
     @Override
     public Professor encontrarPorId(@NotNull UUID id) {
         log.info(">>> encontrarPorId: encontrando professor por id");
-        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao(id, USUARIO_SERVICE);
+        validadorAutorizacaoRequisicaoService.getUsuarioLogado ();
 
         return professorRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException (format("Professor não encontrado, id: %s", id)));
@@ -66,7 +67,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         String linkConfirmacao = ".../professor/confirmacao-cadastro?id=" + professor.getId ();
         String email = professor.getEmail();
         try {
-            mensagemEmailService.enviarEmailConfirmacaoCadastro(email, EstilizarEmailUtil.estilizaConfirmacao (linkConfirmacao));
+            mensagemEmailService.enviarEmailConfirmacaoCadastro(email, EstilizacaoEmailUtil.estilizaConfirmacao (linkConfirmacao));
         } catch (Exception e) {
             throw new MensagemEmailException ("Envio de e-mail falhou.");
         }
@@ -77,7 +78,6 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         Professor professorAtualizado = encontrarPorId (professor.getId ());
         copyProperties(professor, professorAtualizado, PROPRIEDADES_IGNORADAS);
-        professorAtualizado = professorRepository.save (professorAtualizado);
 
         if(!Objects.equals (professor.getEmail (), professorAtualizado.getEmail ())) {
             professorAtualizado.setConfirmaCadastro (false);
@@ -90,7 +90,9 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
             } catch (Exception e) {
                 throw new MensagemEmailException ("Envio de e-mail falhou.");
             }*/
-        }
+        } else
+            professorAtualizado = professorRepository.save (professorAtualizado);
+
 
         return professorAtualizado;
     }
@@ -112,7 +114,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
     @Override
     public List<Professor> listarTodos() {
         log.info(">>> listarTodos: listando todos os professores");
-        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        validadorAutorizacaoRequisicaoService.getUsuarioLogado ();
         return professorRepository.findAll();
     }
 
@@ -131,6 +133,14 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         return professorRepository.findByEmail(email)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(format("professor não encontrado, email: %s",
                         email)));
+    }
+
+
+    public List<Agendamento> listarAgendamentos(UUID id) {
+        Professor professor = encontrarPorId (id);
+        if(professor.getAgendamentos () == null || professor.getAgendamentos ().isEmpty ())
+            throw new ProfessorException ("O professor não possui agendamentos");
+        return professor.getAgendamentos ();
     }
 
 }

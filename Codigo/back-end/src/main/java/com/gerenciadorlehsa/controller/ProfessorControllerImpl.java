@@ -2,9 +2,10 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.controller.interfaces.ProfessorController;
+import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.dto.ProfessorDTO;
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Professor;
-import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
@@ -95,6 +96,17 @@ public class ProfessorControllerImpl implements OperacoesCRUDController<Professo
         log.info (" >>> Confirmando o cadastro do professor");
         professorService.confirmaEmail (id, true);
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_PROFESSOR_CONTROLLER, asList(OK.value(), MSG_PROFESSOR_CONFIRMACAO_CADASTRO, id)));
+    }
+
+
+    @GetMapping("/{id}/agendamentos")
+    public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoProfessor(@PathVariable UUID id) {
+        log.info(">>> listarAgendamento: recebendo requisição para listar todos agendamentos de um professor");
+
+        List<Agendamento> agendamentos =
+                professorService.listarAgendamentos (id);
+
+        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 
 

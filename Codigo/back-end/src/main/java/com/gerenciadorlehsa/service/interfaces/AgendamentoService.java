@@ -17,6 +17,6 @@ public interface AgendamentoService {
 
     void enviarEmailParaProfessor(Agendamento agendamento);
 
-    void verificarConfirmacaoProfessor(Agendamento agendamento);
+    void verificarConfirmacaoCadastroProfessor(Agendamento agendamento);
 
 }

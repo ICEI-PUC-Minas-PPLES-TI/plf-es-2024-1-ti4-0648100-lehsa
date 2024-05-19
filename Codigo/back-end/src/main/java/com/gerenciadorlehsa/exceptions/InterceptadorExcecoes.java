@@ -191,6 +191,15 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProfessorException.class)
+    public ResponseEntity<Object> capturarProfessorException(@NotNull ProfessorException e,WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ProfessorException: recurso do professor não encontrado: %s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.NOT_FOUND, request);
+    }
+
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ProfessorConfirmaAgendamentoException.class)

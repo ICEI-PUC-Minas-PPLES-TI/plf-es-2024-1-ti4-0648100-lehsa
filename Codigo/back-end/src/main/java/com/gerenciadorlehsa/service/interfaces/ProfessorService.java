@@ -1,8 +1,10 @@
 package com.gerenciadorlehsa.service.interfaces;
 
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Professor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ProfessorService {
@@ -12,4 +14,6 @@ public interface ProfessorService {
     Professor encontrarPorEmail(@NotNull String email);
 
     void enviarEmailParaProfessor(Professor professor);
+
+    List<Agendamento> listarAgendamentos(UUID id);
 }

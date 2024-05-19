@@ -7,7 +7,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ESTILIZAR_EMAIL_UT
 
 @UtilityClass
 @Slf4j(topic = ESTILIZAR_EMAIL_UTIL)
-public class EstilizarEmailUtil {
+public class EstilizacaoEmailUtil {
 
     public static String estilizaConfirmacao (String linkConfirmacao) {
         return "<html>" +

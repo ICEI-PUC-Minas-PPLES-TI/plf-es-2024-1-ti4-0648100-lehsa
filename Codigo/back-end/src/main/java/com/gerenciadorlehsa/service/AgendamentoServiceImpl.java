@@ -2,7 +2,6 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
@@ -12,7 +11,7 @@ import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
-import com.gerenciadorlehsa.util.EstilizarEmailUtil;
+import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +72,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         log.info(">>> criando: criando agendamento");
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
-        verificarConfirmacaoProfessor (obj);
+        verificarConfirmacaoCadastroProfessor (obj);
         //enviarEmailParaProfessor (obj);
 
         checkTecnicoNaoSolicita (obj);
@@ -100,7 +99,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     public Agendamento atualizar (Agendamento obj) {
         log.info(">>> atualizar: atualizando agendamento");
         Agendamento agendamentoAtt = encontrarPorId(obj.getId());
-
         UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
 
@@ -132,8 +130,11 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         copyProperties(obj, agendamentoAtt, propriedadesIgnoradas);
         log.info("Técnico " + (agendamentoAtt.getTecnico()==null));
 
-        log.info("Teste");
         return this.agendamentoRepository.save(agendamentoAtt);
+    }
+
+    public void vefificarAtualizacaoDoProfessorNoAgendamento(Agendamento agendamento) {
+        
     }
 
     @Override
@@ -165,8 +166,9 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 //----------------AgendamentoService - INÍCIO ---------------------------
 
 
+
     @Override
-    public void verificarConfirmacaoProfessor(Agendamento agendamento) {
+    public void verificarConfirmacaoCadastroProfessor(Agendamento agendamento) {
         if(!agendamento.getProfessor ().getConfirmaCadastro ())
             throw new ProfessorConfirmaCadastroException ("O Professor ainda não confirmou cadastro");
     }
@@ -181,7 +183,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         String email = agendamento.getProfessor ().getEmail();
         try {
             mensagemEmailService.enviarEmailConfirmacaoAgendamento(email,
-                    EstilizarEmailUtil.estilizaConfirmacaoAgendamento (linkConfirmacao,
+                    EstilizacaoEmailUtil.estilizaConfirmacaoAgendamento (linkConfirmacao,
                             agendamento.getDataHoraInicio (), agendamento.getDataHoraFim ()));
         } catch (Exception e) {
             throw new MensagemEmailException ("Envio de e-mail falhou.");
