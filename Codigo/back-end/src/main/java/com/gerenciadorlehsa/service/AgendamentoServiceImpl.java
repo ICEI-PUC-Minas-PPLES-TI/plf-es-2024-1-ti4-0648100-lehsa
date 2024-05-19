@@ -105,6 +105,8 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         copiarAtributosRelevantes(obj, agendamentoAtt, atributosIguais);
 
+        verificarNovoProfessor (obj, agendamentoAtt);
+
         return agendamentoRepository.save(agendamentoAtt);
     }
 
@@ -422,6 +424,22 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty()) {
             throw new AgendamentoException("Já existe agendamento aprovado pelo administrador ou confirmado pelo usuário para essa data");
         }
+    }
+
+    private void verificarMudancaProfessor(Agendamento agendamento) {
+        StatusTransacaoItem statusTransacaoItem = agendamento.getStatusTransacaoItem ();
+        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO))
+            throw new AtualizarAgendamentoException ("O professor com status em análise ou aprovado");
+
+    }
+
+    private Agendamento verificarNovoProfessor(Agendamento novoAgedamento, Agendamento velhoAgendamento) {
+        if(novoAgedamento.getProfessor () != velhoAgendamento.getProfessor ()) {
+            verificarMudancaProfessor (novoAgedamento);
+            velhoAgendamento.setStatusTransacaoItem (AGUARDANDO_CONFIRMACAO_PROFESSOR);
+            //enviarEmailParaProfessor (velhoAgendamento);
+        }
+        return velhoAgendamento;
     }
 
 }

@@ -209,6 +209,14 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(AtualizarAgendamentoException.class)
+    public ResponseEntity<Object> capturarAtualiazarAgendamentoException(@NotNull AtualizarAgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] AtualizarAgendamentoException: Falha ao atualizar o agendamento: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.UNPROCESSABLE_ENTITY, request);
+    }
+
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ProfessorConfirmaAgendamentoException.class)
