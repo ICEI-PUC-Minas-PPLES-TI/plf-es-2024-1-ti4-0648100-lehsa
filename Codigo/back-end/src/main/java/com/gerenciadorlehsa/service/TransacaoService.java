@@ -1,18 +1,30 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.TempoExpiradoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
+import com.gerenciadorlehsa.util.DataHoraUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+
+import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_ITEM_SERVICE;
+import static com.gerenciadorlehsa.util.DataHoraUtil.dataValida;
 
 
 @Slf4j(topic = TRANSACAO_ITEM_SERVICE)
@@ -44,10 +56,15 @@ public abstract class TransacaoService<T extends Transacao> {
 
     public abstract void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, T transacao);
 
+    public abstract void deletarItensAssociados(Item item);
 
+    public abstract void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(T transacao, StatusTransacaoItem status);
+
+
+    public abstract void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais);
 
     protected boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
-        log.info(">>> Verificando datas conflitantes: barrando agendamento solicitado em uma mesma data");
+        log.info(">>> Verificando datas conflitantes: barrando transacao solicitado em uma mesma data");
 
         if (transacaoExistente.getId() == novaTransacao.getId())
             return false;
@@ -63,7 +80,55 @@ public abstract class TransacaoService<T extends Transacao> {
                         dataHoraFimNovo.isEqual(dataHoraInicioExistente));
     }
 
-    public abstract void deletarItensAssociados(Item item);
+    public StatusTransacaoItem getStatusUpperCase(String status) {
+        try {
+            return Enum.valueOf(StatusTransacaoItem.class, status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new EnumNaoEncontradoException ("O status passado não existe: " + status);
+        }
+    }
+
+    public void verificarAutorizacaoDoUsuario(T transacao, StatusTransacaoItem status) {
+
+        if (status.equals(CANCELADO) || status.equals(CONFIRMADO)) {
+
+            UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+
+            if (!ehUsuarioAutorizado(transacao, usuarioLogado)) {
+                throw new UsuarioNaoAutorizadoException ("O usuário não possui permissão para atualizar o transacão");
+            }
+            if (status.equals(CONFIRMADO)) {
+                long difTempo = DataHoraUtil.calcularDiferencaDeTempo(LocalDateTime.now(),
+                        transacao.getDataHoraInicio());
+                if (difTempo < 24) {
+                    throw new TempoExpiradoException ("O Tempo para confirmar já expirou");
+                }
+            }
+        } else {
+            validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        }
+    }
+
+    public void verificarAutorizacaoDoUsuario(T transacao) {
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        if (!ehSolicitante(transacao, usuarioLogado)) {
+            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar a transação");
+        }
+    }
+
+    public List<String> encontrarAtributosIguais(T transacaoA, T transacaoB) {
+        List<String> atributosIguais = new ArrayList<> ();
+
+        if (transacaoA.getDataHoraInicio().isEqual(transacaoB.getDataHoraInicio()))
+            atributosIguais.add("dataHoraInicio");
+        if (transacaoA.getDataHoraFim().isEqual(transacaoB.getDataHoraFim()))
+            atributosIguais.add("dataHoraFim");
+        if (Objects.equals(transacaoA.getObservacaoSolicitacao(), transacaoB.getObservacaoSolicitacao()))
+            atributosIguais.add("observacaoSolicitacao");
+
+        return atributosIguais;
+    }
+
 
 
 

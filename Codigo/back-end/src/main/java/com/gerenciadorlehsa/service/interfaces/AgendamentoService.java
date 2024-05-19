@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.service.interfaces;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.security.UsuarioDetails;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +18,14 @@ public interface AgendamentoService {
 
     void enviarEmailParaProfessor(Agendamento agendamento);
 
+    boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado);
+
+    void checkTecnicoNaoSolicita(Agendamento agendamento);
+
+    void verificarPerfilTecnico(User tecnico);
+
     void verificarConfirmacaoCadastroProfessor(Agendamento agendamento);
+
+    Agendamento verificarNovoProfessor(Agendamento novoAgedamento, Agendamento velhoAgendamento);
 
 }

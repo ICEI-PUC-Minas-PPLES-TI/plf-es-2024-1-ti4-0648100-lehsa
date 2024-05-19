@@ -1,8 +1,10 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.EmprestimoException;
 import com.gerenciadorlehsa.repository.EmprestimoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
@@ -80,25 +82,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         return emprestimoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
     }
 
-/*    public void verificarConflitoComTransacoesAprovadasOuConfirmadas (Emprestimo emprestimo){
-        List<Item> itens = emprestimo.getItens ();
-        List<Emprestimo> emprestimosAprovadosOuConfirmadosConflitantes =
-                transacoesAprovadasOuConfirmadasConflitantes (emprestimo.getDataHoraInicio (), emprestimo.getDataHoraFim ());
 
-        for (Item item : itens) {
-            List<Emprestimo> emprestimosDoItem = item.getEmprestimos ();
-
-            if(emprestimosDoItem != null && !emprestimosDoItem.isEmpty ()) {
-                for (Emprestimo emprestimoDoItem : emprestimosDoItem) {
-                    if(emprestimosAprovadosOuConfirmadosConflitantes.contains (emprestimoDoItem))
-                        throw new EmprestimoException ("O item " + item.getNome () + " já possui um empréstimo nessa " +
-                                "data e hora!");
-                }
-            }
-
-
-        }
-    }*/
 
     @Override
     public int calcularQuantidadeTransacao(Item item, List<Emprestimo> emprestimos) {
@@ -148,5 +132,15 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     @Override
     public void deletarItensAssociados (Item item) {
         // Implementar método de deletar itens associados ao empréstimo
+    }
+
+    @Override
+    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO (Emprestimo transacao, StatusTransacaoItem status) {
+
+    }
+
+    @Override
+    public void copiarAtributosRelevantes (Agendamento source, Agendamento target, List<String> atributosIguais) {
+
     }
 }
