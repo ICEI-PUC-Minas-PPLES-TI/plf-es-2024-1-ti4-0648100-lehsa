@@ -15,4 +15,6 @@ public class ConstantesNumUtil {
     public static final Integer TRES = 3;
 
     public static final Integer LIMITE_AGENDAMENTOS_EM_ANALISE = 9;
+
+    public static final Integer LIMITE_EMPRESTIMO_EM_ANALISE = 4;
 }

@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.DATA_HORA_UTIL;
@@ -52,5 +51,18 @@ public class DataHoraUtil {
             throw new DataException ("Data inválida!");
     }
 
+    public static void dataValidaEmprestimo(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim){
+        Duration tempoEntreDatas = Duration.between(dataHoraInicio, dataHoraFim);
 
+        boolean NaoEhValida = dataHoraInicio.isBefore (LocalDateTime.now ()) ||
+                dataHoraFim.isBefore (dataHoraInicio) ||
+                tempoEntreDatas.toDays() > 15 ||
+                tempoEntreDatas.toDays() < 1 ||
+                dataHoraInicio.getHour() < 8 ||
+                dataHoraInicio.getHour() > 18 ||
+                dataHoraFim.getHour() > 18 ||
+                dataHoraFim.getHour() < 8;
+        if(NaoEhValida)
+            throw new DataException ("Data inválida!");
+    }
 }
