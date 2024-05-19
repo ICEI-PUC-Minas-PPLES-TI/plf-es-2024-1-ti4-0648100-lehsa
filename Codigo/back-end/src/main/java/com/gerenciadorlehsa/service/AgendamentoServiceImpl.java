@@ -28,6 +28,7 @@ import java.util.UUID;
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
+import static com.gerenciadorlehsa.util.DataHoraUtil.dataValida;
 import static java.lang.String.format;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
@@ -76,67 +77,37 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         verificarConfirmacaoCadastroProfessor (obj);
         //enviarEmailParaProfessor (obj);
-
         checkTecnicoNaoSolicita (obj);
-        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
-        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
-        DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
+        dataValida (obj.getDataHoraInicio (), obj.getDataHoraFim ());
 
-        if(!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty ())
-            throw new AgendamentoException ("Já existe agendamento aprovado pelo administrador ou confirmado pelo " +
-                    "usuário" +
-                    "para essa data");
+        verificarConflitosDeAgendamento(obj.getDataHoraInicio (), obj.getDataHoraFim ());
 
         verificarLimiteTransacaoEmAnalise (obj.getSolicitantes ());
-        verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
 
+        verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
         obj.setId (null);
 
         return agendamentoRepository.save (obj);
     }
 
-
     @Override
-    public Agendamento atualizar (Agendamento obj) {
+    public Agendamento atualizar(Agendamento obj) {
         log.info(">>> atualizar: atualizando agendamento");
+
         Agendamento agendamentoAtt = encontrarPorId(obj.getId());
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
+        verificarAutorizacaoDoUsuario(agendamentoAtt);
 
-        if (!ehSolicitante(obj, usuarioLogado)) {
-            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
-        }
+        List<String> atributosIguais = encontrarAtributosIguais(agendamentoAtt, obj);
 
-        List<String> atributosIguais = atributosIguais(agendamentoAtt, obj);
+        validarDataHora(atributosIguais, obj);
 
+        copiarAtributosRelevantes(obj, agendamentoAtt, atributosIguais);
 
-        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
-        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
-
-        if (!(atributosIguais.contains("dataHoraInicio") && atributosIguais.contains("dataHoraFim"))) {
-            DataHoraUtil.dataValida(dataHoraInicio, dataHoraFim);
-
-            if(!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty ())
-                throw new AgendamentoException ("Já existe agendamento para essa data");
-
-            verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
-        }
-        atributosIguais.add("tecnico");
-        atributosIguais.add("statusTransacaoItem");
-        atributosIguais.add("id");
-        String[] propriedadesIgnoradas = new String[atributosIguais.size()];
-        propriedadesIgnoradas = atributosIguais.toArray(propriedadesIgnoradas);
-
-        copyProperties(obj, agendamentoAtt, propriedadesIgnoradas);
-        log.info("Técnico " + (agendamentoAtt.getTecnico()==null));
-
-        return this.agendamentoRepository.save(agendamentoAtt);
+        return agendamentoRepository.save(agendamentoAtt);
     }
 
-    public void vefificarAtualizacaoDoProfessorNoAgendamento(Agendamento agendamento) {
-
-    }
 
     @Override
     public List<Agendamento> listarTodos () {
@@ -364,20 +335,6 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
 
-    private List<String> atributosIguais (Agendamento a, Agendamento b) {
-        List<String> atributosIguais = new ArrayList<>();
-
-        if (a.getDataHoraInicio().isEqual(b.getDataHoraInicio()))
-            atributosIguais.add("dataHoraInicio");
-        if (a.getDataHoraFim().isEqual(b.getDataHoraFim()))
-            atributosIguais.add("dataHoraFim");
-        if (a.getObservacaoSolicitacao().equals(b.getObservacaoSolicitacao()))
-            atributosIguais.add("observacaoSolicitacao");
-
-        return atributosIguais;
-    }
-
-
     public void deletarAgendamentoDaListaDosUsuarios(Agendamento agendamento) {
 
         if(agendamento.getSolicitantes () != null && !agendamento.getSolicitantes ().isEmpty ())
@@ -421,5 +378,50 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
 
+    private void verificarAutorizacaoDoUsuario(Agendamento agendamento) {
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        if (!ehSolicitante(agendamento, usuarioLogado)) {
+            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
+        }
+    }
+
+    private List<String> encontrarAtributosIguais(Agendamento agendamentoA, Agendamento agendamentoB) {
+        List<String> atributosIguais = new ArrayList<>();
+
+        if (agendamentoA.getDataHoraInicio().isEqual(agendamentoB.getDataHoraInicio()))
+            atributosIguais.add("dataHoraInicio");
+        if (agendamentoA.getDataHoraFim().isEqual(agendamentoB.getDataHoraFim()))
+            atributosIguais.add("dataHoraFim");
+        if (Objects.equals(agendamentoA.getObservacaoSolicitacao(), agendamentoB.getObservacaoSolicitacao()))
+            atributosIguais.add("observacaoSolicitacao");
+
+        return atributosIguais;
+    }
+
+    private void validarDataHora(List<String> atributosIguais, Agendamento obj){
+        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
+        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
+        if (!atributosIguais.contains("dataHoraInicio") || !atributosIguais.contains("dataHoraFim")) {
+            dataValida(dataHoraInicio, dataHoraFim);
+            if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty())
+                throw new AgendamentoException("Já existe agendamento para essa data");
+            verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
+        }
+    }
+
+    private void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
+        atributosIguais.add("tecnico");
+        atributosIguais.add("statusTransacaoItem");
+        atributosIguais.add("id");
+        String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
+        copyProperties(source, target, propriedadesIgnoradas);
+    }
+
+
+    private void verificarConflitosDeAgendamento(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+        if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty()) {
+            throw new AgendamentoException("Já existe agendamento aprovado pelo administrador ou confirmado pelo usuário para essa data");
+        }
+    }
 
 }
