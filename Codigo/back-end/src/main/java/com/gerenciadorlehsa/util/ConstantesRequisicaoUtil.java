@@ -51,6 +51,8 @@ public class ConstantesRequisicaoUtil {
 
     public static final List<String> CHAVES_AGENDAMENTO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_agendamento"));
 
+    public static final List<String> CHAVES_EMPRESTIMO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_emprestimo"));
+
     public static final String MSG_USUARIO_CRIADO = "usuario criado com sucesso";
 
     public static final String MSG_PROFESSOR_CRIADO = "Professor criado com sucesso";
@@ -76,4 +78,6 @@ public class ConstantesRequisicaoUtil {
     public static final String MSG_PROFESSOR_CONFIRMACAO_CADASTRO = "Professor confirmou cadastro";
 
     public static final String MSG_USUARIO_SENHA = "senha atualizada com sucesso";
+
+    public static final String MSG_EMPRESTIMO_CRIADO = "emprestimo criado com sucesso";
 }

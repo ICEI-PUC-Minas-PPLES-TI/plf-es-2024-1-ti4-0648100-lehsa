@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.AGUARDANDO_CONFIRMACAO_PROFESSOR;
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
