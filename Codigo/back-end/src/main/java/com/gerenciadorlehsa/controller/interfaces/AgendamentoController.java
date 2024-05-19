@@ -17,7 +17,7 @@ public interface AgendamentoController {
     @PatchMapping("/tecnico/{id}/{email}")
     ResponseEntity<Map<String, Object>> atualizarTecnico (@PathVariable UUID id,
                                                                  @PathVariable String email);
-
+    @PatchMapping("/professor-confirma")
     ResponseEntity<Map<String, Object>> confirmarAgendamento(@RequestParam("id") UUID id);
 
 }

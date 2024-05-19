@@ -13,7 +13,7 @@ public interface ProfessorService {
 
     Professor encontrarPorEmail(@NotNull String email);
 
-    void enviarEmailParaProfessor(Professor professor);
+    void enviarEmailParaProfessor(Professor professor, String linkConfirmacao);
 
     List<Agendamento> listarAgendamentos(UUID id);
 }

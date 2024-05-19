@@ -200,6 +200,15 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.NOT_FOUND, request);
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(TempoExpiradoException.class)
+    public ResponseEntity<Object> capturarTempoExpiradoException(@NotNull TempoExpiradoException e,WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] TempoExpiradoException: Tempo esgotado: %s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
+
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ProfessorConfirmaAgendamentoException.class)

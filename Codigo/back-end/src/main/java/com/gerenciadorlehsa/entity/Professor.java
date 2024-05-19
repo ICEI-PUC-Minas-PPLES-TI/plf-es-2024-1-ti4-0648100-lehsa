@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -46,7 +47,7 @@ public class Professor extends Pessoa{
     private LocalDateTime dataHoraCriacao;
 
     @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Agendamento> agendamentos;
+    private List<Agendamento> agendamentos = new ArrayList<> ();
 
     //private String foto;
 }

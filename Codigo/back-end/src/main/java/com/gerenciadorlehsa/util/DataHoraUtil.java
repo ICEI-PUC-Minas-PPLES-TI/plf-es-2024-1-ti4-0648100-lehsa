@@ -30,6 +30,12 @@ public class DataHoraUtil {
         }
     }
 
+    public static long calcularDiferencaDeTempo(LocalDateTime dataHora1, LocalDateTime dataHora2) {
+        Duration duration = Duration.between(dataHora1, dataHora2);
+        return duration.toHours();
+    }
+
+
     public static void dataValida(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim){
         Duration tempoEntreDatas = Duration.between(dataHoraInicio, dataHoraFim);
 

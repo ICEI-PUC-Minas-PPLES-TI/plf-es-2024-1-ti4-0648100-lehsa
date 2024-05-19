@@ -66,7 +66,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity(agendamentoDTO);
 
         log.info (">>> Validar o mapa que rege a relação entre itens e agendamento");
-        mapaTransacaoItemService.validarMapa(null, agendamento);
+        mapaTransacaoItemService.validarMapaParaCriacao(agendamento);
 
         log.info (">>> Criar um agendamento");
         Agendamento agendamentoCriado = operacoesCRUDService.criar(agendamento);
@@ -80,7 +80,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
                                                           @Valid @RequestBody AgendamentoDTO obj) {
         log.info(">>> atualizar: recebendo requisição para atualizar agendamento");
         Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (obj);
-        mapaTransacaoItemService.validarMapa (id, agendamento);
+        mapaTransacaoItemService.validarMapaParaAtualizacao (id, agendamento);
         agendamento.setId(id);
         Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
 

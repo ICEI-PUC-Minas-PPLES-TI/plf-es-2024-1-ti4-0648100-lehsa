@@ -21,8 +21,8 @@ public class ConstantesRequisicaoUtil {
 
     public static final String ENDPOINT_ITEM = "/item";
 
-    public static final String[] CAMINHOS_PUBLICOS = {"/", "/actuator/health", "/usuario/verificar-token",
-            "/professor/confirmacao-cadastro"};
+    public static final String[] CAMINHOS_PUBLICOS = {"/", "/actuator/health", "/usuario/verificar-token","/professor" +
+            "/confirmacao-cadastro","/professor/professor-confirma"};
 
     public static final String[] CAMINHOS_PUBLICOS_POST = {"/usuario", "/login"};
 
@@ -42,7 +42,7 @@ public class ConstantesRequisicaoUtil {
             "\n}";
 
     public static final String[] PROPRIEDADES_IGNORADAS = new String[]{"id", "password", "perfilUsuario","nota",
-            "confirmaCadastro", "dataHoraCriacao"};
+            "confirmaCadastro", "dataHoraCriacao", "agendamentos", "emprestimos"};
 
     public static final List<String> CHAVES_USUARIO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_usuario"));
 

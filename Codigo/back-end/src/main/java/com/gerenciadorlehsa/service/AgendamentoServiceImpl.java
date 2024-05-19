@@ -17,6 +17,8 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +111,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         List<String> atributosIguais = atributosIguais(agendamentoAtt, obj);
 
 
-
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
@@ -134,7 +135,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     }
 
     public void vefificarAtualizacaoDoProfessorNoAgendamento(Agendamento agendamento) {
-        
+
     }
 
     @Override
@@ -232,41 +233,23 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
 
 //----------------TransacaoService - INÍCIO ---------------------------
-    @Override
-    public void atualizarStatus (@NotNull String status, @NotNull UUID id) {
-        log.info(">>> atualizarStatus: atualizando status do agendamento");
-        try {
-            StatusTransacaoItem statusUpperCase =
-                    Enum.valueOf(StatusTransacaoItem.class, status.toUpperCase());
+@Override
+public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
+    log.info(">>> atualizarStatus: atualizando status do agendamento");
+    StatusTransacaoItem statusUpperCase = getStatusUpperCase(status);
 
-            Agendamento agendamento = encontrarPorId(id);
+    Agendamento agendamento = encontrarPorId (id);
 
-            if(!agendamentoRepository.findAprovadosOuConfirmadosConflitantes (agendamento.getDataHoraInicio (), agendamento.getDataHoraFim ()).isEmpty () && (statusUpperCase == APROVADO || statusUpperCase == CONFIRMADO)) {
-                throw new AgendamentoException ("Um agendamento para essa data já foi aprovado ou confirmado.");
-            }
+    verificarConflitosDeAgendamento(agendamento, statusUpperCase);
 
+    verificarAutorizacaoDoUsuario(agendamento, statusUpperCase);
 
-            if (statusUpperCase.equals(StatusTransacaoItem.CANCELADO) ||
-                    statusUpperCase.equals(CONFIRMADO)) {
-                UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-                if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
-                    throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
-                }
-            } else
-                validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+    agendamento.setStatusTransacaoItem(statusUpperCase);
+    agendamentoRepository.save(agendamento);
+    log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
+            " atualizado para " + agendamento.getStatusTransacaoItem());
+}
 
-          /*  if(agendamento.getStatusTransacaoItem () == AGUARDANDO_CONFIRMACAO_PROFESSOR)
-                throw new ProfessorConfirmaAgendamentoException ("O professor ainda não confirmou o agendamento!");*/
-
-            agendamento.setStatusTransacaoItem(statusUpperCase);
-            this.agendamentoRepository.save(agendamento);
-            log.info(">>> atualizarStatus: status do agendamento "+agendamento.getId()
-                    + " atualizado para "+agendamento.getStatusTransacaoItem());
-
-        } catch (IllegalArgumentException e) {
-            throw new EnumNaoEncontradoException ("O status passado não existe: " + status);
-        }
-    }
 
     @Override
     public List<Agendamento> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
@@ -404,7 +387,38 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     }
 
 
+    private StatusTransacaoItem getStatusUpperCase(String status) {
+        try {
+            return Enum.valueOf(StatusTransacaoItem.class, status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new EnumNaoEncontradoException("O status passado não existe: " + status);
+        }
+    }
 
+
+    private void verificarConflitosDeAgendamento(Agendamento agendamento, StatusTransacaoItem status) {
+        if (!agendamentoRepository.findAprovadosOuConfirmadosConflitantes(agendamento.getDataHoraInicio(), agendamento.getDataHoraFim()).isEmpty()
+                && (status == APROVADO || status == CONFIRMADO)) {
+            throw new AgendamentoException("Um agendamento para essa data já foi aprovado ou confirmado.");
+        }
+    }
+
+    private void verificarAutorizacaoDoUsuario(Agendamento agendamento, StatusTransacaoItem status) {
+        if (status.equals(CANCELADO) || status.equals(CONFIRMADO)) {
+            UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+            if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
+                throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
+            }
+            if (status.equals(CONFIRMADO)) {
+                long difTempo = DataHoraUtil.calcularDiferencaDeTempo(LocalDateTime.now(), agendamento.getDataHoraInicio());
+                if (difTempo < 24) {
+                    throw new TempoExpiradoException("O Tempo para confirmar já expirou");
+                }
+            }
+        } else {
+            validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        }
+    }
 
 
 

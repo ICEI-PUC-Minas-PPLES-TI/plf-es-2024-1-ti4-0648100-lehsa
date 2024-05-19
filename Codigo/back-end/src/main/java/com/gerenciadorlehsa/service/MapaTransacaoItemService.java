@@ -24,8 +24,14 @@ public class MapaTransacaoItemService<T extends Transacao> {
     private final TransacaoService<Emprestimo> transacaoEmprestimoService;
     private final TransacaoService<Agendamento> transacaoAgendamentoService;
 
-    public void validarMapa(UUID id, T transacao) {
-        log.info (">>> Validando Mapa da relação entre Transacao e Item");
+    public void validarMapaParaCriacao(T transacao) {
+        log.info(">>> Validando Mapa para criação de Transacao");
+        verificarQuantidadeDeItemInValida(transacao.getItensQuantidade());
+        verificarQuantidadeSelecionada(null, transacao);
+    }
+
+    public void validarMapaParaAtualizacao(UUID id, T transacao) {
+        log.info(">>> Validando Mapa para atualização de Transacao");
         verificarQuantidadeDeItemInValida(transacao.getItensQuantidade());
         verificarQuantidadeSelecionada(id, transacao);
     }
@@ -35,7 +41,7 @@ public class MapaTransacaoItemService<T extends Transacao> {
         for (Map.Entry<Item, Integer> entry : transacao.getItensQuantidade().entrySet()) {
             Item item = entry.getKey();
             int quantidadeSelecionada = entry.getValue();
-            int quantidadeDisponivel = calcularQuantidadeDisponivelParaItem(transacao, id, item, transacao.getDataHoraInicio(), transacao.getDataHoraFim());
+            int quantidadeDisponivel = calcularQuantidadeDisponivelParaItem(transacao, id, item);
 
             if (quantidadeSelecionada > quantidadeDisponivel) {
                 throw new TransacaoException ("Quantidade selecionada para o item " + item.getNome() + " excede a quantidade disponível.");
@@ -43,8 +49,10 @@ public class MapaTransacaoItemService<T extends Transacao> {
         }
     }
 
-    public int calcularQuantidadeDisponivelParaItem(T transacao, UUID id, Item item, LocalDateTime inicio,
-                                                    LocalDateTime fim) {
+    public int calcularQuantidadeDisponivelParaItem(T transacao, UUID id, Item item) {
+        LocalDateTime inicio = transacao.getDataHoraInicio ();
+        LocalDateTime fim = transacao.getDataHoraFim ();
+
         List<Emprestimo> emprestimosEmConflito = buscarEmprestimosEmConflito(inicio, fim);
         List<Agendamento> agendamentosEmConflito = buscarAgendamentosEmConflito(inicio, fim);
 
@@ -54,7 +62,6 @@ public class MapaTransacaoItemService<T extends Transacao> {
             else if (transacao instanceof Agendamento)
                 agendamentosEmConflito.removeIf(agendamento -> agendamento.getId().equals(id));
         }
-
 
         int quantidadeEmprestada = transacaoEmprestimoService.calcularQuantidadeTransacao(item, emprestimosEmConflito);
         int quantidadeAgendada = transacaoAgendamentoService.calcularQuantidadeTransacao(item, agendamentosEmConflito);

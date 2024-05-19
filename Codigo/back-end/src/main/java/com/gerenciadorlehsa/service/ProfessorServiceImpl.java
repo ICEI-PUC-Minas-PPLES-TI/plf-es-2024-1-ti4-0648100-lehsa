@@ -57,21 +57,12 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         obj.setDataHoraCriacao (LocalDateTime.now ());
         Professor professor = this.professorRepository.save (obj);
 
-        //enviarEmailParaProfessor(professor);
+        //todo: envio de e-mail por enquanto comentado
+        /*enviarEmailParaProfessor(professor, ".../professor/confirmacao-cadastro?id=" + professor.getId ());*/
 
         return professor;
     }
 
-
-    public void enviarEmailParaProfessor(Professor professor) {
-        String linkConfirmacao = ".../professor/confirmacao-cadastro?id=" + professor.getId ();
-        String email = professor.getEmail();
-        try {
-            mensagemEmailService.enviarEmailConfirmacaoCadastro(email, EstilizacaoEmailUtil.estilizaConfirmacao (linkConfirmacao));
-        } catch (Exception e) {
-            throw new MensagemEmailException ("Envio de e-mail falhou.");
-        }
-    }
 
     @Override
     public Professor atualizar (Professor professor) {
@@ -79,17 +70,16 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         Professor professorAtualizado = encontrarPorId (professor.getId ());
         copyProperties(professor, professorAtualizado, PROPRIEDADES_IGNORADAS);
 
+        // todo: Setando confirmação de cadastro como verdadeiro só para teste
+        // professorAtualizado.setConfirmaCadastro (true);
+
+
         if(!Objects.equals (professor.getEmail (), professorAtualizado.getEmail ())) {
             professorAtualizado.setConfirmaCadastro (false);
             professorAtualizado = professorRepository.save (professorAtualizado);
-            /*String linkConfirmacao = ".../professor/confirmacao-cadastro?id=" + professorAtualizado.getId ();
-            String email = professorAtualizado.getEmail();
-            try {
-                mensagemEmailService.enviarEmailConfirmacaoCadastro(email,
-                        EstilizarEmailUtil.estilizaConfirmacao (linkConfirmacao));
-            } catch (Exception e) {
-                throw new MensagemEmailException ("Envio de e-mail falhou.");
-            }*/
+
+            //todo: envio de e-mail por enquanto comentado
+            /*enviarEmailParaProfessor (professorAtualizado, ".../professor/confirmacao-cadastro?id=" + professorAtualizado.getId ());*/
         } else
             professorAtualizado = professorRepository.save (professorAtualizado);
 
@@ -102,7 +92,6 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         log.info(">>> deletar: deletando professor");
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         encontrarPorId(id);
-        // Apagar o agendamento pelo qual o professor está vinculado
         try {
             this.professorRepository.deleteById(id);
             log.info(format(">>> deletar: professor deletado, id: %s", id));
@@ -118,6 +107,14 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         return professorRepository.findAll();
     }
 
+    @Override
+    public void enviarEmailParaProfessor(Professor professor, String linkConfirmacao) {
+        try {
+            mensagemEmailService.enviarEmailConfirmacaoCadastro(professor.getEmail(), EstilizacaoEmailUtil.estilizaConfirmacao (linkConfirmacao));
+        } catch (Exception e) {
+            throw new MensagemEmailException ("Envio de e-mail falhou.");
+        }
+    }
 
     @Override
     public Professor confirmaEmail(UUID id, Boolean value) {
