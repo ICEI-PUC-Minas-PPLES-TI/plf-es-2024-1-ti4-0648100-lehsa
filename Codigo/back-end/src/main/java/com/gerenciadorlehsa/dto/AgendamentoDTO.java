@@ -11,6 +11,8 @@ public record AgendamentoDTO(
         UUID id,
         List<UsuarioDTO> solicitantes,
         List<ItemDTO> itens,
+        ProfessorDTO professor,
+
         String dataHoraInicio,
         String dataHoraFim,
         String observacaoSolicitacao

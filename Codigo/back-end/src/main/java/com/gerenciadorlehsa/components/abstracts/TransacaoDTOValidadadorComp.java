@@ -29,7 +29,7 @@ public abstract class TransacaoDTOValidadadorComp<DTO> {
             throw new TransacaoException ("A lista de itens contém elementos nulos");
         if (itensDTO.stream().anyMatch(itemDTO -> itemDTO.id() == null))
             throw new TransacaoException ("A lista de itens contém IDs nulos");
-        if(itensDTO.stream().anyMatch(itemDTO -> itemDTO.quantidade () == null))
+        if(itensDTO.stream().anyMatch(itemDTO -> itemDTO.quantidadeTransacao () == null))
             throw new TransacaoException ("A lista de itens contém quantidade nula");
         if (itensDTO.size() > 10)
             throw new TransacaoException ("O máximo de itens é 10");

@@ -146,5 +146,15 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
 
+    @Override
+    @PatchMapping("/professor-confirma")
+    public ResponseEntity<Map<String, Object>> confirmarAgendamento(@RequestParam("id") UUID id) {
+        log.info (" >>> Confirmando o agendamento por parte do professor");
+        agendamentoService.professorConfirmaAgendamento(id);
+
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_PROFESSOR_CONFIRMA, id)));
+    }
+
+
 
 }

@@ -175,13 +175,33 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(MensagemEmailException.class)
-    public ResponseEntity<Object> capturarMensagemEmailException(@NotNull DataException e, WebRequest request) {
+    public ResponseEntity<Object> capturarMensagemEmailException(@NotNull MensagemEmailException e, WebRequest request) {
         String msgErro = e.getMessage();
         log.error(format("[ERRO] MensagemEmailExeption: falha no envio de e-mail: %s", msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ProfessorConfirmaCadastroException.class)
+    public ResponseEntity<Object> capturarProfessorConfirmaCadastroException(@NotNull ProfessorConfirmaCadastroException e,WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ProfessorConfirmaCadastroException: falha na confirmação de e-mail do professor: %s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
+
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ProfessorConfirmaAgendamentoException.class)
+    public ResponseEntity<Object> capturarProfessorConfirmaAgendamentoException(@NotNull ProfessorConfirmaAgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ProfessorConfirmaAgendamentoException: falha na confirmação de agendamento por " +
+                        "parte do professor: " +
+                        "%s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
 
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

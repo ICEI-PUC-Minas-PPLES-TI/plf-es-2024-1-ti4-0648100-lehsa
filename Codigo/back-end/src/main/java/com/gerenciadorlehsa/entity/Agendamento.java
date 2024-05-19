@@ -42,6 +42,11 @@ public class Agendamento extends Transacao {
     private Map<Item, Integer> itensQuantidade = new HashMap<> ();
 
 
+    @ManyToOne
+    @JoinColumn(name = "professor_id", nullable = false)
+    private Professor professor;
+
+
     @PreRemove
     @Override
     public void preRemove() {

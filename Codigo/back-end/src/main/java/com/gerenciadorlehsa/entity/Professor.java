@@ -1,9 +1,7 @@
 package com.gerenciadorlehsa.entity;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "TB_PROFESSOR")
@@ -45,6 +44,9 @@ public class Professor extends Pessoa{
 
     @Column(name = "DATA_CRIACAO", nullable = false)
     private LocalDateTime dataHoraCriacao;
+
+    @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Agendamento> agendamentos;
 
     //private String foto;
 }

@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
@@ -55,15 +56,20 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         obj.setDataHoraCriacao (LocalDateTime.now ());
         Professor professor = this.professorRepository.save (obj);
 
-      /*  String linkConfirmacao = ".../professor/confirmacao-cadastro?id=" + professor.getId ();
+        //enviarEmailParaProfessor(professor);
+
+        return professor;
+    }
+
+
+    public void enviarEmailParaProfessor(Professor professor) {
+        String linkConfirmacao = ".../professor/confirmacao-cadastro?id=" + professor.getId ();
         String email = professor.getEmail();
         try {
             mensagemEmailService.enviarEmailConfirmacaoCadastro(email, EstilizarEmailUtil.estilizaConfirmacao (linkConfirmacao));
         } catch (Exception e) {
             throw new MensagemEmailException ("Envio de e-mail falhou.");
-        }*/
-
-        return professor;
+        }
     }
 
     @Override
@@ -75,7 +81,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
 
         if(!Objects.equals (professor.getEmail (), professorAtualizado.getEmail ())) {
             professorAtualizado.setConfirmaCadastro (false);
-
+            professorAtualizado = professorRepository.save (professorAtualizado);
             /*String linkConfirmacao = ".../professor/confirmacao-cadastro?id=" + professorAtualizado.getId ();
             String email = professorAtualizado.getEmail();
             try {
@@ -117,6 +123,14 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         log.info(">>> confirmaEmail: confirmando cadastro do professor");
         professor.setConfirmaCadastro (true);
         return professorRepository.save (professor);
+    }
+
+    @Override
+    public Professor encontrarPorEmail(@NotNull String email) {
+        log.info(">>> encontrarPorEmail: encontrando professor por email");
+        return professorRepository.findByEmail(email)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(format("professor não encontrado, email: %s",
+                        email)));
     }
 
 }

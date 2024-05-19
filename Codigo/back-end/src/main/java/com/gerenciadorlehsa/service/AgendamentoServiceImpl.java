@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
@@ -11,6 +12,7 @@ import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
+import com.gerenciadorlehsa.util.EstilizarEmailUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +36,15 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     private final AgendamentoRepository agendamentoRepository;
 
+    private final MensagemEmailService mensagemEmailService;
+
 
     @Autowired
-    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, AgendamentoRepository agendamentoRepository) {
+    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
+                                   AgendamentoRepository agendamentoRepository, MensagemEmailService mensagemEmailService) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
+        this.mensagemEmailService = mensagemEmailService;
     }
 
 //----------------CRUD - INÍCIO---------------------------------------
@@ -67,6 +73,9 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         log.info(">>> criando: criando agendamento");
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
+        verificarConfirmacaoProfessor (obj);
+        //enviarEmailParaProfessor (obj);
+
         checkTecnicoNaoSolicita (obj);
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
@@ -85,6 +94,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         return agendamentoRepository.save (obj);
     }
+
 
     @Override
     public Agendamento atualizar (Agendamento obj) {
@@ -156,6 +166,39 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
 
     @Override
+    public void verificarConfirmacaoProfessor(Agendamento agendamento) {
+        if(!agendamento.getProfessor ().getConfirmaCadastro ())
+            throw new ProfessorConfirmaCadastroException ("O Professor ainda não confirmou cadastro");
+    }
+
+    @Override
+    public void enviarEmailParaProfessor(Agendamento agendamento) {
+
+       /* String linkConfirmacao = ".../agendamento/professor-confirma?id=" + agendamento.getProfessor ().getId ();*/
+
+        String linkConfirmacao = "https://www.youtube.com/watch?v=1bMOsJcigIw&t=10162s";
+
+        String email = agendamento.getProfessor ().getEmail();
+        try {
+            mensagemEmailService.enviarEmailConfirmacaoAgendamento(email,
+                    EstilizarEmailUtil.estilizaConfirmacaoAgendamento (linkConfirmacao,
+                            agendamento.getDataHoraInicio (), agendamento.getDataHoraFim ()));
+        } catch (Exception e) {
+            throw new MensagemEmailException ("Envio de e-mail falhou.");
+        }
+    }
+
+
+    @Override
+    public Agendamento professorConfirmaAgendamento(UUID id) {
+        Agendamento agendamento = encontrarPorId (id);
+        log.info(">>> professorConfirmaAgendamento: professor confirma agendamento");
+        agendamento.setStatusTransacaoItem (EM_ANALISE);
+        return agendamentoRepository.save (agendamento);
+    }
+
+
+    @Override
     public void atualizarTecnico (User tecnico, @NotNull UUID id) {
         log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
         Agendamento agendamento = encontrarPorId(id);
@@ -209,6 +252,9 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
                 }
             } else
                 validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+
+          /*  if(agendamento.getStatusTransacaoItem () == AGUARDANDO_CONFIRMACAO_PROFESSOR)
+                throw new ProfessorConfirmaAgendamentoException ("O professor ainda não confirmou o agendamento!");*/
 
             agendamento.setStatusTransacaoItem(statusUpperCase);
             this.agendamentoRepository.save(agendamento);
