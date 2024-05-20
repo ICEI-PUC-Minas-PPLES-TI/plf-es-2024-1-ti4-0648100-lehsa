@@ -1,6 +1,5 @@
 package com.gerenciadorlehsa.service;
 
-import ch.qos.logback.core.model.processor.ProcessorException;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
@@ -16,15 +15,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.PROFESSOR_SERVICE;
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.USUARIO_SERVICE;
 import static java.lang.String.format;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
