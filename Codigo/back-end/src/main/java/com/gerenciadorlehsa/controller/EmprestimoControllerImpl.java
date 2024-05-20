@@ -9,6 +9,7 @@ import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.TransacaoService;
 import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
+import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,9 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     }
 
     @Override
+    @GetMapping
     public ResponseEntity<List<EmprestimoDTORes>> listarTodos () {
-        return null;
+        List<Emprestimo> emprestimos = operacoesCRUDService.listarTodos();
+        return ResponseEntity.ok().body(emprestimos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 }

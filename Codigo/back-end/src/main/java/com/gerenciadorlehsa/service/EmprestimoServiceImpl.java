@@ -76,7 +76,8 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public List<Emprestimo> listarTodos () {
-        return null;
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        return this.emprestimoRepository.findAll();
     }
 
     @Override
