@@ -14,9 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
@@ -26,6 +24,7 @@ import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_CONTROLLER;
 import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirRespostaJSON;
+import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDtoRes;
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -43,11 +42,14 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> emprestimoEntityConverterComp;
 
     @Override
-    public ResponseEntity<EmprestimoDTORes> encontrarPorId (UUID id) {
-        return null;
+    @GetMapping("/{id}")
+    public ResponseEntity<EmprestimoDTORes> encontrarPorId (@PathVariable UUID id) {
+        Emprestimo emprestimo = operacoesCRUDService.encontrarPorId(id);
+        return ResponseEntity.ok().body(converterParaDtoRes(emprestimo));
     }
 
     @Override
+    @PostMapping
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody EmprestimoDTO obj) {
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
         mapaTransacaoItemService.validarMapaParaCriacao (emprestimo);

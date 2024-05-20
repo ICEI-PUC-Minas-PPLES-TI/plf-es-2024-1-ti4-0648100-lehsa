@@ -6,6 +6,8 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.EmprestimoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
+import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
 import com.gerenciadorlehsa.repository.EmprestimoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
@@ -34,7 +36,13 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public Emprestimo encontrarPorId (UUID id) {
-        return null;
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        Emprestimo obj = emprestimoRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(
+                String.format("Emprestimo não encontrado, id: %s", id)));
+
+        if(!ehUsuarioAutorizado(obj, usuarioLogado))
+            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para acessar o emprestimo");
+        return obj;
     }
 
     @Override
@@ -48,11 +56,13 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         DataHoraUtil.dataValidaEmprestimo (dataHoraInicio, dataHoraFim);
         verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitante(), obj);
 
-        if(transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).stream()
+        /*if(transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).stream()
                 .anyMatch(emprestimo -> emprestimo.getItensQuantidade()
                         .keySet().stream().anyMatch(item -> obj.getItensQuantidade().containsKey(item))))
             throw new EmprestimoException("Algum item já está sendo emprestado entre essas datas!");
 
+         */
+        obj.setStatusTransacaoItem(EM_ANALISE);
         obj.setId(null);
         return emprestimoRepository.save(obj);
     }
