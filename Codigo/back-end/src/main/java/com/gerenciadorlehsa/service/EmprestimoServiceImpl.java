@@ -48,6 +48,8 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     @Override
     public Emprestimo criar (Emprestimo obj) {
         ehUsuarioAutorizado(obj, validadorAutorizacaoRequisicaoService.getUsuarioLogado ());
+        if (obj.getItensQuantidade().keySet().stream().anyMatch(item -> !item.getEmprestavel()))
+            throw new EmprestimoException("Item não emprestavel selecionado para empresitmo!");
         verificarLimiteTransacaoEmAnalise(obj.getSolicitante());
 
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
@@ -56,14 +58,9 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         DataHoraUtil.dataValidaEmprestimo (dataHoraInicio, dataHoraFim);
         verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitante(), obj);
 
-        /*if(transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).stream()
-                .anyMatch(emprestimo -> emprestimo.getItensQuantidade()
-                        .keySet().stream().anyMatch(item -> obj.getItensQuantidade().containsKey(item))))
-            throw new EmprestimoException("Algum item já está sendo emprestado entre essas datas!");
-
-         */
         obj.setStatusTransacaoItem(EM_ANALISE);
         obj.setId(null);
+        obj.getLocalUso().setId(null);
         return emprestimoRepository.save(obj);
     }
 
@@ -79,7 +76,8 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public List<Emprestimo> listarTodos () {
-        return null;
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        return this.emprestimoRepository.findAll();
     }
 
     @Override
