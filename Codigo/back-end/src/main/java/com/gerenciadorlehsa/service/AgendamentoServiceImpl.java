@@ -91,10 +91,10 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         verificarLimiteTransacaoEmAnalise (obj.getSolicitantes ());
 
+        verificarTransacaoDeMesmaDataDoProfessor(obj.getProfessor (), obj);
+
         verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
         obj.setId (null);
-
-        verificarTransacaoDeMesmaDataDoProfessor(obj.getProfessor (), obj);
 
 
         return agendamentoRepository.save (obj);
@@ -256,7 +256,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
                 .anyMatch (agendamentoAVista -> temConflitoDeData (agendamentoAVista, agendamento));
 
         if (conflitoDeData) {
-            throw new AgendamentoException ("O Professor tem um agendamento marcado pra essa data");
+            throw new ConflitoDataException ("O Professor tem um agendamento marcado pra essa data");
         }
     }
 
@@ -305,7 +305,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
                 .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
 
         if (conflitoDeData) {
-            throw new AgendamentoException ("Um dos solicitantes já fez uma agendamento na mesma data");
+            throw new ConflitoDataException ("Um dos solicitantes já fez uma agendamento na mesma data");
         }
     }
 
