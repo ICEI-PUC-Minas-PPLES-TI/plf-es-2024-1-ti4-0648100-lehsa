@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
@@ -92,6 +93,9 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
         obj.setId (null);
+
+        verificarTransacaoDeMesmaDataDoProfessor(obj.getProfessor (), obj);
+
 
         return agendamentoRepository.save (obj);
     }
@@ -243,6 +247,19 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         return velhoAgendamento;
     }
 
+    @Override
+    public void verificarTransacaoDeMesmaDataDoProfessor(Professor professor, Agendamento agendamento) {
+        log.info (">>> Verificar conflito de data do professor: barrando agendamento de mesma data de um professor");
+
+        boolean conflitoDeData = professor.getAgendamentos ()
+                .stream ()
+                .anyMatch (agendamentoAVista -> temConflitoDeData (agendamentoAVista, agendamento));
+
+        if (conflitoDeData) {
+            throw new AgendamentoException ("O Professor tem um agendamento marcado pra essa data");
+        }
+    }
+
 //----------------AgendamentoService - FIM ---------------------------
 
 
@@ -360,6 +377,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
             verificarTransacaoDeMesmaDataDoUsuario (solicitante, agendamento);
         }
     }
+
 
     private void verificarLimiteTransacaoEmAnalise(List<User> solicitantes) {
         log.info(">>> Verificar limite de solicitação: Barrando limite excedente de solicitação");
