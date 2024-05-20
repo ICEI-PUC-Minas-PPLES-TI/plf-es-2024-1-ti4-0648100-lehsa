@@ -76,7 +76,12 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
         verificarConfirmacaoCadastroProfessor (obj);
+
+        //Enviar e-mail confirmação:
         //enviarEmailParaProfessor (obj);
+        //Caso não envie e-mail:
+        //obj.setStatusTransacaoItem (EM_ANALISE);
+
         checkTecnicoNaoSolicita (obj);
 
         dataValida (obj.getDataHoraInicio (), obj.getDataHoraFim ());
@@ -97,6 +102,8 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         Agendamento agendamentoAtt = encontrarPorId(obj.getId());
 
+        verificarNovoProfessor (obj, agendamentoAtt);
+
         verificarAutorizacaoDoUsuario(agendamentoAtt);
 
         List<String> atributosIguais = encontrarAtributosIguais(agendamentoAtt, obj);
@@ -104,8 +111,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         validarDataHora(atributosIguais, obj);
 
         copiarAtributosRelevantes(obj, agendamentoAtt, atributosIguais);
-
-        verificarNovoProfessor (obj, agendamentoAtt);
 
         return agendamentoRepository.save(agendamentoAtt);
     }
@@ -124,7 +129,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         Agendamento agendamento = encontrarPorId(id);
         deletarAgendamentoDaListaDosUsuarios (agendamento);
-        //deletarAgendamentoDaListaDosItens(agendamento);
         log.info(">>> deletar: deletando agendamento");
         try{
             this.agendamentoRepository.deleteById(id);
@@ -394,8 +398,9 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
     private void verificarMudancaProfessor(Agendamento agendamento) {
         StatusTransacaoItem statusTransacaoItem = agendamento.getStatusTransacaoItem ();
-        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO))
-            throw new AtualizarAgendamentoException ("O professor com status em análise ou aprovado");
+        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO) && !statusTransacaoItem.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
+            throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
+                    "aprovada, confirmada ou em análise");
 
     }
 
