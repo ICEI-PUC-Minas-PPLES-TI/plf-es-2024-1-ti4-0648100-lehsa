@@ -49,7 +49,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
         log.info (">>> criar: criando professor");
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         obj.setId (null);
-        obj.setConfirmaCadastro (false);
+        obj.setConfirmaCadastro (true);
         obj.setDataHoraCriacao (LocalDateTime.now ());
         Professor professor = this.professorRepository.save (obj);
 
