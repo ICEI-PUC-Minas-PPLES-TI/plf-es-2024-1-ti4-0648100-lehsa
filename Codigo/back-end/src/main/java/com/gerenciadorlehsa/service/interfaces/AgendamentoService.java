@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.service.interfaces;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +18,8 @@ public interface AgendamentoService {
     Agendamento professorConfirmaAgendamento(UUID id);
 
     void enviarEmailParaProfessor(Agendamento agendamento);
+
+    void verificarTransacaoDeMesmaDataDoProfessor(Professor professor, Agendamento agendamento);
 
     boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado);
 

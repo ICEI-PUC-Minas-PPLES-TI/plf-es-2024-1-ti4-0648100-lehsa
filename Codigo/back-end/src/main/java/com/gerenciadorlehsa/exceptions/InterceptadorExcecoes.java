@@ -209,6 +209,17 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ConflitoDataException.class)
+    public ResponseEntity<Object> capturarConflitoDataException(@NotNull ConflitoDataException e,WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ConflitoDataException: Data conflitante: %s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
+
+
+
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(AtualizarAgendamentoException.class)
     public ResponseEntity<Object> capturarAtualiazarAgendamentoException(@NotNull AtualizarAgendamentoException e, WebRequest request) {

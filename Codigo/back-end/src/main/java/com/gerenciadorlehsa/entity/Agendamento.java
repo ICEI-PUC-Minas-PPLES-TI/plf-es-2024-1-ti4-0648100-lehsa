@@ -23,6 +23,7 @@ public class Agendamento extends Transacao {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "tecnico_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
+    @ToString.Exclude
     private User tecnico;
 
 
@@ -32,6 +33,7 @@ public class Agendamento extends Transacao {
             joinColumns = @JoinColumn(name = "agendamento_id"),
             inverseJoinColumns = @JoinColumn(name = "usuario_id")
     )
+    @ToString.Exclude
     private List<User> solicitantes;
 
     @ElementCollection
@@ -44,6 +46,7 @@ public class Agendamento extends Transacao {
 
     @ManyToOne
     @JoinColumn(name = "professor_id", nullable = false)
+    @ToString.Exclude
     private Professor professor;
 
 

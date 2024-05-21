@@ -14,9 +14,9 @@ const UserPage = () => {
   const [agendamentos, setAgendamentos] = useState<AgendamentoType[]>([]);
 
   const token = Cookie.get("token");
-  let decoded = "";
+  let decoded: any = {};
   if (token) {
-    decoded = jwtDecode(token);
+     decoded = jwtDecode(token);
   }
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const UserPage = () => {
   }, []);
 
   const fetchAgendamento = () => {
-    fetch(`http://localhost:8080/agendamento/usuario/${decoded.sub}`, {
+    fetch(`http://localhost:8080/usuario/${decoded.userId}/agendamentos`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

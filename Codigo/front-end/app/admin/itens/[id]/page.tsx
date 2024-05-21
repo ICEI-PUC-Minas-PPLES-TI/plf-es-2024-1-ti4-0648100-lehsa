@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import { EditIcon, TrashIcon } from "lucide-react";
+import { EditIcon, TrashIcon, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Cookie from "js-cookie";
 import ImageComp from "@/components/ImageComp";

@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
@@ -76,7 +77,12 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
         verificarConfirmacaoCadastroProfessor (obj);
+
+        //Enviar e-mail confirmação:
         //enviarEmailParaProfessor (obj);
+        //Caso não envie e-mail:
+        //obj.setStatusTransacaoItem (EM_ANALISE);
+
         checkTecnicoNaoSolicita (obj);
 
         dataValida (obj.getDataHoraInicio (), obj.getDataHoraFim ());
@@ -85,7 +91,10 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         verificarLimiteTransacaoEmAnalise (obj.getSolicitantes ());
 
+        verificarTransacaoDeMesmaDataDoProfessor(obj.getProfessor (), obj);
+
         verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
+
         obj.setId (null);
 
         return agendamentoRepository.save (obj);
@@ -97,6 +106,8 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         Agendamento agendamentoAtt = encontrarPorId(obj.getId());
 
+        verificarNovoProfessor (obj, agendamentoAtt);
+
         verificarAutorizacaoDoUsuario(agendamentoAtt);
 
         List<String> atributosIguais = encontrarAtributosIguais(agendamentoAtt, obj);
@@ -104,8 +115,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         validarDataHora(atributosIguais, obj);
 
         copiarAtributosRelevantes(obj, agendamentoAtt, atributosIguais);
-
-        verificarNovoProfessor (obj, agendamentoAtt);
 
         return agendamentoRepository.save(agendamentoAtt);
     }
@@ -124,7 +133,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         Agendamento agendamento = encontrarPorId(id);
         deletarAgendamentoDaListaDosUsuarios (agendamento);
-        //deletarAgendamentoDaListaDosItens(agendamento);
         log.info(">>> deletar: deletando agendamento");
         try{
             this.agendamentoRepository.deleteById(id);
@@ -239,6 +247,22 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         return velhoAgendamento;
     }
 
+    @Override
+    public void verificarTransacaoDeMesmaDataDoProfessor(Professor professor, Agendamento agendamento) {
+        log.info (">>> Verificar conflito de data do professor: barrando agendamento de mesma data de um professor");
+        List<Agendamento> agendamentosDoProfessor = professor.getAgendamentos ();
+        boolean conflitoDeData = false;
+        if(agendamentosDoProfessor != null && !agendamentosDoProfessor.isEmpty ()) {
+            conflitoDeData = professor.getAgendamentos ()
+                    .stream ()
+                    .anyMatch (agendamentoAVista -> temConflitoDeData (agendamentoAVista, agendamento));
+        }
+
+        if (conflitoDeData) {
+            throw new ConflitoDataException ("O Professor tem um agendamento marcado pra essa data");
+        }
+    }
+
 //----------------AgendamentoService - FIM ---------------------------
 
 
@@ -280,11 +304,16 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
     @Override
     public void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, Agendamento agendamento) {
-        boolean conflitoDeData = solicitante.getAgendamentosRealizados().stream()
-                .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
+
+        List<Agendamento> agendamentosDoSolicitante = solicitante.getAgendamentosRealizados ();
+        boolean conflitoDeData = false;
+
+        if(agendamentosDoSolicitante != null && !agendamentosDoSolicitante.isEmpty ())
+            conflitoDeData = agendamentosDoSolicitante.stream()
+                    .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
 
         if (conflitoDeData) {
-            throw new AgendamentoException ("Um dos solicitantes já fez uma agendamento na mesma data");
+            throw new ConflitoDataException ("Um dos solicitantes já fez uma agendamento na mesma data");
         }
     }
 
@@ -357,6 +386,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         }
     }
 
+
     private void verificarLimiteTransacaoEmAnalise(List<User> solicitantes) {
         log.info(">>> Verificar limite de solicitação: Barrando limite excedente de solicitação");
         for (User solicitante : solicitantes) {
@@ -394,8 +424,9 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
     private void verificarMudancaProfessor(Agendamento agendamento) {
         StatusTransacaoItem statusTransacaoItem = agendamento.getStatusTransacaoItem ();
-        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO))
-            throw new AtualizarAgendamentoException ("O professor com status em análise ou aprovado");
+        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO) && !statusTransacaoItem.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
+            throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
+                    "aprovada, confirmada ou em análise");
 
     }
 
