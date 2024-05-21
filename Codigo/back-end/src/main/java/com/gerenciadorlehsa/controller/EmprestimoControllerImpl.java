@@ -28,6 +28,7 @@ import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirResp
 import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDtoRes;
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @Slf4j(topic = EMPRESTIMO_CONTROLLER)
 @RestController
@@ -64,8 +65,10 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> deletar (UUID id) {
-        return null;
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> deletar (@PathVariable UUID id) {
+        operacoesCRUDService.deletar(id);
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_DELETADO, id)));
     }
 
     @Override

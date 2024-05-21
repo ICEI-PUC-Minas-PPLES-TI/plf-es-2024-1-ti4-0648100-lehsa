@@ -5,6 +5,7 @@ import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EmprestimoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
@@ -22,23 +23,27 @@ import java.util.UUID;
 
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_EMPRESTIMO_EM_ANALISE;
+import static java.lang.String.format;
 
 @Service
 public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>, EmprestimoService{
 
     private final EmprestimoRepository emprestimoRepository;
+    private final EnderecoService enderecoService;
 
     @Autowired
-    public EmprestimoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, EmprestimoRepository emprestimoRepository) {
+    public EmprestimoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, EmprestimoRepository emprestimoRepository,
+                                  EnderecoService enderecoService) {
         super (validadorAutorizacaoRequisicaoService);
         this.emprestimoRepository = emprestimoRepository;
+        this.enderecoService = enderecoService;
     }
 
     @Override
     public Emprestimo encontrarPorId (UUID id) {
         UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         Emprestimo obj = emprestimoRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(
-                String.format("Emprestimo não encontrado, id: %s", id)));
+                format("Emprestimo não encontrado, id: %s", id)));
 
         if(!ehUsuarioAutorizado(obj, usuarioLogado))
             throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para acessar o emprestimo");
@@ -71,7 +76,18 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public void deletar (UUID id) {
-
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        Emprestimo obj = encontrarPorId(id);
+        int nEmprestimosComEndereco = emprestimoRepository.countEmprestimoByLocalUso(obj.getLocalUso());
+        try {
+            emprestimoRepository.deleteById(id);
+            if (nEmprestimosComEndereco == 1) {
+                enderecoService.deletar(obj.getLocalUso().getId());
+            }
+            deletarEmprestimoDaListaDoUsuario(obj);
+        } catch (Exception e) {
+            throw new DeletarEntidadeException(format("existem entidades relacionadas: %s", e));
+        }
     }
 
     @Override
@@ -139,7 +155,14 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public void deletarItensAssociados (Item item) {
-        // Implementar método de deletar itens associados ao empréstimo
+        List<Emprestimo> emprestimos = emprestimoRepository.findByItem(item);
+
+        if(emprestimos != null && !emprestimos.isEmpty ()) {
+            for (Emprestimo emprestimo : emprestimos) {
+                emprestimo.getItensQuantidade().remove(item);
+                emprestimoRepository.save(emprestimo);
+            }
+        }
     }
 
     @Override
@@ -150,5 +173,10 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     @Override
     public void copiarAtributosRelevantes (Agendamento source, Agendamento target, List<String> atributosIguais) {
 
+    }
+
+    private void deletarEmprestimoDaListaDoUsuario(Emprestimo emprestimo) {
+        if(emprestimo.getSolicitante () != null)
+            emprestimo.getSolicitante().getEmprestimos().remove (emprestimo);
     }
 }
