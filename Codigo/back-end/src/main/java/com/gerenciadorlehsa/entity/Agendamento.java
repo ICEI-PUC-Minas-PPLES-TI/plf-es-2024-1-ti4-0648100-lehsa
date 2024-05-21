@@ -45,7 +45,7 @@ public class Agendamento extends Transacao {
 
 
     @ManyToOne
-    @JoinColumn(name = "professor_id"/*, nullable = false*/)
+    @JoinColumn(name = "professor_id", nullable = false)
     @ToString.Exclude
     private Professor professor;
 
