@@ -48,6 +48,10 @@ type Props = {
   tipo_item: string;
 };
 
+interface EmailObject {
+  email: string;
+}
+
 const ItensDisplay = ({ searchTerm, onSubmitSuccess }: ItensCardProps) => {
   const [items, setItems] = useState<Props[]>([]);
   const [data, setData] = React.useState<Date>();
@@ -58,11 +62,15 @@ const ItensDisplay = ({ searchTerm, onSubmitSuccess }: ItensCardProps) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
   const token = Cookie.get("token");
+  let decoded = "";
+  if (token) {
+    decoded = jwtDecode(token);
+  }
 
   const [openSolic, setOpenSolic] = React.useState(false);
   const [valueSolic, setValueSolic] = React.useState("");
-  const [emails, setEmails] = useState([])
-  const [solicitantes, setSolicitantes] = useState([])
+  const [emails, setEmails] = useState([]);
+  const [solicitantes, setSolicitantes] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:8080/item", {
@@ -78,9 +86,8 @@ const ItensDisplay = ({ searchTerm, onSubmitSuccess }: ItensCardProps) => {
       })
       .catch((error) => console.error("Error fetching items:", error));
 
-      fetchEmails()
+    fetchEmails();
   }, []);
-
 
   const fetchEmails = async () => {
     const dataEmailsRaw = await fetch("http://localhost:8080/usuario/emails", {
@@ -89,14 +96,14 @@ const ItensDisplay = ({ searchTerm, onSubmitSuccess }: ItensCardProps) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
-    const dataEmails = await dataEmailsRaw.json()
-    setEmails(dataEmails)
-  }
+    });
+    const dataEmails = await dataEmailsRaw.json();
+    setEmails(dataEmails);
+  };
   const emailsToDisplay = Array.isArray(emails) ? emails.slice(0, 5) : [];
 
   const handleRemoveEmail = (mail: string) => {
-    setSolicitantes(prevEmails => prevEmails.filter(item => item !== mail));
+    setSolicitantes((prevEmails) => prevEmails.filter((item) => item !== mail));
   };
 
   const filteredItems = items.filter((item) =>
@@ -127,21 +134,21 @@ const ItensDisplay = ({ searchTerm, onSubmitSuccess }: ItensCardProps) => {
     setTimeFim(cleanValue);
   };
 
+  const userMailObj: EmailObject = {email: `${decoded.sub}`}
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    let decoded = "";
-    if (token) {
-      decoded = jwtDecode(token);
-    }
-
+    const emailObjects: EmailObject[] = solicitantes.map(email => ({ email }));
+    emailObjects.push(userMailObj)
+    console.log(emailObjects)
+    const dateFormat = format(data ? data : "", "dd/MM/yyyy");
+    const dataHoraInicio = `${dateFormat} ${timeInicio}:00`;
+    const dataHoraFim = `${dateFormat} ${timeFim}:00`;
+    //const solicitantes = [{ email: decoded.sub }];
+    const itens = [{ id: idItem, quantidade_transacao: 1 }];
+    const observacaoSolicitacao = obs;
     try {
-      const dateFormat = format(data ? data : "", "dd/MM/yyyy");
-      const dataHoraInicio = `${dateFormat} ${timeInicio}:00`;
-      const dataHoraFim = `${dateFormat} ${timeFim}:00`;
-      const solicitantes = [{ email: decoded.sub }];
-      const itens = [{ id: idItem, quantidade_transacao: 1 }];
-      const observacaoSolicitacao = obs;
       const response = await fetch("http://localhost:8080/agendamento", {
         method: "POST",
         headers: {
@@ -152,7 +159,7 @@ const ItensDisplay = ({ searchTerm, onSubmitSuccess }: ItensCardProps) => {
           dataHoraInicio,
           dataHoraFim,
           itens,
-          solicitantes,
+          solicitantes: emailObjects,
           observacaoSolicitacao,
         }),
       });
@@ -239,49 +246,61 @@ const ItensDisplay = ({ searchTerm, onSubmitSuccess }: ItensCardProps) => {
                       />
                     </div>
                   </div>
-                  <Popover open={openSolic} onOpenChange={setOpenSolic}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={openSolic}
-                        className="w-[200px] justify-between"
-                      >
-                        Digite um email...
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                      <Command>
-                        <CommandInput placeholder="Search framework..." />
-                        <CommandList>
-                          <CommandEmpty>No results found.</CommandEmpty>
-                          {emailsToDisplay.map((email) => (
-                            <CommandItem
-                              key={email}
-                              value={email}
-                              onSelect={(currentValue) => {
-                                setValueSolic(
-                                  currentValue === valueSolic ? "" : currentValue
-                                );
-                                setOpenSolic(false);
-                                setSolicitantes(prevEmails => [...prevEmails, email])
-                              }}
-                            >
-
-                              {email}
-                            </CommandItem>
-                          ))}
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  {solicitantes.map((mail) => (
-                    <div className="flex space-x-2 items-center">
-                      <span className="text-[14px]">{mail}</span>
-                      <X className="cursor-pointer w-5" onClick={() => handleRemoveEmail(mail)}/>
+                  <div>
+                    <div className="flex flex-col mb-3">
+                      <Label htmlFor="emails" className="mb-1">Outros participantes:</Label>
+                      <Popover open={openSolic} onOpenChange={setOpenSolic}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openSolic}
+                            className="w-[200px] justify-between"
+                          >
+                            Digite um email...
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0">
+                          <Command>
+                            <CommandInput placeholder="Digite um email..." />
+                            <CommandList>
+                              <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
+                              {emailsToDisplay.map((email) => (
+                                <CommandItem
+                                  key={email}
+                                  value={email}
+                                  onSelect={(currentValue) => {
+                                    setValueSolic(
+                                      currentValue === valueSolic
+                                        ? ""
+                                        : currentValue
+                                    );
+                                    setOpenSolic(false);
+                                    setSolicitantes((prevEmails) => [
+                                      ...prevEmails,
+                                      email,
+                                    ]);
+                                  }}
+                                >
+                                  {email}
+                                </CommandItem>
+                              ))}
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
-                  ))}
+                    {solicitantes.map((mail) => (
+                      <div className="flex space-x-2 items-center">
+                        <span className="text-[14px]">{mail}</span>
+                        <X
+                          className="cursor-pointer w-5"
+                          onClick={() => handleRemoveEmail(mail)}
+                        />
+                      </div>
+                    ))}
+                  </div>
                   <div>
                     <Label htmlFor="observacoes">Observações</Label>
                     <Textarea
