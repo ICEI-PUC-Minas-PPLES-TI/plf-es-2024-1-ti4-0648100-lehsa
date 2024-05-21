@@ -5,10 +5,7 @@ import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
-import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
-import com.gerenciadorlehsa.exceptions.lancaveis.EmprestimoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
-import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.EmprestimoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
@@ -21,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_EMPRESTIMO_EM_ANALISE;
 import static java.lang.String.format;
 
@@ -61,6 +58,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
 
         DataHoraUtil.dataValidaEmprestimo (dataHoraInicio, dataHoraFim);
+        verificarConflitosDeEmprestimo(dataHoraInicio, dataHoraFim);
         verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitante(), obj);
 
         obj.setStatusTransacaoItem(EM_ANALISE);
@@ -167,7 +165,10 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO (Emprestimo transacao, StatusTransacaoItem status) {
-
+        if (!transacoesAprovadasOuConfirmadasConflitantes(transacao.getDataHoraInicio(), transacao.getDataHoraFim()).isEmpty()
+                && (status == APROVADO || status == CONFIRMADO)) {
+            throw new AgendamentoException("Um agendamento para essa data já foi aprovado ou confirmado.");
+        }
     }
 
     @Override
@@ -179,4 +180,11 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         if(emprestimo.getSolicitante () != null)
             emprestimo.getSolicitante().getEmprestimos().remove (emprestimo);
     }
+
+    private void verificarConflitosDeEmprestimo(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+        if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty()) {
+            throw new EmprestimoException("Já existe emprestimo ou agendamento aprovado pelo administrador ou confirmado pelo usuário para essa data");
+        }
+    }
+
 }

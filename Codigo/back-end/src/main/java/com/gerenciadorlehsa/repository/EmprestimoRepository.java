@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public interface EmprestimoRepository extends JpaRepository<Emprestimo, UUID> {
 
-    @Query("SELECT e FROM Emprestimo e WHERE e.statusTransacaoItem = 'APROVADO' OR e.statusTransacaoItem = 'CONFIRMADO' AND " +
+    @Query("SELECT e FROM Emprestimo e WHERE (e.statusTransacaoItem = 'APROVADO' OR e.statusTransacaoItem = 'CONFIRMADO') AND " +
             "((e.dataHoraInicio <= :novaDataHoraFim AND e.dataHoraFim >= :novaDataHoraInicio) OR " +
             "(e.dataHoraInicio >= :novaDataHoraInicio AND e.dataHoraInicio <= :novaDataHoraFim) OR " +
             "(e.dataHoraFim >= :novaDataHoraInicio AND e.dataHoraFim <= :novaDataHoraFim))")
