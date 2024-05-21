@@ -94,8 +94,8 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         verificarTransacaoDeMesmaDataDoProfessor(obj.getProfessor (), obj);
 
         verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
-        obj.setId (null);
 
+        obj.setId (null);
 
         return agendamentoRepository.save (obj);
     }
@@ -250,10 +250,13 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     @Override
     public void verificarTransacaoDeMesmaDataDoProfessor(Professor professor, Agendamento agendamento) {
         log.info (">>> Verificar conflito de data do professor: barrando agendamento de mesma data de um professor");
-
-        boolean conflitoDeData = professor.getAgendamentos ()
-                .stream ()
-                .anyMatch (agendamentoAVista -> temConflitoDeData (agendamentoAVista, agendamento));
+        List<Agendamento> agendamentosDoProfessor = professor.getAgendamentos ();
+        boolean conflitoDeData = false;
+        if(agendamentosDoProfessor != null && !agendamentosDoProfessor.isEmpty ()) {
+            conflitoDeData = professor.getAgendamentos ()
+                    .stream ()
+                    .anyMatch (agendamentoAVista -> temConflitoDeData (agendamentoAVista, agendamento));
+        }
 
         if (conflitoDeData) {
             throw new ConflitoDataException ("O Professor tem um agendamento marcado pra essa data");
@@ -301,8 +304,13 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
     @Override
     public void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, Agendamento agendamento) {
-        boolean conflitoDeData = solicitante.getAgendamentosRealizados().stream()
-                .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
+
+        List<Agendamento> agendamentosDoSolicitante = solicitante.getAgendamentosRealizados ();
+        boolean conflitoDeData = false;
+
+        if(agendamentosDoSolicitante != null && !agendamentosDoSolicitante.isEmpty ())
+            conflitoDeData = agendamentosDoSolicitante.stream()
+                    .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
 
         if (conflitoDeData) {
             throw new ConflitoDataException ("Um dos solicitantes já fez uma agendamento na mesma data");
