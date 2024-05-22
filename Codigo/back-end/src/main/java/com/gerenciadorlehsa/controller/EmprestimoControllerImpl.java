@@ -83,4 +83,14 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
         List<Emprestimo> emprestimos = operacoesCRUDService.listarTodos();
         return ResponseEntity.ok().body(emprestimos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
+
+    @PatchMapping("/{id}/{status}")
+    public ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
+                                                                @PathVariable String status) {
+        log.info(">>> atualizarStatus: recebendo requisição para atualizar status do emprestimo");
+
+        transacaoService.atualizarStatus(status, id);
+
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_ATUALIZADO, id)));
+    }
 }

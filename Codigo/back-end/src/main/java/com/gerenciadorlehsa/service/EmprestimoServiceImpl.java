@@ -103,7 +103,16 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public void atualizarStatus (String status, UUID id) {
+        StatusTransacaoItem statusUpperCase = getStatusUpperCase(status);
 
+        Emprestimo emprestimo = encontrarPorId (id);
+
+        verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(emprestimo, statusUpperCase);
+
+        verificarAutorizacaoDoUsuario(emprestimo, statusUpperCase);
+
+        emprestimo.setStatusTransacaoItem(statusUpperCase);
+        emprestimoRepository.save(emprestimo);
     }
 
     @Override
@@ -174,7 +183,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO (Emprestimo transacao, StatusTransacaoItem status) {
         if (!transacoesAprovadasOuConfirmadasConflitantes(transacao.getDataHoraInicio(), transacao.getDataHoraFim()).isEmpty()
                 && (status == APROVADO || status == CONFIRMADO)) {
-            throw new EmprestimoException("Um agendamento para essa data já foi aprovado ou confirmado.");
+            throw new EmprestimoException("Um emprestimo para essa data já foi aprovado ou confirmado.");
         }
     }
 
