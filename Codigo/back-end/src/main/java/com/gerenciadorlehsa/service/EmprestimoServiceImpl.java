@@ -1,9 +1,6 @@
 package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Emprestimo;
-import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.User;
+import com.gerenciadorlehsa.entity.*;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.EmprestimoRepository;
@@ -20,6 +17,7 @@ import java.util.UUID;
 
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_EMPRESTIMO_EM_ANALISE;
+import static com.gerenciadorlehsa.util.DataHoraUtil.dataValidaEmprestimo;
 import static java.lang.String.format;
 
 @Service
@@ -69,19 +67,28 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public Emprestimo atualizar (Emprestimo obj) {
-        return null;
+        Emprestimo emprestimoExistente = encontrarPorId(obj.getId());
+
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        if (!ehSolicitante(emprestimoExistente, usuarioLogado))
+            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar a transação");
+        validarDataHoraAtt(encontrarAtributosIguais(obj, emprestimoExistente), obj);
+
+
+        obj.setStatusTransacaoItem(emprestimoExistente.getStatusTransacaoItem());
+        obj.setSolicitante(emprestimoExistente.getSolicitante());
+        if (emprestimoRepository.countEmprestimoByLocalUso(emprestimoExistente.getLocalUso()) == 1)
+            obj.getLocalUso().setId(emprestimoExistente.getLocalUso().getId());
+        return emprestimoRepository.save(obj);
     }
 
     @Override
     public void deletar (UUID id) {
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         Emprestimo obj = encontrarPorId(id);
-        int nEmprestimosComEndereco = emprestimoRepository.countEmprestimoByLocalUso(obj.getLocalUso());
         try {
             emprestimoRepository.deleteById(id);
-            if (nEmprestimosComEndereco == 1) {
-                enderecoService.deletar(obj.getLocalUso().getId());
-            }
+            deletarEndereco(obj.getLocalUso());
             deletarEmprestimoDaListaDoUsuario(obj);
         } catch (Exception e) {
             throw new DeletarEntidadeException(format("existem entidades relacionadas: %s", e));
@@ -146,7 +153,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
                 .anyMatch(emprestimoExistente -> temConflitoDeData(emprestimoExistente, transacao));
 
         if (conflitoDeData) {
-            throw new EmprestimoException ("Um dos solicitantes já fez uma agendamento na mesma data");
+            throw new EmprestimoException ("O solicitente já fez uma emprestimo na mesma data");
         }
 
     }
@@ -167,7 +174,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO (Emprestimo transacao, StatusTransacaoItem status) {
         if (!transacoesAprovadasOuConfirmadasConflitantes(transacao.getDataHoraInicio(), transacao.getDataHoraFim()).isEmpty()
                 && (status == APROVADO || status == CONFIRMADO)) {
-            throw new AgendamentoException("Um agendamento para essa data já foi aprovado ou confirmado.");
+            throw new EmprestimoException("Um agendamento para essa data já foi aprovado ou confirmado.");
         }
     }
 
@@ -187,4 +194,26 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         }
     }
 
+    private void validarDataHoraAtt(List<String> atributosIguais, Emprestimo obj){
+        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
+        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
+        if (!atributosIguais.contains("dataHoraInicio") || !atributosIguais.contains("dataHoraFim")) {
+            dataValidaEmprestimo(dataHoraInicio, dataHoraFim);
+            List<Emprestimo> conflitantes = transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim);
+            if (!conflitantes.isEmpty()) {
+                if (conflitantes.stream().noneMatch(emprestimo -> emprestimo.getId().equals(obj.getId()))) {
+                    throw new EmprestimoException("Já existe emprestimo para essa data");
+                }
+            }
+            verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitante(), obj);
+        }
+    }
+
+    private void deletarEndereco (Endereco endereco) {
+        int nEmprestimosComEndereco = emprestimoRepository.countEmprestimoByLocalUso(endereco);
+
+        if (nEmprestimosComEndereco == 1 || nEmprestimosComEndereco == 0) {
+            enderecoService.deletar(endereco.getId());
+        }
+    }
 }

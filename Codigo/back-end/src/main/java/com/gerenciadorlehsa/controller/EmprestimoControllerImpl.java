@@ -60,8 +60,14 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> atualizar (UUID id, EmprestimoDTO obj) {
-        return null;
+    @PutMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
+                                                          @Valid @RequestBody EmprestimoDTO obj) {
+        Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
+        mapaTransacaoItemService.validarMapaParaCriacao (emprestimo);
+        emprestimo.setId(id);
+        Emprestimo emprestimoAtt = operacoesCRUDService.atualizar(emprestimo);
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_ATUALIZADO, emprestimoAtt.getId())));
     }
 
     @Override

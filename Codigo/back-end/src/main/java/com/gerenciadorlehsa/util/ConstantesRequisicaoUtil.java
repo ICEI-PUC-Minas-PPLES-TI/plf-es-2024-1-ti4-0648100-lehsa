@@ -81,4 +81,5 @@ public class ConstantesRequisicaoUtil {
 
     public static final String MSG_EMPRESTIMO_CRIADO = "emprestimo criado com sucesso";
     public static final String MSG_EMPRESTIMO_DELETADO = "emprestimo deletado com sucesso";
+    public static final String MSG_EMPRESTIMO_ATUALIZADO = "emprestimo atualizado com sucesso";
 }
