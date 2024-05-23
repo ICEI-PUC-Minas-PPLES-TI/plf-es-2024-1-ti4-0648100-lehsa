@@ -116,6 +116,8 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         copiarAtributosRelevantes(obj, agendamentoAtt, atributosIguais);
 
+        //agendamentoAtt.setStatusTransacaoItem (CONFIRMADO);
+
         return agendamentoRepository.save(agendamentoAtt);
     }
 
@@ -280,6 +282,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
     agendamento.setStatusTransacaoItem(statusUpperCase);
     agendamentoRepository.save(agendamento);
+
     log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
             " atualizado para " + agendamento.getStatusTransacaoItem());
 }

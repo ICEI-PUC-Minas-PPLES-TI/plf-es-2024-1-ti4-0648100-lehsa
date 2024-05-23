@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AgendamentoService {
+
     void atualizarTecnico (User tecnico, @NotNull UUID id);
 
     void deletarAgendamentoSeVazio(UUID id);

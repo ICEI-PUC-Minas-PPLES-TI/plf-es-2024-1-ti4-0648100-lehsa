@@ -104,7 +104,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDService<Professor>, Pr
     }
 
     @Override
-    public void enviarEmailParaProfessor(Professor professor, String linkConfirmacao) {
+    public void enviarEmail(Professor professor, String linkConfirmacao) {
         try {
             mensagemEmailService.enviarEmailConfirmacaoCadastro(professor.getEmail(), EstilizacaoEmailUtil.estilizaConfirmacao (linkConfirmacao));
         } catch (Exception e) {
