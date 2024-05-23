@@ -277,6 +277,12 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
     verificarAutorizacaoDoUsuario(agendamento, statusUpperCase);
 
+    if(tempoExpirado (agendamento, statusUpperCase)) {
+        agendamento.setStatusTransacaoItem (NAO_COMPARECEU);
+        agendamentoRepository.save(agendamento);
+        throw new TempoExpiradoException ("O tempo para confirmação já acabou!");
+    }
+
     if (statusUpperCase == APROVADO &&
             agendamento.getStatusTransacaoItem() == StatusTransacaoItem.AGUARDANDO_CONFIRMACAO_PROFESSOR) {
         throw new ProfessorConfirmaAgendamentoException ("Não é possível aprovar agendamento: Professor ainda não " +

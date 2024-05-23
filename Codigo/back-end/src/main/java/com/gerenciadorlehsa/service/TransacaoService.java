@@ -94,20 +94,22 @@ public abstract class TransacaoService<T extends Transacao> {
 
             UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
-            if (!ehUsuarioAutorizado(transacao, usuarioLogado)) {
+            if (!ehUsuarioAutorizado(transacao, usuarioLogado))
                 throw new UsuarioNaoAutorizadoException ("O usuário não possui permissão para atualizar o transacão");
-            }
-            if (status.equals(CONFIRMADO)) {
-                long difTempo = DataHoraUtil.calcularDiferencaDeTempo(LocalDateTime.now(),
-                        transacao.getDataHoraInicio());
-                if (difTempo < 24) {
-                    throw new TempoExpiradoException ("O Tempo para confirmar já expirou");
-                }
-            }
-        } else {
+        } else
             validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
-        }
+
     }
+
+    public boolean tempoExpirado(T transacao, StatusTransacaoItem status) {
+        if (status.equals(CONFIRMADO)) {
+            long difTempo = DataHoraUtil.calcularDiferencaDeTempo(LocalDateTime.now(),
+                    transacao.getDataHoraInicio());
+            return difTempo < 24;
+        }
+        return false;
+    }
+
 
     public void verificarAutorizacaoDoUsuario(T transacao) {
         UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
