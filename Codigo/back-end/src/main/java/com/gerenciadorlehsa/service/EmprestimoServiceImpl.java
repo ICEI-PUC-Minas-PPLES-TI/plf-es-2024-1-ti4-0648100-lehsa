@@ -111,6 +111,12 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
         verificarAutorizacaoDoUsuario(emprestimo, statusUpperCase);
 
+        if(tempoExpirado (emprestimo, statusUpperCase)) {
+            emprestimo.setStatusTransacaoItem (NAO_COMPARECEU);
+            emprestimoRepository.save(emprestimo);
+            throw new TempoExpiradoException ("O tempo para confirmação já acabou!");
+        }
+
         emprestimo.setStatusTransacaoItem(statusUpperCase);
         emprestimoRepository.save(emprestimo);
     }
