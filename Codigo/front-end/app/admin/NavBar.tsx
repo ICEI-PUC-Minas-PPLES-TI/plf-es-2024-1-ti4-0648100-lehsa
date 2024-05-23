@@ -18,6 +18,7 @@ const NavBar = () => {
                 <Link href='/admin/agendamentos' className={`pl-6 py-2 rounded-l-full ${isActiveAgenda ? 'bg-primary text-white' : 'hover:bg-slate-100'}`}>Agendamentos</Link>
                 <Link href='/admin/emprestimos' className={`pl-6 py-2 rounded-l-full ${isActiveEmprest ? 'bg-primary text-white' : 'hover:bg-slate-100'}`}>Emprestimos</Link>
                 <Link href='/admin/usuarios' className={`pl-6 py-2 rounded-l-full ${pathname === '/admin/usuarios' ? 'bg-primary text-white' : 'hover:bg-slate-100'}`}>Usuários</Link>
+                <Link href='/admin/professores' className={`pl-6 py-2 rounded-l-full ${pathname === '/admin/professores' ? 'bg-primary text-white' : 'hover:bg-slate-100'}`}>Professores</Link>
             </div>
         </aside>
     )
