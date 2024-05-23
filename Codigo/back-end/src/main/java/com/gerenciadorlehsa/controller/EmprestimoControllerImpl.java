@@ -28,6 +28,7 @@ import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirResp
 import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDtoRes;
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @Slf4j(topic = EMPRESTIMO_CONTROLLER)
 @RestController
@@ -59,13 +60,21 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> atualizar (UUID id, EmprestimoDTO obj) {
-        return null;
+    @PutMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
+                                                          @Valid @RequestBody EmprestimoDTO obj) {
+        Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
+        mapaTransacaoItemService.validarMapaParaCriacao (emprestimo);
+        emprestimo.setId(id);
+        Emprestimo emprestimoAtt = operacoesCRUDService.atualizar(emprestimo);
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_ATUALIZADO, emprestimoAtt.getId())));
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> deletar (UUID id) {
-        return null;
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> deletar (@PathVariable UUID id) {
+        operacoesCRUDService.deletar(id);
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_DELETADO, id)));
     }
 
     @Override
@@ -73,5 +82,15 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     public ResponseEntity<List<EmprestimoDTORes>> listarTodos () {
         List<Emprestimo> emprestimos = operacoesCRUDService.listarTodos();
         return ResponseEntity.ok().body(emprestimos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
+    }
+
+    @PatchMapping("/{id}/{status}")
+    public ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
+                                                                @PathVariable String status) {
+        log.info(">>> atualizarStatus: recebendo requisição para atualizar status do emprestimo");
+
+        transacaoService.atualizarStatus(status, id);
+
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_ATUALIZADO, id)));
     }
 }
