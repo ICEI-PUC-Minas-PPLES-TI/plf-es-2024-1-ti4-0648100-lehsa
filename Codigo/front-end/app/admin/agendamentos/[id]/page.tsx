@@ -24,6 +24,7 @@ type Item = {
   id: string;
   nome: string;
   tipo_item: string;
+  quantidade: number;
 };
 
 type AgendamentoProps = {
@@ -192,6 +193,11 @@ const ValidarAgendamento = () => {
                       <li className="flex space-x-2">
                         <h2 className="font-bold">Categoria:</h2>
                         <p>{item.tipo_item}</p>
+                      </li>
+
+                      <li className="flex space-x-2">
+                        <h2 className="font-bold">Quantidade para agendamento:</h2>
+                        <p>{item.quantidade}</p>
                       </li>
                     </ul>
                   </div>

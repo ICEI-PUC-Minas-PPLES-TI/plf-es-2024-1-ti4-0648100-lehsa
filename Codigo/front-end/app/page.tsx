@@ -32,7 +32,7 @@ export default function Home() {
       const data = await response.json();
       const { token } = data
       Cookie.set("token", token, { expires: 7 });
-      router.push("/admin");
+      router.push("/admin/itens");
       
     } else {
       setErrorMessage('Email ou senha inválida')
