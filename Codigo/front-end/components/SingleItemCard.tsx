@@ -17,7 +17,7 @@ interface Props {
 const SingleItemCard = ({ id, nome, tipo_item, quantidade }: Props) => {
   return (
     <div>
-      <Card className="rounded-lg overflow-hidden shadow-lg mx-auto hover:shadow-xl transition-all duration-200 mt-10">
+      <Card className="rounded-lg overflow-hidden shadow-lg mx-auto hover:shadow-xl transition-all duration-200 w-60">
         <ImageComp
           src={`http://localhost:8080/item/img/${id}`}
           alt="item picture"

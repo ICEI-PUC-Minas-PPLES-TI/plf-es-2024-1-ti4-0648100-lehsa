@@ -41,9 +41,6 @@ const UserPage = () => {
       });
   };
 
-  const handleFormSubmitSuccess = () => {
-    fetchAgendamento();
-  };
 
   return (
     <div className="max-w-7xl m-auto space-y-5">
@@ -74,7 +71,7 @@ const UserPage = () => {
             {/* <FilterSelect /> */}
           </div>
         </div>
-        <ItensDisplay searchTerm={searchTerm} onSubmitSuccess={handleFormSubmitSuccess} />
+        <ItensDisplay searchTerm={searchTerm}  />
       </div>
     </div>
   );
