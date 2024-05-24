@@ -141,7 +141,7 @@ const CadastroProfessor = () => {
                 E-mail
                 <Input
                   placeholder="exemplo@email.com"
-                  type="text"
+                  type="email"
                   name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
