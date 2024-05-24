@@ -1,3 +1,4 @@
+import { Separator } from "@/components/ui/separator";
 import { EditIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 
@@ -33,6 +34,7 @@ const SingleTeacherCard = ({ nome, email, matricula, laboratorio, campus, lotaca
               <p className="text-gray-600 dark:text-gray-400">{area_atuacao}</p>
             </div>
           </div>
+          <Separator className="mt-3"/>
           <ul className="mt-4 text-md leading-relaxed">
             <li className="flex flex-wrap gap-2">
               <h4 className="font-semibold text-gray-800 dark:text-gray-300">Matrícula:</h4>
