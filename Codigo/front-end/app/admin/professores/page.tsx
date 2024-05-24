@@ -1,4 +1,4 @@
-import TeacherRow from "@/components/TeacherRow";
+import TeacherCard from "@/components/TeacherCard";
 import TopMenu from "@/components/topMenu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -11,7 +11,7 @@ const Professores = () => {
         <div className='mt-10'>
         <Link href='/admin/emprestimo/cadastro'><Button>+ Novo Professor</Button></Link>
         </div>
-        <TeacherRow/>
+        <TeacherCard/>
       </div>
     );
   };
