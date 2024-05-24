@@ -57,10 +57,10 @@ const SingleTeacherCard = ({ nome, email, matricula, laboratorio, campus, lotaca
           </ul>
           <div className="flex justify-end mt-4 space-x-2">
             <button className="px-2 py-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors flex items-center rounded-full">
-              <EditIcon className="" />
+              <EditIcon />
             </button>
             <button className="px-2 py-2 bg-red-500 text-white rounded-full hover:bg-red-700 transition-colors flex items-center">
-              <TrashIcon className="" />
+              <TrashIcon />
             </button>
           </div>
         </div>
