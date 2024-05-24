@@ -9,6 +9,7 @@ import FilterSelect from "@/components/FilterSelect";
 import ItensDisplay from "./ItensDisplay";
 import { jwtDecode } from "jwt-decode";
 
+
 const UserPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [agendamentos, setAgendamentos] = useState<AgendamentoType[]>([]);
@@ -16,7 +17,7 @@ const UserPage = () => {
   const token = Cookie.get("token");
   let decoded: any = {};
   if (token) {
-     decoded = jwtDecode(token);
+    decoded = jwtDecode(token);
   }
 
   useEffect(() => {
@@ -41,21 +42,24 @@ const UserPage = () => {
       });
   };
 
-
   return (
     <div className="max-w-7xl m-auto space-y-5">
       <TopMenu title="Dashboard" />
       <div className="flex space-x-5">
         <div className="w-full bg-white h-auto rounded-2xl p-5">
           <h2 className="font-semibold text-xl mb-4">Seus Agendamentos</h2>
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center items-center">
             {agendamentos.map((agendamento) => (
               <Agendamento
                 key={agendamento.id}
                 items={agendamento.itens}
+                tecnico={agendamento.tecnico}
+                professor={agendamento.professor}
+                solicitantes={agendamento.solicitantes}
                 dataHoraFim={agendamento.dataHoraFim}
                 dataHoraInicio={agendamento.dataHoraInicio}
-                tecnico={agendamento.tecnico}
+                observacaoSolicitacao={agendamento.observacaoSolicitacao}
+                statusTransacaoItem={agendamento.statusTransacaoItem}
               />
             ))}
           </div>
@@ -71,7 +75,7 @@ const UserPage = () => {
             {/* <FilterSelect /> */}
           </div>
         </div>
-        <ItensDisplay searchTerm={searchTerm}  />
+        <ItensDisplay searchTerm={searchTerm} />
       </div>
     </div>
   );

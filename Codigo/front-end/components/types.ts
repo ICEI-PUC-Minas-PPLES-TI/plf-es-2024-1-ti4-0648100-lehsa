@@ -16,10 +16,18 @@ export interface Item {
 
 export interface Tecnico {
   id: string;
-  curso: null;
+  curso: null | string;
   email: string;
   nome: string;
   telefone: string;
+}
+
+export interface Professor {
+  email: string;
+}
+
+export interface Solicitante {
+  email: string;
 }
 
 export interface Agendamento {
@@ -30,6 +38,10 @@ export interface Agendamento {
   contato: string; // Contato do responsavel
   itens: Item[];
   tecnico: Tecnico;
+  professor: Professor;
+  solicitantes: Solicitante[];
+  observacaoSolicitacao: string;
+  statusTransacaoItem: string;
 }
 
 export interface Emprestimo {
