@@ -63,6 +63,11 @@ public abstract class TransacaoService<T extends Transacao> {
 
     public abstract void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais);
 
+    public abstract void verificarCondicoesDeConfirmacao(T transacao, StatusTransacaoItem statusTransacaoItem);
+
+
+    public abstract void verificarCondicoesDeAprovacao(T agendamento, StatusTransacaoItem statusUpperCase);
+
     protected boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
         log.info(">>> Verificando datas conflitantes: barrando transacao solicitado em uma mesma data");
 
@@ -89,25 +94,20 @@ public abstract class TransacaoService<T extends Transacao> {
     }
 
     public void verificarAutorizacaoDoUsuario(T transacao, StatusTransacaoItem status) {
-
         if (status.equals(CANCELADO) || status.equals(CONFIRMADO)) {
-
             UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-
             if (!ehUsuarioAutorizado(transacao, usuarioLogado))
-                throw new UsuarioNaoAutorizadoException ("O usuário não possui permissão para atualizar o transacão");
+                throw new UsuarioNaoAutorizadoException ("O usuário não possui permissão para atualizar a transacão");
         } else
             validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
-
     }
 
-    public boolean tempoExpirado(T transacao, StatusTransacaoItem status) {
-        if (status.equals(CONFIRMADO)) {
-            long difTempo = DataHoraUtil.calcularDiferencaDeTempo(LocalDateTime.now(),
-                    transacao.getDataHoraInicio());
-            return difTempo < 24;
-        }
-        return false;
+
+
+    public boolean tempoExpirado(LocalDateTime dataHoraInicio) {
+        long difTempo = DataHoraUtil.calcularDiferencaDeTempo(LocalDateTime.now(),
+                    dataHoraInicio);
+        return difTempo < 24;
     }
 
 

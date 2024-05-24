@@ -157,12 +157,12 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
      * @param request requisição
      * @return tratamento da exceção (log e resposta da requisição)
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AtualizarStatusException.class)
     public ResponseEntity<Object> capturarAtualizarStatusException(@NotNull AtualizarStatusException e, WebRequest request) {
         String msgErro = e.getMessage();
         log.error(format("[ERRO] AtualizarStatusException: falha ao atualizar status do usuário: %s", msgErro));
-        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

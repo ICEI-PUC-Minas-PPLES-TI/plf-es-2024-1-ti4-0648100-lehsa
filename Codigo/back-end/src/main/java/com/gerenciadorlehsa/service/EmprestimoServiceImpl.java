@@ -107,18 +107,39 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
         Emprestimo emprestimo = encontrarPorId (id);
 
-        verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(emprestimo, statusUpperCase);
-
         verificarAutorizacaoDoUsuario(emprestimo, statusUpperCase);
 
-        if(tempoExpirado (emprestimo, statusUpperCase)) {
-            emprestimo.setStatusTransacaoItem (NAO_COMPARECEU);
-            emprestimoRepository.save(emprestimo);
-            throw new TempoExpiradoException ("O tempo para confirmação já acabou!");
-        }
+        verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(emprestimo, statusUpperCase);
+
+        verificarCondicoesDeConfirmacao (emprestimo, statusUpperCase);
+
+        verificarCondicoesDeAprovacao (emprestimo, statusUpperCase);
 
         emprestimo.setStatusTransacaoItem(statusUpperCase);
         emprestimoRepository.save(emprestimo);
+    }
+
+    @Override
+    public void verificarCondicoesDeAprovacao(Emprestimo emprestimo, StatusTransacaoItem statusUpperCase) {
+        if (statusUpperCase == APROVADO) {
+            if(!emprestimo.getStatusTransacaoItem ().equals (EM_ANALISE))
+                throw new AtualizarStatusException ("O emprestimo não está em análise");
+        }
+    }
+
+    @Override
+    public void verificarCondicoesDeConfirmacao(Emprestimo emprestimo, StatusTransacaoItem statusUpperCase) {
+        if(statusUpperCase.equals (CONFIRMADO)) {
+
+            if(!emprestimo.getStatusTransacaoItem ().equals (APROVADO))
+                throw new AtualizarStatusException ("Para confirmar o emprestimo é preciso que ele esteja aprovado");
+
+            if(tempoExpirado (emprestimo.getDataHoraInicio ())) {
+                emprestimo.setStatusTransacaoItem (NAO_COMPARECEU);
+                emprestimoRepository.save(emprestimo);
+                throw new TempoExpiradoException ("O tempo para confirmação já acabou!");
+            }
+        }
     }
 
     @Override

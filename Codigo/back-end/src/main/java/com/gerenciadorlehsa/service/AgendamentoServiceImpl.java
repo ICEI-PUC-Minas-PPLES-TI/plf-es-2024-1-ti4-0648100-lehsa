@@ -269,25 +269,18 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 @Override
 public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     log.info(">>> atualizarStatus: atualizando status do agendamento");
+
     StatusTransacaoItem statusUpperCase = getStatusUpperCase(status);
 
-    Agendamento agendamento = encontrarPorId (id);
-
-    verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(agendamento, statusUpperCase);
+    Agendamento agendamento = encontrarPorId(id);
 
     verificarAutorizacaoDoUsuario(agendamento, statusUpperCase);
 
-    if(tempoExpirado (agendamento, statusUpperCase)) {
-        agendamento.setStatusTransacaoItem (NAO_COMPARECEU);
-        agendamentoRepository.save(agendamento);
-        throw new TempoExpiradoException ("O tempo para confirmação já acabou!");
-    }
+    verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(agendamento, statusUpperCase);
 
-    if (statusUpperCase == APROVADO &&
-            agendamento.getStatusTransacaoItem() == StatusTransacaoItem.AGUARDANDO_CONFIRMACAO_PROFESSOR) {
-        throw new ProfessorConfirmaAgendamentoException ("Não é possível aprovar agendamento: Professor ainda não " +
-                "confirmou o agendamento");
-    }
+    verificarCondicoesDeConfirmacao(agendamento, statusUpperCase);
+
+    verificarCondicoesDeAprovacao(agendamento, statusUpperCase);
 
     agendamento.setStatusTransacaoItem(statusUpperCase);
     agendamentoRepository.save(agendamento);
@@ -295,6 +288,14 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
             " atualizado para " + agendamento.getStatusTransacaoItem());
 }
+
+    @Override
+    public void verificarCondicoesDeAprovacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
+        if (statusUpperCase == APROVADO) {
+            if(!agendamento.getStatusTransacaoItem ().equals (EM_ANALISE))
+                throw new AtualizarStatusException ("O agendamento não está em análise");
+        }
+    }
 
 
     @Override
@@ -373,7 +374,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(Agendamento agendamento, StatusTransacaoItem status) {
         if (!agendamentoRepository.findAprovadosOuConfirmadosConflitantes(agendamento.getDataHoraInicio(), agendamento.getDataHoraFim()).isEmpty()
                 && (status == APROVADO || status == CONFIRMADO)) {
-            throw new AgendamentoException("Um agendamento para essa data já foi aprovado ou confirmado.");
+            throw new AtualizarStatusException ("Um agendamento para essa data já foi aprovado ou confirmado.");
         }
     }
 
@@ -384,6 +385,23 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         atributosIguais.add("id");
         String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
         copyProperties(source, target, propriedadesIgnoradas);
+    }
+
+    @Override
+    public void verificarCondicoesDeConfirmacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
+        if (statusUpperCase.equals(CONFIRMADO)) {
+            if (!agendamento.getStatusTransacaoItem().equals(APROVADO)) {
+                throw new AtualizarStatusException("Para confirmar o agendamento é preciso que ele esteja aprovado");
+            }
+
+            if (tempoExpirado(agendamento.getDataHoraInicio())) {
+                agendamento.setStatusTransacaoItem(NAO_COMPARECEU);
+                agendamentoRepository.save(agendamento);
+                throw new TempoExpiradoException("A confirmação deve ser feita até 24h antes da data e hora de início" +
+                        " " +
+                        "do agendamento");
+            }
+        }
     }
 
 
