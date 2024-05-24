@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@ToString(exclude = "agendamentos")
 public class Professor extends Pessoa{
 
     @Column(name = "MATRICULA", unique = true, nullable = false)
@@ -44,7 +45,6 @@ public class Professor extends Pessoa{
     private LocalDateTime dataHoraCriacao;
 
     @OneToMany(mappedBy = "professor", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
     private List<Agendamento> agendamentos = new ArrayList<> ();
 
     //private String foto;

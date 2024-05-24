@@ -18,6 +18,7 @@ import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"agendamentosComoTecnico", "agendamentosRealizados", "emprestimos"})
 public class User extends Pessoa {
 
     @Column(name = "PASSWORD", nullable = false)
