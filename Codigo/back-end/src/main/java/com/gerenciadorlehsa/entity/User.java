@@ -60,17 +60,14 @@ public class User extends Pessoa {
 
 
     @OneToMany(mappedBy = "tecnico", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<Agendamento> agendamentosComoTecnico;
 
 
     @ManyToMany(mappedBy = "solicitantes", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @ToString.Exclude
     private List<Agendamento> agendamentosRealizados;
 
 
     @OneToMany(mappedBy = "solicitante", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
     private List<Emprestimo> emprestimos;
 
 

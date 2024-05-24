@@ -8,13 +8,19 @@ import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Endereco;
 import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
+@Slf4j(topic = EMPRESTIMO_ENTITY_CONVERTER_COMP)
 @Component
+@Schema(description = "Responsável por converter DTO de empréstimo em entidade empréstimo")
 public class EmprestimoEntityConverterComp extends TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> {
 
     TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp;

@@ -20,8 +20,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_ITEM_SERVICE;
-@Slf4j(topic = TRANSACAO_ITEM_SERVICE)
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_SERVICE;
+
+@Slf4j(topic = TRANSACAO_SERVICE)
 @Service
 @Schema(description = "Superclasse abstrata que contém métodos e atributos em comum para qualquer tipo que é subtipo " +
         "de TransacaoItem")

@@ -1,11 +1,11 @@
 package com.gerenciadorlehsa.util;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.experimental.UtilityClass;
 
-/**
- * Contém as constantes relacionadas aos tópicos das classes
- */
+
 @UtilityClass
+@Schema(description = "Contém as constantes relacionadas aos tópicos das classes")
 public class ConstantesTopicosUtil {
 
     public static final String USUARIO_SERVICE = "USUARIO_SERVICE";
@@ -18,14 +18,15 @@ public class ConstantesTopicosUtil {
 
     public static final String EMPRESTIMO_SERVICE = "EMPRESTIMO_SERVICE";
 
-    public static final String TRANSACAO_ITEM_SERVICE = "TRANSACAO_ITEM_SERVICE";
+    public static final String TRANSACAO_SERVICE = "TRANSACAO_SERVICE";
 
     public static final String AGENDAMENTO_ENTITY_CONVERTER_COMP = "AGENDAMENTO_ENTITY_CONVERTER_COMP";
 
-
-    public static final String AGENDAMENTO_VALIDADOR_COMP = "AGENDAMENTO_VALIDADOR_COMP";
+    public static final String EMPRESTIMO_ENTITY_CONVERTER_COMP = "EMPRESTIMO_ENTITY_CONVERTER_COMP";
 
     public static final String AGENDAMENTO_DTO_VALIDADOR_COMP = "AGENDAMENTO_DTO_VALIDADOR_COMP";
+
+    public static final String EMPRESTIMO_DTO_VALIDADOR_COMP = "EMPRESTIMO_DTO_VALIDADOR_COMP";
 
     public static final String ITEM_SERVICE = "ITEM_SERVICE";
 

@@ -14,7 +14,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_DTO_VA
 @Slf4j(topic = AGENDAMENTO_DTO_VALIDADOR_COMP)
 @Component
 @AllArgsConstructor
-@Schema(description = "validações relacionadas aos solicitantes e itens do agendamento")
+@Schema(description = "validações relacionadas ao agendamento")
 public class AgendamentoDTOValidadorComp extends TransacaoDTOValidadadorComp<AgendamentoDTO> {
 
     @Override

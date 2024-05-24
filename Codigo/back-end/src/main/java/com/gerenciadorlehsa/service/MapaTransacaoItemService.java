@@ -6,6 +6,7 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.MAPA_TRANSACAO_ITE
 @Slf4j(topic = MAPA_TRANSACAO_ITEM_SERVICE)
 @Service
 @AllArgsConstructor
+@Schema(description = "Responsável por lidar com a relação entre item e transação")
 public class MapaTransacaoItemService<T extends Transacao> {
 
     private final TransacaoService<Emprestimo> transacaoEmprestimoService;

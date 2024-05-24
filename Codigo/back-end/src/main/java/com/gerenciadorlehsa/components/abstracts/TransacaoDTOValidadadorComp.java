@@ -6,7 +6,6 @@ import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
 import java.util.List;
 
-
 public abstract class TransacaoDTOValidadadorComp<DTO> {
 
 

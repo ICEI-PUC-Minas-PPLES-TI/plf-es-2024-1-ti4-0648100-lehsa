@@ -4,11 +4,18 @@ import com.gerenciadorlehsa.components.abstracts.TransacaoDTOValidadadorComp;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EnderecoDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.EmprestimoException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_DTO_VALIDADOR_COMP;
+
+
+@Slf4j(topic = EMPRESTIMO_DTO_VALIDADOR_COMP)
 @Component
 @AllArgsConstructor
+@Schema(description = "validações relacionadas ao empréstimo")
 public class EmprestimoDTOValidadorComp extends TransacaoDTOValidadadorComp<EmprestimoDTO> {
     @Override
     public void validate(EmprestimoDTO emprestimoDTO) {
