@@ -293,7 +293,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     public void verificarCondicoesDeAprovacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
         if (statusUpperCase == APROVADO) {
             if(!agendamento.getStatusTransacaoItem ().equals (EM_ANALISE))
-                throw new AtualizarStatusException ("O agendamento não está em análise");
+                throw new AtualizarStatusException ("O agendamento precisa estar EM_ANALISE para ser APROVADO");
         }
     }
 

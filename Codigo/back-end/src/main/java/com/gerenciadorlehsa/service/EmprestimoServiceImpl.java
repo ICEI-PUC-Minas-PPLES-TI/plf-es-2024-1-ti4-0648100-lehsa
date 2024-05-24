@@ -127,7 +127,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     public void verificarCondicoesDeAprovacao(Emprestimo emprestimo, StatusTransacaoItem statusUpperCase) {
         if (statusUpperCase == APROVADO) {
             if(!emprestimo.getStatusTransacaoItem ().equals (EM_ANALISE))
-                throw new AtualizarStatusException ("O emprestimo não está em análise");
+                throw new AtualizarStatusException ("O emprestimo precisa estar EM_ANALISE para ser APROVADO");
         }
     }
 
