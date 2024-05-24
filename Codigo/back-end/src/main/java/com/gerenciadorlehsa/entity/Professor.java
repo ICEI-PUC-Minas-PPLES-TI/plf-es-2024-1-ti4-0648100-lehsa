@@ -43,7 +43,7 @@ public class Professor extends Pessoa{
     @Column(name = "DATA_CRIACAO", nullable = false)
     private LocalDateTime dataHoraCriacao;
 
-    @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "professor", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Agendamento> agendamentos = new ArrayList<> ();
 

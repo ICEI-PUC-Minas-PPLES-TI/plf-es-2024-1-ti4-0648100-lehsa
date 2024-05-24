@@ -44,7 +44,7 @@ public class Agendamento extends Transacao {
     private Map<Item, Integer> itensQuantidade = new HashMap<> ();
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id", nullable = false)
     @ToString.Exclude
     private Professor professor;
