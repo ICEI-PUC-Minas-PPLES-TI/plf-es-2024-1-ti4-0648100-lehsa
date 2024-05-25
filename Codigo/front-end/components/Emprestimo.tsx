@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ImageComp from "./ImageComp";
-import { Item, Tecnico, Professor, Solicitante } from "./types";
+import { Item, Solicitante } from "./types";
+import { differenceInDays, parse, format } from "date-fns";
 
 interface EmprestimoProps {
   items: Item[];
@@ -21,10 +22,91 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
   observacaoSolicitacao,
   statusTransacaoItem,
 }) => {
+  const [currentDuration, setCurrentDuration] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(0);
+  const [daysRemaining, setDaysRemaining] = useState(0);
+
+  useEffect(() => {
+    const dateFormat = "dd/MM/yyyy HH:mm:ss";
+    const start = parse(dataHoraInicio, dateFormat, new Date());
+    const end = parse(dataHoraFim, dateFormat, new Date());
+    const now = new Date(); // Dynamic current date
+    // const now = new Date("Sat May 27 2024 11:36:22 GMT-0300 (Horário Padrão de Brasília)");
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      console.error("Formato de data inválido");
+      return;
+    }
+
+    const totalDays = differenceInDays(end, start);
+    const currentDays = differenceInDays(now, start);
+    const remainingDays = differenceInDays(end, now);
+
+    console.log(`Start: ${format(start, dateFormat)}`);
+    console.log(`End: ${format(end, dateFormat)}`);
+    console.log(`Now: ${format(now, dateFormat)}`);
+    console.log(`Total Days: ${totalDays}`);
+    console.log(`Current Days: ${currentDays}`);
+    console.log(`Remaining Days: ${remainingDays}`);
+
+    setTotalDuration(totalDays);
+    setCurrentDuration(currentDays);
+    setDaysRemaining(remainingDays);
+  }, [dataHoraInicio, dataHoraFim]);
+
+  const maxLimitDays = 30;
+  const greenBarWidth = (totalDuration / maxLimitDays) * 95;
+
+  let grayBarWidth;
+  if (currentDuration >= totalDuration) {
+    grayBarWidth = 100;
+  } else if (currentDuration < 0) {
+    grayBarWidth = 0;
+  } else {
+    grayBarWidth = ((totalDuration - daysRemaining) / totalDuration) * 100;
+  }
+
+  console.log("cur dur: " + currentDuration);
+
+  const [dateInicio] = dataHoraInicio.split(" ");
+  const [dateFim] = dataHoraFim.split(" ");
+
+  const getBarColor = () => {
+    if (daysRemaining > totalDuration) {
+      return "bg-primary";
+    } else if (daysRemaining >= 5) {
+      return "bg-green-500";
+    } else if (daysRemaining < 5 && daysRemaining > 2) {
+      return "bg-orange-400";
+    } else if (daysRemaining <= 2) {
+      return "bg-red-500";
+    }
+    return "bg-green-500"; // Default color
+  };
+
+  const renderMarkers = () => {
+    const markers = [];
+    const markerInterval =
+      totalDuration > 10 ? Math.ceil(totalDuration / 10) : 1;
+
+    for (let i = 1; i <= totalDuration; i += markerInterval) {
+      const leftPosition = (i / totalDuration) * 100;
+      markers.push(
+        <div
+          key={i}
+          className="absolute h-full border-l-2 border-white"
+          style={{ left: `${leftPosition}%` }}
+        ></div>
+      );
+    }
+
+    return markers;
+  };
+
   return (
     <div className="flex flex-col items-center my-2 pb-16 w-[60rem] min-h-[12rem] bg-white border shadow-md rounded-lg relative">
       <div className="flex flex-row justify-between">
-        <div className="flex flex-col min-w-[28rem] justify-center py-4 items-center">
+        <div className="flex flex-col w-[28rem] justify-center py-4 items-center">
           <h2 className="text-xl font-bold mb-2">Itens</h2>
           <div className="grid grid-cols-4 gap-2">
             {items.map((item) => (
@@ -36,7 +118,6 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
                   height={400}
                   className="object-fill w-[5rem] h-[5rem] m-4 rounded-lg"
                 />
-
                 <h1 className="text-md font-semibold text-center">
                   {item.nome}
                 </h1>
@@ -48,10 +129,6 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
         <div className="p-4 w-[28rem]">
           <h2 className="text-xl font-bold mb-2">Detalhes</h2>
           <ul className="text-gray-500 dark:text-gray-400">
-            {/* <li className="flex space-x-2">
-            <strong>Solicitantes:</strong>{" "}
-            {solicitantes.map((solicitante) => solicitante.email).join(", ")}
-          </li> */}
             <li className="flex space-x-2">
               <strong>Data Hora Início:</strong> {dataHoraInicio}
             </li>
@@ -79,11 +156,34 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
           </ul>
         </div>
       </div>
-      <div className="h-7 w-[95%] m-5 bg-green-500 rounded-full bottom-4 left-2 absolute"></div>
-      <div className="h-7 w-[10%] m-5 bg-slate-500 rounded-full bottom-4 left-2 absolute"></div>
-      <h1 className="bottom-10 text-white absolute">{`${solicitante} dias restantes`}</h1>
-      <h3 className="bottom-2 left-8 absolute">{dataHoraInicio}</h3>
-      <h3 className="bottom-2 right-7 absolute">{dataHoraFim}</h3>
+      <div
+        className={`h-4 ${getBarColor()} rounded-full bottom-12 absolute`}
+        style={{ width: `${greenBarWidth}%` }}
+      >
+        <h3 className="bottom-0 left-[-75px] text-gray-500 text-xs font-medium absolute">{`${dateInicio}`}</h3>
+        <h3 className="bottom-0 right-[-75px] text-gray-500 text-xs font-medium absolute">{`${dateFim}`}</h3>
+        <div
+          className="h-4 bg-slate-600 rounded-l-full bottom-0 left-0 absolute"
+          style={{ width: `${grayBarWidth}%` }}
+        ></div>
+        {renderMarkers()}
+      </div>
+
+      {daysRemaining > totalDuration ? (
+        <h1 className="bottom-4 font-semibold absolute">{`${
+          daysRemaining - totalDuration
+        } ${
+          daysRemaining - totalDuration === 1
+            ? "dia até o início"
+            : "dias até o início"
+        }`}</h1>
+      ) : daysRemaining < 0 ? (
+        <h1 className="bottom-4 font-semibold absolute">{`Tempo encerrado`}</h1>
+      ) : (
+        <h1 className="bottom-4 font-semibold absolute">{`${daysRemaining} ${
+          daysRemaining === 1 ? "dia restante" : "dias restantes"
+        }`}</h1>
+      )}
     </div>
   );
 };

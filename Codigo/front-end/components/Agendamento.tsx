@@ -27,7 +27,7 @@ const Agendamento: React.FC<AgendamentoProps> = ({
 }) => {
   return (
     <div className="flex flex-row justify-between my-2 w-[60rem] min-h-[12rem] bg-white border shadow-md rounded-lg">
-      <div className="flex flex-col min-w-[28rem] justify-center py-4 items-center">
+      <div className="flex flex-col w-[28rem] justify-center py-4 items-center">
         <h2 className="text-xl font-bold mb-2">Itens</h2>
         <div className="grid grid-cols-4 gap-2">
           {items.map((item) => (
