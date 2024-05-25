@@ -30,6 +30,16 @@ export interface Solicitante {
   email: string;
 }
 
+export interface Endereco {
+  cep: string,
+  uf: string,
+  cidade: string,
+  bairro: string,
+  rua: string,
+  numero: string,
+  complemento: string
+}
+
 export interface Agendamento {
   id: string;
   dataHoraFim: string;
@@ -48,8 +58,9 @@ export interface Emprestimo {
   id: string;
   dataHoraFim: string;
   dataHoraInicio: string;
-  tecnicoResponsavel: string; // Nome do tecnico responsavel
-  contato: string; // Contato do responsavel
   itens: Item[];
-  tecnico: Tecnico;
+  solicitante: Solicitante;
+  endereco: Endereco;
+  observacaoSolicitacao: string;
+  statusTransacaoItem: string;
 }
