@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProfessorService {
-
     Professor confirmaEmail(UUID id, Boolean value);
 
     Professor encontrarPorEmail(@NotNull String email);

@@ -47,5 +47,6 @@ public class Professor extends Pessoa{
     @OneToMany(mappedBy = "professor", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Agendamento> agendamentos = new ArrayList<> ();
 
-    //private String foto;
+    @Column(name = "caminho_img", nullable = false)
+    private String caminhoImg;
 }

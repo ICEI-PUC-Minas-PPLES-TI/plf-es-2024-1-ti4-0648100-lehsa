@@ -1,21 +1,24 @@
 package com.gerenciadorlehsa.controller;
 
-import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
+import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDControllerImg;
 import com.gerenciadorlehsa.controller.interfaces.ProfessorController;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.dto.ProfessorDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Professor;
-import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
+import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +37,9 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_PROFESSOR)
 @AllArgsConstructor
-public class ProfessorControllerImpl implements OperacoesCRUDController<Professor, ProfessorDTO>, ProfessorController {
+public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Professor, ProfessorDTO>, ProfessorController {
 
-    OperacoesCRUDService<Professor> operacoesCRUDService;
+    OperacoesCRUDServiceImg<Professor> operacoesCRUDService;
 
     ProfessorService professorService;
 
@@ -49,23 +52,25 @@ public class ProfessorControllerImpl implements OperacoesCRUDController<Professo
     }
 
     @Override
-    @PostMapping
-    public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody Professor professor){
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, Object>> criar (@Valid @RequestPart("professor") Professor professor,
+                                                      @NotNull @RequestPart("imagem")MultipartFile img) {
         log.info(">>> criar: recebendo requisição para criar professor");
-        Professor professorCriado = operacoesCRUDService.criar(professor);
+        Professor professorCriado = operacoesCRUDService.criar(professor, img);
 
         return ResponseEntity.created (URI.create("/professor/" + professorCriado.getId())).body (construirRespostaJSON(CHAVES_PROFESSOR_CONTROLLER, asList(CREATED.value(), MSG_PROFESSOR_CRIADO, professorCriado.getId())));
 
     }
 
     @Override
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
-                                                          @Valid @RequestBody @NotNull Professor professor) {
+                                                          @Valid @RequestPart("professor") @NotNull Professor professor,
+                                                          @RequestPart("imagem") MultipartFile img) {
         log.info(">>> atualizar: recebendo requisição para atualizar professor");
 
         professor.setId(id);
-        Professor professorAtualizado = operacoesCRUDService.atualizar(professor);
+        Professor professorAtualizado = operacoesCRUDService.atualizar(professor, img);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_PROFESSOR_CONTROLLER, asList(OK.value(),
                 MSG_PROFESSOR_ATUALIZADO, professorAtualizado.getId())));
@@ -110,6 +115,12 @@ public class ProfessorControllerImpl implements OperacoesCRUDController<Professo
     }
 
 
-
+    @GetMapping("img/{id}")
+    public ResponseEntity<?> encontrarImagemPorId (@PathVariable UUID id) {
+        byte [] img = this.operacoesCRUDService.encontrarImagemPorId(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("image/png"))
+                .body(img);
+    }
 
 }
