@@ -1,6 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { EditIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
+import ImageComp from './ImageComp'
 import Cookie from "js-cookie";
 import {
   AlertDialog,
@@ -95,15 +96,11 @@ const SingleTeacherCard = ({
       <div className="max-w-md mx-auto md:max-w-lg lg:max-w-2xl">
         <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-950 hover:shadow-lg transition-shadow duration-300 ease-in-out">
           <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <Image
-              alt="Teacher 1"
+            <ImageComp
+              alt="foto do professor"
               className="h-16 w-16 rounded-full object-cover bg-slate-200"
               height={64}
-              src="../placeholder.svg"
-              style={{
-                aspectRatio: "1/1",
-                objectFit: "cover",
-              }}
+              src={`http://localhost:8080/professor/img/${id}`}
               width={64}
             />
             <div className="text-center sm:text-left">

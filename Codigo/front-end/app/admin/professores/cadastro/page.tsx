@@ -16,27 +16,32 @@ const CadastroProfessor = () => {
   const [laboratorio, setLaboratorio] = useState("");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
+  const [imagem, setImagem] = useState<File | null>(null);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setImagem(event.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+      const formData = new FormData();
+      formData.append('professor', new Blob([JSON.stringify({ matricula, campus, lotacao, areaAtuacao, laboratorio, nome, email })], {
+        type: "application/json"
+      }));
+      if (imagem) {
+        formData.append('imagem', imagem);
+      }
 
     const token = Cookie.get("token");
     try {
       const response = await fetch("http://localhost:8080/professor", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({
-          matricula,
-          campus,
-          lotacao,
-          areaAtuacao,
-          laboratorio,
-          nome,
-          email,
-        }),
+        body: formData
       });
       if (!response.ok) {
         throw new Error("Falha ao enviar o formulário");
@@ -136,7 +141,7 @@ const CadastroProfessor = () => {
                 />
               </Label>
             </div>
-            <div className="col-span-2">
+            <div>
               <Label htmlFor="email">
                 E-mail
                 <Input
@@ -147,6 +152,12 @@ const CadastroProfessor = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+              </Label>
+            </div>
+            <div>
+              <Label htmlFor='imagem'>
+                Imagem
+                <Input name='imagem' type='file' accept="image/*" onChange={handleImageChange} />
               </Label>
             </div>
           </div>
