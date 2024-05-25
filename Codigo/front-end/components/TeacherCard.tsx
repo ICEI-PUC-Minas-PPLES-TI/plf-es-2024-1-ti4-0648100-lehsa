@@ -15,7 +15,6 @@ type Props = {
     area_atuacao: string;
   }
 
-
 const TeacherCard = () => {
 
     const [teacher, setTeacher] = useState<Props[]>([]);
@@ -36,11 +35,16 @@ const TeacherCard = () => {
             .catch(error => console.error('Error fetching items:', error));
     }, []);
 
+    const handleDelete = (id: string) => {
+        setTeacher(teacher.filter(teacher => teacher.id !== id)); // Remover o professor da lista
+      };
+
     return (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {teacher.map((teacher: Props) => (
                 <div key={teacher.id}>
-                    <SingleTeacherCard nome={teacher.nome} email={teacher.email} matricula={teacher.matricula} laboratorio={teacher.laboratorio} campus={teacher.campus} lotacao={teacher.lotacao} area_atuacao={teacher.area_atuacao}/>
+                    <SingleTeacherCard {...teacher}
+                    onDelete={handleDelete}/>
                     </div>
             ))}
         </div>

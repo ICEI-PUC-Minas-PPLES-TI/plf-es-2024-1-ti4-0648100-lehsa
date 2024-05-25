@@ -1,8 +1,10 @@
 import { Separator } from "@/components/ui/separator";
 import { EditIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
+import Cookie from 'js-cookie'
 
 interface Props {
+    id: string;
     nome: string;
     email: string;
     matricula: string;
@@ -10,9 +12,53 @@ interface Props {
     campus: string;
     lotacao: string;
     area_atuacao: string;
+    onDelete: (id: string) => void;
   }
 
-const SingleTeacherCard = ({ nome, email, matricula, laboratorio, campus, lotacao, area_atuacao }: Props) => {
+  const deleteTeacher = async (id: string | string[]) => {
+    try {
+
+        const token = Cookie.get("token");
+        if (!token) {
+            throw new Error("Usuário não autenticado");
+        }
+
+        const response = await fetch(`http://localhost:8080/professor/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to delete item");
+        }
+
+        return true;
+    } catch (error) {
+        console.error("Failed to delete item:", error);
+        return false;
+    }
+};
+
+const SingleTeacherCard = ({ id, nome, email, matricula, laboratorio, campus, lotacao, area_atuacao, onDelete }: Props) => {
+ 
+  const handleDelete = async () => {
+
+    const deleted = await deleteTeacher(id);
+    if (deleted) {
+      onDelete(id);
+      const toaster = document.createElement('div');
+      toaster.classList.add('bg-green-500', 'text-white', 'p-4', 'rounded', 'fixed', 'bottom-4', 'left-1/2', 'transform', '-translate-x-1/2');
+      toaster.textContent = 'Professor excluído!';
+      document.body.appendChild(toaster);
+      setTimeout(() => {
+          document.body.removeChild(toaster);
+      }, 3000);
+    }
+};
+
   return (
     <section key="1" className="container mx-auto px-4 py-6 sm:py-8 md:px-6 lg:py-10 xl:py-12">
       <div className="max-w-md mx-auto md:max-w-lg lg:max-w-2xl">
@@ -61,7 +107,8 @@ const SingleTeacherCard = ({ nome, email, matricula, laboratorio, campus, lotaca
             <button className="px-2 py-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors flex items-center rounded-full">
               <EditIcon />
             </button>
-            <button className="px-2 py-2 bg-red-500 text-white rounded-full hover:bg-red-700 transition-colors flex items-center">
+            <button className="px-2 py-2 bg-red-500 text-white rounded-full hover:bg-red-700 transition-colors flex items-center"
+            onClick={handleDelete}>
               <TrashIcon />
             </button>
           </div>
