@@ -1,8 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { EditIcon, TrashIcon } from "lucide-react";
-import Image from "next/image";
 import ImageComp from './ImageComp'
-import Cookie from "js-cookie";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +13,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { UpdateTeacherDialog } from "./UpdateTeacherDialog";
+import { showSuccessMessage } from "@/utils/toast";
+import { deleteTeacherData } from "@/api/professor";
 
 interface Props {
   id: string;
@@ -28,32 +28,6 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-const deleteTeacher = async (id: string | string[]) => {
-  try {
-    const token = Cookie.get("token");
-    if (!token) {
-      throw new Error("Usuário não autenticado");
-    }
-
-    const response = await fetch(`http://localhost:8080/professor/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to delete item");
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Failed to delete item:", error);
-    return false;
-  }
-};
-
 const SingleTeacherCard = ({
   id,
   nome,
@@ -66,26 +40,10 @@ const SingleTeacherCard = ({
   onDelete,
 }: Props) => {
   const handleDelete = async () => {
-    const deleted = await deleteTeacher(id);
+    const deleted = await deleteTeacherData(id);
     if (deleted) {
       onDelete(id);
-      const toaster = document.createElement("div");
-      toaster.classList.add(
-        "bg-green-500",
-        "text-white",
-        "p-4",
-        "rounded",
-        "fixed",
-        "bottom-4",
-        "left-1/2",
-        "transform",
-        "-translate-x-1/2",
-      );
-      toaster.textContent = "Professor excluído!";
-      document.body.appendChild(toaster);
-      setTimeout(() => {
-        document.body.removeChild(toaster);
-      }, 3000);
+      showSuccessMessage("Professor deletado!");
     }
   };
 

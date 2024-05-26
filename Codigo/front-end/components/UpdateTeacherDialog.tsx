@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -12,7 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
-import Cookie from "js-cookie";
+import { getTeacherData, updateTeacherData } from "@/api/professor";
+import { showSuccessMessage } from "@/utils/toast";
 
 interface UpdateTeacherDialogProps {
   children: React.ReactNode;
@@ -30,17 +32,11 @@ export const UpdateTeacherDialog: React.FC<UpdateTeacherDialogProps> = ({ childr
   const [email, setEmail] = useState("");
   const [imagem, setImagem] = useState<File | null>(null);
 
+
   useEffect(() => {
     const fetchData = async () => {
-      const token = Cookie.get("token");
-      const response = await fetch(`http://localhost:8080/professor/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
+      try {
+        const data = await getTeacherData(id);
         setMatricula(data.matricula);
         setCampus(data.campus);
         setLotacao(data.lotacao);
@@ -49,6 +45,8 @@ export const UpdateTeacherDialog: React.FC<UpdateTeacherDialogProps> = ({ childr
         setNome(data.nome);
         setEmail(data.email);
         setImagem(data.imagem);
+      } catch (error) {
+        console.error("Erro ao buscar os dados do professor:", error);
       }
     };
 
@@ -87,37 +85,11 @@ export const UpdateTeacherDialog: React.FC<UpdateTeacherDialogProps> = ({ childr
       formData.append("imagem", imagem);
     }
 
-    const token = Cookie.get("token");
     try {
-      const response = await fetch(`http://localhost:8080/professor/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-      if (!response.ok) {
-        throw new Error("Falha ao enviar o formulário");
-      }
-      const toaster = document.createElement("div");
-      toaster.classList.add(
-        "bg-green-500",
-        "text-white",
-        "p-4",
-        "rounded",
-        "fixed",
-        "bottom-4",
-        "left-1/2",
-        "transform",
-        "-translate-x-1/2",
-      );
-      toaster.textContent = "Professor atualizado!";
-      document.body.appendChild(toaster);
-      setTimeout(() => {
-        document.body.removeChild(toaster);
-      }, 3000);
+      await updateTeacherData(id, formData);
+      showSuccessMessage("Professor atualizado!");
     } catch (error) {
-      console.error("Erro ao enviar o formulário:", error);
+      console.error("Erro ao atualizar o professor:", error);
     }
   };
 
@@ -230,7 +202,9 @@ export const UpdateTeacherDialog: React.FC<UpdateTeacherDialogProps> = ({ childr
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Salvar</Button>
+            <DialogClose>
+            <Button type="submit" className="mt-4">Salvar</Button>
+            </DialogClose>
           </DialogFooter>
         </form>
       </DialogContent>

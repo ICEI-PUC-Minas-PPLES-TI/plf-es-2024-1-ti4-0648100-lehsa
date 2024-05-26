@@ -2,6 +2,7 @@
 import Cookie from 'js-cookie'
 import { useEffect, useState } from "react";
 import SingleTeacherCard from './SingleTeacherCard';
+import { fetchTeachers } from '@/api/professor';
 
 
 type Props = {
@@ -21,19 +22,12 @@ const TeacherCard = () => {
     const token = Cookie.get("token");
 
     useEffect(() => {
-        fetch("http://localhost:8080/professor", {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": `Bearer ${token}`
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                setTeacher(data)
-            })
+        if (token) {
+          fetchTeachers(token)
+            .then(data => setTeacher(data))
             .catch(error => console.error('Error fetching items:', error));
-    }, []);
+        }
+      }, [token]);
 
     const handleDelete = (id: string) => {
         setTeacher(teacher.filter(teacher => teacher.id !== id)); // Remover o professor da lista
