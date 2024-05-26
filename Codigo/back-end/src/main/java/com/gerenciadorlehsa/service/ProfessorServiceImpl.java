@@ -226,7 +226,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>,
 
 
     private void processarImagem(Professor professor, Professor professorAtualizado, MultipartFile img) {
-        if (img.getContentType() == null) {
+        if (img == null || img.getContentType() == null) {
             professor.setCaminhoImg(professorAtualizado.getCaminhoImg());
         } else {
             verificarTipoArquivo(img);
@@ -238,6 +238,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>,
             }
         }
     }
+
 
     private void atualizarProfessor(Professor professor, Professor professorAtualizado) {
         copyProperties(professor, professorAtualizado, PROPRIEDADES_IGNORADAS);
