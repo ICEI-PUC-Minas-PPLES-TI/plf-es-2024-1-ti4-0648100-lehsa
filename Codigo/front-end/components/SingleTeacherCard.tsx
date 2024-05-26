@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { UpdateTeacherDialog } from "./UpdateTeacherDialog";
 
 interface Props {
   id: string;
@@ -90,7 +91,7 @@ const SingleTeacherCard = ({
 
   return (
     <section
-      key="1"
+      key={id}
       className="container mx-auto px-4 py-6 sm:py-8 md:px-6 lg:py-10 xl:py-12"
     >
       <div className="max-w-md mx-auto md:max-w-lg lg:max-w-2xl">
@@ -144,9 +145,11 @@ const SingleTeacherCard = ({
             </li>
           </ul>
           <div className="flex justify-end mt-4 space-x-2">
+            <UpdateTeacherDialog id={id}>
             <button className="px-2 py-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors flex items-center rounded-full">
               <EditIcon />
             </button>
+            </UpdateTeacherDialog>
             <AlertDialog>
               <AlertDialogTrigger className="p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition duration-150 ease-in-out">
                 <TrashIcon className="h-5 w-5" />
