@@ -1,8 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { EditIcon, TrashIcon } from "lucide-react";
-import Image from "next/image";
 import ImageComp from './ImageComp'
-import Cookie from "js-cookie";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +12,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { UpdateTeacherDialog } from "./UpdateTeacherDialog";
+import { showSuccessMessage } from "@/utils/toast";
+import { deleteTeacherData } from "@/api/professor";
 
 interface Props {
   id: string;
@@ -27,32 +28,6 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-const deleteTeacher = async (id: string | string[]) => {
-  try {
-    const token = Cookie.get("token");
-    if (!token) {
-      throw new Error("Usuário não autenticado");
-    }
-
-    const response = await fetch(`http://localhost:8080/professor/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to delete item");
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Failed to delete item:", error);
-    return false;
-  }
-};
-
 const SingleTeacherCard = ({
   id,
   nome,
@@ -65,32 +40,16 @@ const SingleTeacherCard = ({
   onDelete,
 }: Props) => {
   const handleDelete = async () => {
-    const deleted = await deleteTeacher(id);
+    const deleted = await deleteTeacherData(id);
     if (deleted) {
       onDelete(id);
-      const toaster = document.createElement("div");
-      toaster.classList.add(
-        "bg-green-500",
-        "text-white",
-        "p-4",
-        "rounded",
-        "fixed",
-        "bottom-4",
-        "left-1/2",
-        "transform",
-        "-translate-x-1/2",
-      );
-      toaster.textContent = "Professor excluído!";
-      document.body.appendChild(toaster);
-      setTimeout(() => {
-        document.body.removeChild(toaster);
-      }, 3000);
+      showSuccessMessage("Professor deletado!");
     }
   };
 
   return (
     <section
-      key="1"
+      key={id}
       className="container mx-auto px-4 py-6 sm:py-8 md:px-6 lg:py-10 xl:py-12"
     >
       <div className="max-w-md mx-auto md:max-w-lg lg:max-w-2xl">
@@ -144,9 +103,11 @@ const SingleTeacherCard = ({
             </li>
           </ul>
           <div className="flex justify-end mt-4 space-x-2">
+            <UpdateTeacherDialog id={id}>
             <button className="px-2 py-2 bg-yellow-500 text-white hover:bg-yellow-600 transition-colors flex items-center rounded-full">
               <EditIcon />
             </button>
+            </UpdateTeacherDialog>
             <AlertDialog>
               <AlertDialogTrigger className="p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition duration-150 ease-in-out">
                 <TrashIcon className="h-5 w-5" />
