@@ -8,8 +8,10 @@ import com.gerenciadorlehsa.exceptions.lancaveis.MensagemEmailException;
 import com.gerenciadorlehsa.exceptions.lancaveis.ProfessorException;
 import com.gerenciadorlehsa.repository.ProfessorRepository;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
+import com.gerenciadorlehsa.service.interfaces.OperacoesImagemService;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
+import com.gerenciadorlehsa.util.ConstantesImgUtil;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static com.gerenciadorlehsa.util.ConstantesImgUtil.DIRETORIO_IMGS_PROFESSOR;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.PROFESSOR_SERVICE;
 import static java.lang.String.format;
@@ -33,7 +37,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = PROFESSOR_SERVICE)
 @Service
 @AllArgsConstructor
-public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>, ProfessorService {
+public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>, ProfessorService, OperacoesImagemService {
 
     private final ProfessorRepository professorRepository;
 
@@ -41,8 +45,7 @@ public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>,
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
-    private final String DIRETORIO_IMGS = "src/main/java/com/gerenciadorlehsa/util/imgs/prof";
-
+    // --------------- CRUD - INICIO ---------------------------------------
     @Override
     public Professor encontrarPorId(@NotNull UUID id) {
         log.info(">>> encontrarPorId: encontrando professor por id");
@@ -72,61 +75,16 @@ public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>,
 
     }
 
-    public String saveImageToStorage(MultipartFile imageFile) throws IOException {
-        verificarTipoArquivo(imageFile);
-        if (imageFile.getSize() > 250 * 1024) {
-            throw new RuntimeException("Tamanho do arquivo para imagem de item excede 250 KB");
-        }
-
-        String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-
-        Path uploadPath = Path.of(DIRETORIO_IMGS);
-        Path filePath = uploadPath.resolve(uniqueFileName);
-
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return uniqueFileName;
-    }
-
-
     @Override
     public Professor atualizar(Professor professor, MultipartFile img) {
-        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
-        Professor professorAtualizado = encontrarPorId (professor.getId ());
-        if (img.getContentType() == null) {
-            professor.setCaminhoImg(professorAtualizado.getCaminhoImg());
-        } else {
-            verificarTipoArquivo(img);
-            try {
-                deleteImage(professorAtualizado.getCaminhoImg());
-                professor.setCaminhoImg(saveImageToStorage(img));
-            } catch (IOException e) {
-                throw new ProfessorException(e.getMessage());
-            }
-        }
-
-        copyProperties(professor, professorAtualizado, PROPRIEDADES_IGNORADAS);
-
-        // todo: Setando confirmação de cadastro como verdadeiro só para teste
-        // professorAtualizado.setConfirmaCadastro (true);
-
-
-        if(!Objects.equals (professor.getEmail (), professorAtualizado.getEmail ())) {
-            professorAtualizado.setConfirmaCadastro (false);
-            professorAtualizado = professorRepository.save (professorAtualizado);
-
-            //todo: envio de e-mail por enquanto comentado
-            /*enviarEmailParaProfessor (professorAtualizado, ".../professor/confirmacao-cadastro?id=" + professorAtualizado.getId ());*/
-        } else
-            professorAtualizado = professorRepository.save (professorAtualizado);
-
-
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        Professor professorAtualizado = encontrarPorId(professor.getId());
+        processarImagem(professor, professorAtualizado, img);
+        atualizarProfessor(professor, professorAtualizado);
+        professorAtualizado.setConfirmaCadastro (true);
         return professorAtualizado;
     }
+
 
     @Override
     public void deletar(@NotNull UUID id) {
@@ -142,16 +100,6 @@ public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>,
         }
     }
 
-    public String deleteImage(String imageName) throws IOException {
-        Path imagePath = Path.of(DIRETORIO_IMGS, imageName);
-
-        if (Files.exists(imagePath)) {
-            Files.delete(imagePath);
-            return "Success";
-        } else {
-            return "Failed"; // Handle missing images
-        }
-    }
 
     @Override
     public List<Professor> listarTodos() {
@@ -159,6 +107,23 @@ public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>,
         validadorAutorizacaoRequisicaoService.getUsuarioLogado ();
         return professorRepository.findAll();
     }
+
+    @Override
+    public byte[] encontrarImagemPorId(@NotNull UUID id) {
+        log.info(">>> encontrarImagemPorId: encontrando imagem por id");
+        Professor profImg = encontrarPorId(id);
+        try {
+            return getImage(profImg.getCaminhoImg());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+// --------------- CRUD - FIM ---------------------------------------
+
+
+
+// --------------- ProfessorService - INICIO ---------------------------------------
 
     @Override
     public void enviarEmail(Professor professor, String linkConfirmacao) {
@@ -185,13 +150,70 @@ public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>,
                         email)));
     }
 
-
+    @Override
     public List<Agendamento> listarAgendamentos(UUID id) {
         Professor professor = encontrarPorId (id);
         if(professor.getAgendamentos () == null || professor.getAgendamentos ().isEmpty ())
             throw new ProfessorException ("O professor não possui agendamentos");
         return professor.getAgendamentos ();
     }
+
+
+// --------------- ProfessorService - FIM ---------------------------------------
+
+
+
+// --------------- OperacoesImagemService - INICIO -----------------------------
+
+    @Override
+    public byte[] getImage(String imageName) throws IOException {
+        Path imagePath = Path.of(DIRETORIO_IMGS_PROFESSOR, imageName);
+
+        if (Files.exists(imagePath)) {
+            return Files.readAllBytes(imagePath);
+        } else {
+            throw new EntidadeNaoEncontradaException("Imagem não encontrada"); // Handle missing images
+        }
+    }
+
+    @Override
+    public String deleteImage(String imageName) throws IOException {
+        Path imagePath = Path.of(DIRETORIO_IMGS_PROFESSOR, imageName);
+
+        if (Files.exists(imagePath)) {
+            Files.delete(imagePath);
+            return "Success";
+        } else {
+            return "Failed"; // Handle missing images
+        }
+    }
+
+
+    @Override
+    public String saveImageToStorage(MultipartFile imageFile) throws IOException {
+        verificarTipoArquivo(imageFile);
+        if (imageFile.getSize() > 250 * 1024) {
+            throw new RuntimeException("Tamanho do arquivo para imagem de item excede 250 KB");
+        }
+
+        String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+
+        Path uploadPath = Path.of(DIRETORIO_IMGS_PROFESSOR);
+        Path filePath = uploadPath.resolve(uniqueFileName);
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return uniqueFileName;
+    }
+
+
+
+// --------------- OperacoesImagemService - FIM -----------------------------
+
 
     private void verificarTipoArquivo (MultipartFile img) {
         if (img.getContentType() == null) {
@@ -202,25 +224,31 @@ public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>,
         }
     }
 
-    @Override
-    public byte[] encontrarImagemPorId(@NotNull UUID id) {
-        log.info(">>> encontrarImagemPorId: encontrando imagem por id");
-        Professor profImg = encontrarPorId(id);
-        try {
-            return getImage(profImg.getCaminhoImg());
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
 
-    private byte[] getImage(String imageName) throws IOException {
-        Path imagePath = Path.of(DIRETORIO_IMGS, imageName);
-
-        if (Files.exists(imagePath)) {
-            return Files.readAllBytes(imagePath);
+    private void processarImagem(Professor professor, Professor professorAtualizado, MultipartFile img) {
+        if (img.getContentType() == null) {
+            professor.setCaminhoImg(professorAtualizado.getCaminhoImg());
         } else {
-            throw new EntidadeNaoEncontradaException("Imagem não encontrada"); // Handle missing images
+            verificarTipoArquivo(img);
+            try {
+                deleteImage(professorAtualizado.getCaminhoImg());
+                professor.setCaminhoImg(saveImageToStorage(img));
+            } catch (IOException e) {
+                throw new ProfessorException(e.getMessage());
+            }
         }
     }
+
+    private void atualizarProfessor(Professor professor, Professor professorAtualizado) {
+        copyProperties(professor, professorAtualizado, PROPRIEDADES_IGNORADAS);
+        if (!Objects.equals(professor.getEmail(), professorAtualizado.getEmail())) {
+            professorAtualizado.setConfirmaCadastro(false);
+            professorAtualizado = professorRepository.save(professorAtualizado);
+            /*enviarEmail (professorAtualizado, "{caminho_padrao}/professor/confirmacao-cadastro?id=" + professorAtualizado.getId ());*/
+        } else {
+            professorAtualizado = professorRepository.save(professorAtualizado);
+        }
+    }
+
 
 }
