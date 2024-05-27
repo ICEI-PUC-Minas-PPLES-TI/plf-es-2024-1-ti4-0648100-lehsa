@@ -34,7 +34,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
-    @Lazy
     private final AgendamentoService agendamentoService;
 
     private final UsuarioRepository usuarioRepository;
