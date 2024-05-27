@@ -199,6 +199,11 @@ public class ItemService implements OperacoesCRUDServiceImg<Item>, OperacoesImag
         }
     }
 
+    public List<Item> listarEmprestaveis () {
+        log.info(">>> listarEmprestaveis: listando itens que são emprestaveis");
+        return itemRepository.findEmprestaveis();
+    }
+
     public List<Item> encontrarPorNome (@NotNull String nome) {
         log.info(">>> encontrarPorNome: encontrando itens com o nome especificado");
         return this.itemRepository.findByNome(nome);

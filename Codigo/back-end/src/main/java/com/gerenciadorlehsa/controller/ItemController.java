@@ -54,6 +54,13 @@ public class ItemController {
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
+    @GetMapping("/emprestaveis")
+    public ResponseEntity<List<ItemDTO>> listarEmprestaveis () {
+        log.info(">>> listarEmprestaveis: recebendo requisição para listar itens emprestaveis");
+        List<Item> itens = this.itemService.listarEmprestaveis();
+        return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
+    }
+
     @GetMapping("/tipo/{tipo}")
     public ResponseEntity<List<ItemDTO>> encontrarPorTipo (@PathVariable String tipo) {
         log.info(">>> encontrarPorTipo: recebendo requisição para encontrar itens por tipo");
