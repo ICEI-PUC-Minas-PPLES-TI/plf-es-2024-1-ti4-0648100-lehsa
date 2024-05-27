@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
@@ -205,5 +206,15 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
             return this.usuarioRepository.findAgendamentosRealizadosById(id);
 
         throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses agendamentos");
+    }
+
+    @Override
+    public List<Emprestimo> listarEmprestimoUsuario (@NotNull UUID id) {
+        User usuario = encontrarPorId(id);
+        log.info(">>> listarEmprestimoUsuario: listando todos emprestimo do usuario de id: " + usuario.getId());
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
+            return this.usuarioRepository.findEmprestimosById(id);
+        throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses emprestimos");
     }
 }

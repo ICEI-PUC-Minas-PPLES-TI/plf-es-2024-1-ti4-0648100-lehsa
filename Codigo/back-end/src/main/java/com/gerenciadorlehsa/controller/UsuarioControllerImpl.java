@@ -2,7 +2,9 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.components.security.JWTComp;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
+import com.gerenciadorlehsa.dto.EmprestimoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -183,6 +185,15 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
                 this.usuarioService.listarAgendamentoUsuario(id);
 
         return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
+    }
+
+    @GetMapping("/{id}/emprestimos")
+    public ResponseEntity<List<EmprestimoDTORes>> listarEmprestimoUsuario (@PathVariable UUID id) {
+        log.info(">>> listarEmprestimoUsuario: recebendo requisição para listar todos emprestimos de um usuario");
+        List<Emprestimo> emprestimos =
+                this.usuarioService.listarEmprestimoUsuario(id);
+
+        return ResponseEntity.ok().body(emprestimos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 
     @GetMapping("/emails")

@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.repository;
 
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -54,4 +55,7 @@ public interface UsuarioRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u.agendamentosRealizados FROM User u WHERE u.id = :id")
     List<Agendamento> findAgendamentosRealizadosById(UUID id);
+
+    @Query("SELECT u.emprestimos FROM User u WHERE u.id = :id")
+    List<Emprestimo> findEmprestimosById(UUID id);
 }
