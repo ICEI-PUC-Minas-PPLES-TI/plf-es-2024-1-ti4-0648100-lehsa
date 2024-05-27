@@ -17,7 +17,7 @@ import com.gerenciadorlehsa.repository.UsuarioRepository;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.USUARIO_SERVICE;
@@ -34,16 +34,12 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
-    private AgendamentoService agendamentoService;
+    @Lazy
+    private final AgendamentoService agendamentoService;
 
     private final UsuarioRepository usuarioRepository;
 
     private final PasswordEncoderServiceImpl passwordEncoder;
-
-    @Autowired
-    public void setAgendamentoService(AgendamentoService agendamentoService) {
-        this.agendamentoService = agendamentoService;
-    }
 
     /**
      * Encontra um usuário a partir do seu id

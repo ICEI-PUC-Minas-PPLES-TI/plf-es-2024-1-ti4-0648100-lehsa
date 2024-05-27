@@ -16,6 +16,7 @@ import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,20 +40,18 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     private final MensagemEmailService mensagemEmailService;
 
-    private UsuarioService usuarioService;
+    @Lazy
+    private final UsuarioService usuarioService;
 
 
     @Autowired
     public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
                                    AgendamentoRepository agendamentoRepository,
-                                   MensagemEmailService mensagemEmailService) {
+                                   MensagemEmailService mensagemEmailService,
+                                   UsuarioService usuarioService) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
-    }
-
-    @Autowired
-    public void setUsuarioService(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
