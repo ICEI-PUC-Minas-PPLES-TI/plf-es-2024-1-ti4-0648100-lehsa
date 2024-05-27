@@ -30,8 +30,10 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
     const dateFormat = "dd/MM/yyyy HH:mm:ss";
     const start = parse(dataHoraInicio, dateFormat, new Date());
     const end = parse(dataHoraFim, dateFormat, new Date());
-    const now = new Date(); // Dynamic current date
-    // const now = new Date("Sat May 27 2024 11:36:22 GMT-0300 (Horário Padrão de Brasília)");
+    // const now = new Date();
+    const now = new Date(
+      "Sat May 28 2024 11:36:22 GMT-0300 (Horário Padrão de Brasília)"
+    );
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       console.error("Formato de data inválido");
@@ -68,8 +70,14 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
 
   console.log("cur dur: " + currentDuration);
 
-  const [dateInicio] = dataHoraInicio.split(" ");
-  const [dateFim] = dataHoraFim.split(" ");
+  const dateInicio = format(
+    parse(dataHoraInicio, "dd/MM/yyyy HH:mm:ss", new Date()),
+    "dd/MM"
+  );
+  const dateFim = format(
+    parse(dataHoraFim, "dd/MM/yyyy HH:mm:ss", new Date()),
+    "dd/MM"
+  );
 
   const getBarColor = () => {
     if (daysRemaining > totalDuration) {
@@ -86,8 +94,7 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
 
   const renderMarkers = () => {
     const markers = [];
-    const markerInterval =
-      totalDuration > 10 ? Math.ceil(totalDuration / 10) : 1;
+    const markerInterval = 1;
 
     for (let i = 1; i <= totalDuration; i += markerInterval) {
       const leftPosition = (i / totalDuration) * 100;
@@ -160,22 +167,28 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
         className={`h-4 ${getBarColor()} rounded-full bottom-12 absolute`}
         style={{ width: `${greenBarWidth}%` }}
       >
-        <h3 className="bottom-0 left-[-75px] text-gray-500 text-xs font-medium absolute">{`${dateInicio}`}</h3>
-        <h3 className="bottom-0 right-[-75px] text-gray-500 text-xs font-medium absolute">{`${dateFim}`}</h3>
+        <h3 className="bottom-0 left-[-45px] text-gray-500 text-xs font-medium absolute">{`${dateInicio}`}</h3>
+        <h3 className="bottom-0 right-[-45px] text-gray-500 text-xs font-medium absolute">{`${dateFim}`}</h3>
         <div
-          className="h-4 bg-slate-600 rounded-l-full bottom-0 left-0 absolute"
+          className={`h-4 bg-slate-600 ${
+            grayBarWidth >= 100 ? "rounded-full" : "rounded-l-full"
+          }  bottom-0 left-0 absolute`}
           style={{ width: `${grayBarWidth}%` }}
         ></div>
         {renderMarkers()}
       </div>
 
       {daysRemaining > totalDuration ? (
-        <h1 className="bottom-4 font-semibold absolute">{`${
+        <h1 className="bottom-4 font-semibold text-gray-400 absolute">{`${
+          daysRemaining - totalDuration === 1
+            ? "Falta "
+            : "Faltam "
+        }${
           daysRemaining - totalDuration
         } ${
           daysRemaining - totalDuration === 1
-            ? "dia até o início"
-            : "dias até o início"
+            ? "dia para o início do emprestimo"
+            : "dias para o início do emprestimo"
         }`}</h1>
       ) : daysRemaining < 0 ? (
         <h1 className="bottom-4 font-semibold absolute">{`Tempo encerrado`}</h1>

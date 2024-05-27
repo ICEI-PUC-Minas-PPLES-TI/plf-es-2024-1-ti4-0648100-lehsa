@@ -1,53 +1,62 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import Cookie from "js-cookie";
-import { Emprestimo as EmprestimoType } from "@/components/types"; // Assuming Tecnico type is imported here
-import Emprestimo from "@/components/Emprestimo";
-import Link from "next/link";
+import Emprestimo from "./Emprestimo";
+import { Emprestimo as EmprestimoType } from "@/components/types";
+import { jwtDecode } from "jwt-decode";
 
-const Emprestimos = () => {
+const UserEmprestimos = () => {
   const [emprestimos, setEmprestimos] = useState<EmprestimoType[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const token = Cookie.get("token");
+  let decoded: any = {};
+  if (token) {
+    decoded = jwtDecode(token);
+  }
+
   useEffect(() => {
-    const authToken = Cookie.get("token") ?? "";
-    fetch("http://localhost:8080/emprestimo", {
+    if (decoded.userId) {
+      fetchEmprestimo();
+    } else {
+      setError("Invalid user ID");
+    }
+  }, [decoded.userId]);
+
+  const fetchEmprestimo = () => {
+    fetch(`http://localhost:8080/usuario/${decoded.userId}/emprestimos`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${authToken}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error("Failed to fetch emprestimos");
         }
         return response.json();
       })
       .then((data) => {
-        console.log("API response:", data); // Log the data to see its structure
         if (Array.isArray(data)) {
           setEmprestimos(data);
         } else {
-          throw new Error("API response is not an array");
+          throw new Error("Invalid data format");
         }
       })
       .catch((error) => {
         console.error("Error fetching emprestimos:", error);
         setError(error.message);
       });
-  }, []);
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  };
 
   return (
-    <div className="flex flex-col items-center p-4">
-      {emprestimos.map((emprestimo) => (
-        <Link key={emprestimo.id} href={`/admin/emprestimos/${emprestimo.id}`}>
-          <div className="block mb-4 cursor-pointer">
+    <div className="w-full bg-white h-auto rounded-r-2xl rounded-bl-2xl p-5">
+      <div className="flex flex-col justify-center items-center">
+        {error ? (
+          <div className="text-red-500">{error}</div>
+        ) : (
+          emprestimos.map((emprestimo) => (
             <Emprestimo
               key={emprestimo.id}
               items={emprestimo.itens}
@@ -57,11 +66,11 @@ const Emprestimos = () => {
               observacaoSolicitacao={emprestimo.observacaoSolicitacao}
               statusTransacaoItem={emprestimo.statusTransacaoItem}
             />
-          </div>
-        </Link>
-      ))}
+          ))
+        )}
+      </div>
     </div>
   );
 };
 
-export default Emprestimos;
+export default UserEmprestimos;

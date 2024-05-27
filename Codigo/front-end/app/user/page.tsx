@@ -8,11 +8,16 @@ import SearchBar from "@/components/SearchBar";
 import FilterSelect from "@/components/FilterSelect";
 import ItensDisplay from "./ItensDisplay";
 import { jwtDecode } from "jwt-decode";
+import UserTabs from "@/components/UserTabs";
+import UserAgendamentos from "@/components/UserAgendamentos";
+import UserEmprestimos from "@/components/UserEmprestimos";
 
-
-const UserPage = () => {
+const UserPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [agendamentos, setAgendamentos] = useState<AgendamentoType[]>([]);
+  const [activeTab, setActiveTab] = useState<"Agendamentos" | "Emprestimos">(
+    "Agendamentos"
+  );
 
   const token = Cookie.get("token");
   let decoded: any = {};
@@ -45,25 +50,13 @@ const UserPage = () => {
   return (
     <div className="max-w-7xl m-auto space-y-5">
       <TopMenu title="Dashboard" />
-      <div className="flex space-x-5">
-        <div className="w-full bg-white h-auto rounded-2xl p-5">
-          <h2 className="font-semibold text-xl mb-4">Seus Agendamentos</h2>
-          <div className="flex flex-col justify-center items-center">
-            {agendamentos.map((agendamento) => (
-              <Agendamento
-                key={agendamento.id}
-                items={agendamento.itens}
-                tecnico={agendamento.tecnico}
-                professor={agendamento.professor}
-                solicitantes={agendamento.solicitantes}
-                dataHoraFim={agendamento.dataHoraFim}
-                dataHoraInicio={agendamento.dataHoraInicio}
-                observacaoSolicitacao={agendamento.observacaoSolicitacao}
-                statusTransacaoItem={agendamento.statusTransacaoItem}
-              />
-            ))}
-          </div>
-        </div>
+      <div className="flex flex-col space-x-5">
+        <UserTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        {activeTab === "Agendamentos" ? (
+          <UserAgendamentos />
+        ) : (
+          <UserEmprestimos />
+        )}
       </div>
       <div className="w-full bg-white rounded-2xl p-5">
         <h2 className="font-semibold text-xl mb-6">
