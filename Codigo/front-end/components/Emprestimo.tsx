@@ -16,7 +16,6 @@ interface EmprestimoProps {
 
 const Emprestimo: React.FC<EmprestimoProps> = ({
   items,
-  solicitante,
   dataHoraFim,
   dataHoraInicio,
   observacaoSolicitacao,
@@ -30,10 +29,10 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
     const dateFormat = "dd/MM/yyyy HH:mm:ss";
     const start = parse(dataHoraInicio, dateFormat, new Date());
     const end = parse(dataHoraFim, dateFormat, new Date());
-    // const now = new Date();
-    const now = new Date(
-      "Sat May 28 2024 11:36:22 GMT-0300 (Horário Padrão de Brasília)"
-    );
+    const now = new Date();
+    // const now = new Date(
+    //   "Sat June 25 2024 11:36:22 GMT-0300 (Horário Padrão de Brasília)"
+    // );
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       console.error("Formato de data inválido");
@@ -81,7 +80,7 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
 
   const getBarColor = () => {
     if (daysRemaining > totalDuration) {
-      return "bg-primary";
+      return "hidden";
     } else if (daysRemaining >= 5) {
       return "bg-green-500";
     } else if (daysRemaining < 5 && daysRemaining > 2) {
@@ -167,10 +166,17 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
         className={`h-4 ${getBarColor()} rounded-full bottom-12 absolute`}
         style={{ width: `${greenBarWidth}%` }}
       >
-        <h3 className="bottom-0 left-[-45px] text-gray-500 text-xs font-medium absolute">{`${dateInicio}`}</h3>
-        <h3 className="bottom-0 right-[-45px] text-gray-500 text-xs font-medium absolute">{`${dateFim}`}</h3>
+        {daysRemaining <= totalDuration && (
+          <>
+            <h3 className="bottom-0 left-[-45px] text-gray-500 text-xs font-medium absolute">{`${dateInicio}`}</h3>
+            <h3 className="bottom-0 right-[-45px] text-gray-500 text-xs font-medium absolute">{`${dateFim}`}</h3>
+          </>
+        )}
+
         <div
-          className={`h-4 bg-slate-600 ${
+          className={`h-4 ${
+            daysRemaining < 0 ? "bg-gray-300" : "bg-slate-600"
+          } ${
             grayBarWidth >= 100 ? "rounded-full" : "rounded-l-full"
           }  bottom-0 left-0 absolute`}
           style={{ width: `${grayBarWidth}%` }}
@@ -179,19 +185,15 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
       </div>
 
       {daysRemaining > totalDuration ? (
-        <h1 className="bottom-4 font-semibold text-gray-400 absolute">{`${
+        <h1 className="bottom-7 font-semibold text-gray-400 absolute">{`${
           daysRemaining - totalDuration === 1
-            ? "Falta "
-            : "Faltam "
-        }${
-          daysRemaining - totalDuration
-        } ${
-          daysRemaining - totalDuration === 1
-            ? "dia para o início do emprestimo"
-            : "dias para o início do emprestimo"
+            ? "Equipamento disponível em "
+            : "Equipamento disponível em "
+        }${daysRemaining - totalDuration} ${
+          daysRemaining - totalDuration === 1 ? " dia" : " dias"
         }`}</h1>
       ) : daysRemaining < 0 ? (
-        <h1 className="bottom-4 font-semibold absolute">{`Tempo encerrado`}</h1>
+        <h1 className="bottom-4 font-semibold text-gray-400 absolute">{`Tempo encerrado`}</h1>
       ) : (
         <h1 className="bottom-4 font-semibold absolute">{`${daysRemaining} ${
           daysRemaining === 1 ? "dia restante" : "dias restantes"

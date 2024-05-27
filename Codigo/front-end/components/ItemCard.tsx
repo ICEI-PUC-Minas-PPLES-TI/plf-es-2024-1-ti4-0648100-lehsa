@@ -18,11 +18,13 @@ type Props = {
     nome: string;
     quantidade: number;
     tipo_item: string;
+    emprestavel: boolean;
 };
 
 interface ItensCardProps {
     searchTerm: string;
 }
+
 const ItensCard = ({ searchTerm }: ItensCardProps) => {
 
     const [items, setItems] = useState<Props[]>([]);
@@ -52,7 +54,7 @@ const ItensCard = ({ searchTerm }: ItensCardProps) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredItems.map((item: Props) => (
                 <Link key={item.id} href={`/admin/itens/${item.id}`}>
-                    <SingleItemCard id={item.id} nome={item.nome} tipo_item={item.tipo_item} quantidade={item.quantidade}/>                    
+                    <SingleItemCard id={item.id} nome={item.nome} tipo_item={item.tipo_item} quantidade={item.quantidade} emprestavel={item.emprestavel}/>                    
                 </Link>
             ))}
         </div>
