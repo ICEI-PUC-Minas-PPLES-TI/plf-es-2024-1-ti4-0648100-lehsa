@@ -37,7 +37,8 @@ const UserAgendamentos = () => {
   };
 
   return (
-    <div className="w-full bg-white h-auto rounded-r-2xl rounded-bl-2xl p-5">
+    
+    <div className="w-full bg-white h-auto rounded-2xl p-5">
       <div className="flex flex-col justify-center items-center">
         {agendamentos.map((agendamento) => (
           <Agendamento
