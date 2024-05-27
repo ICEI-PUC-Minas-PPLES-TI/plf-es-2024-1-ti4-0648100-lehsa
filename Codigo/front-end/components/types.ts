@@ -3,6 +3,17 @@ enum TipoItem {
   "EQUIPAMENTO",
 }
 
+// enum StatusTransacaoItem {
+//   AGUARDANDO_CONFIRMACAO_PROFESSOR,
+//   EM_ANALISE,
+//   APROVADO, // Admin
+//   RECUSADO, // Admin
+//   CANCELADO, // Usuário pode cancelar
+//   CONFIRMADO, //unico valor utilizado por usuário comum
+//   NAO_COMPARECEU, //Admin
+//   CONCLUIDO // Admin
+// }
+
 export interface Item {
   id: string;
   imagem: File;

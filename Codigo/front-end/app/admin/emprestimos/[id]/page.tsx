@@ -1,9 +1,10 @@
-'use client'
+'use client';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import Cookie from "js-cookie";
 import { useEffect, useState } from "react";
+import { translateStatus } from "@/utils/translateStatus";
 
 type Solicitante = {
   id: string;
@@ -33,7 +34,7 @@ type Endereco = {
 
 type Emprestimo = {
   id: string;
-  statusTransacaoItem: String;
+  statusTransacaoItem: string;
   dataHoraInicio: string;
   dataHoraFim: string;
   tecnico: string | null;
@@ -68,7 +69,7 @@ const fetchItem = async (id: string | string[]) => {
 const DetalhesEmprestimo = () => {
   const [emprestimo, setEmprestimo] = useState<Emprestimo | null>(null);
 
-  const handleAcao = async (status: String) => {
+  const handleAcao = async (status: string) => {
     try {
       const token = Cookie.get("token");
       const response = await fetch(
@@ -145,7 +146,7 @@ const DetalhesEmprestimo = () => {
                             emprestimo?.statusTransacaoItem === 'RECUSADO' ? "bg-red-100 text-red-800" :
                             'bg-gray-500 text-white'
                           }`}>
-                       {emprestimo?.statusTransacaoItem}
+                       {translateStatus(emprestimo?.statusTransacaoItem || '')}
                       </span>
                     </li>
                     <li className="flex space-x-2">

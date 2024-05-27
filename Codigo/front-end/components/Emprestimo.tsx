@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ImageComp from "./ImageComp";
 import { Item, Solicitante } from "./types";
 import { differenceInDays, parse, format } from "date-fns";
+import { translateStatus } from "@/utils/translateStatus";
 
 interface EmprestimoProps {
   items: Item[];
@@ -153,7 +154,7 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
                   : "bg-gray-500 text-white"
               }`}
             >
-              {statusTransacaoItem}
+              {translateStatus(statusTransacaoItem)}
             </span>
             <h1 className="my-2" />
             <li className="flex space-x-2">

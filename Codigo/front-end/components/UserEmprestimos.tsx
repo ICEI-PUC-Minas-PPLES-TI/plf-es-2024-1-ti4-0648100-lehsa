@@ -4,6 +4,7 @@ import Cookie from "js-cookie";
 import Emprestimo from "./Emprestimo";
 import { Emprestimo as EmprestimoType } from "@/components/types";
 import { jwtDecode } from "jwt-decode";
+import { parse } from "date-fns";
 
 const UserEmprestimos = () => {
   const [emprestimos, setEmprestimos] = useState<EmprestimoType[]>([]);
@@ -39,7 +40,13 @@ const UserEmprestimos = () => {
       })
       .then((data) => {
         if (Array.isArray(data)) {
-          setEmprestimos(data);
+          const sortedData = data.sort((a, b) => {
+            const dateFormat = "dd/MM/yyyy HH:mm:ss";
+            const dateA = parse(a.dataHoraInicio, dateFormat, new Date());
+            const dateB = parse(b.dataHoraInicio, dateFormat, new Date());
+            return dateA.getTime() - dateB.getTime();
+          });
+          setEmprestimos(sortedData);
         } else {
           throw new Error("Invalid data format");
         }

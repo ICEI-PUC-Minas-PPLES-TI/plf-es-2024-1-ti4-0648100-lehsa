@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Cookie from "js-cookie";
 import Link from "next/link";
+import { translateStatus } from "@/utils/translateStatus";
 
 type Solicitante = {
   id: string;
@@ -29,7 +30,7 @@ type Item = {
 
 type AgendamentoProps = {
   id: string;
-  statusTransacaoItem: String;
+  statusTransacaoItem: string;
   dataHoraInicio: string;
   dataHoraFim: string;
   tecnico: string | null;
@@ -62,8 +63,8 @@ const fetchItem = async (id: string | string[]) => {
 
 const ValidarAgendamento = () => {
   const [agendamento, setAgendamento] = useState<AgendamentoProps | null>(null);
-  
-  const handleAcao = async (status: String) => {
+
+  const handleAcao = async (status: string) => {
     try {
       const token = Cookie.get("token");
       const response = await fetch(
@@ -76,7 +77,7 @@ const ValidarAgendamento = () => {
           },
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to update status");
       }
@@ -107,11 +108,10 @@ const ValidarAgendamento = () => {
       }
 
       console.log(data)
-  };
+    };
 
-  fetchItemData();
+    fetchItemData();
   }, []);
-
 
   return (
     <>
@@ -136,14 +136,14 @@ const ValidarAgendamento = () => {
                     <li className="flex space-x-2">
                       <h2 className="font-bold">Status:</h2>
                       <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            agendamento?.statusTransacaoItem === 'APROVADO' ? "bg-green-100 text-green-800" :
-                            agendamento?.statusTransacaoItem === 'EM_ANALISE' ? "bg-yellow-100 text-yellow-800" :
-                            agendamento?.statusTransacaoItem === 'RECUSADO' ? "bg-red-100 text-red-800" :
-                            'bg-gray-500 text-white'
-                          }`}
-                        >
-                          {agendamento?.statusTransacaoItem}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          agendamento?.statusTransacaoItem === 'APROVADO' ? "bg-green-100 text-green-800" :
+                          agendamento?.statusTransacaoItem === 'EM_ANALISE' ? "bg-yellow-100 text-yellow-800" :
+                          agendamento?.statusTransacaoItem === 'RECUSADO' ? "bg-red-100 text-red-800" :
+                          'bg-gray-500 text-white'
+                        }`}
+                      >
+                        {translateStatus(agendamento?.statusTransacaoItem || '')}
                       </span>
                     </li>
                     <li className="flex space-x-2">
@@ -158,9 +158,9 @@ const ValidarAgendamento = () => {
                       <SelectValue placeholder="Técnico" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="jane">Lucca</SelectItem>
-                      <SelectItem value="michael">Vitor</SelectItem>
-                      <SelectItem value="sarah">Lucas</SelectItem>
+                      <SelectItem value="lucca">Lucca</SelectItem>
+                      <SelectItem value="vitor">Vitor</SelectItem>
+                      <SelectItem value="lucas">Lucas</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button

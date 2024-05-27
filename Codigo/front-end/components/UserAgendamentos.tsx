@@ -4,6 +4,7 @@ import Cookie from "js-cookie";
 import { Agendamento as AgendamentoType } from "@/components/types";
 import Agendamento from "@/components/Agendamento";
 import { jwtDecode } from "jwt-decode";
+import { parse } from "date-fns";
 
 const UserAgendamentos = () => {
   const [agendamentos, setAgendamentos] = useState<AgendamentoType[]>([]);
@@ -39,7 +40,13 @@ const UserAgendamentos = () => {
       })
       .then((data) => {
         if (Array.isArray(data)) {
-          setAgendamentos(data);
+          const sortedData = data.sort((a, b) => {
+            const dateFormat = "dd/MM/yyyy HH:mm:ss";
+            const dateA = parse(a.dataHoraInicio, dateFormat, new Date());
+            const dateB = parse(b.dataHoraInicio, dateFormat, new Date());
+            return dateA.getTime() - dateB.getTime();
+          });
+          setAgendamentos(sortedData);
         } else {
           throw new Error("Invalid data format");
         }
@@ -53,19 +60,23 @@ const UserAgendamentos = () => {
   return (
     <div className="w-full bg-white h-auto rounded-2xl p-5">
       <div className="flex flex-col justify-center items-center">
-        {agendamentos.map((agendamento) => (
-          <Agendamento
-            key={agendamento.id}
-            items={agendamento.itens}
-            tecnico={agendamento.tecnico}
-            professor={agendamento.professor}
-            solicitantes={agendamento.solicitantes}
-            dataHoraFim={agendamento.dataHoraFim}
-            dataHoraInicio={agendamento.dataHoraInicio}
-            observacaoSolicitacao={agendamento.observacaoSolicitacao}
-            statusTransacaoItem={agendamento.statusTransacaoItem}
-          />
-        ))}
+        {error ? (
+          <div className="text-red-500">{error}</div>
+        ) : (
+          agendamentos.map((agendamento) => (
+            <Agendamento
+              key={agendamento.id}
+              items={agendamento.itens}
+              tecnico={agendamento.tecnico}
+              professor={agendamento.professor}
+              solicitantes={agendamento.solicitantes}
+              dataHoraFim={agendamento.dataHoraFim}
+              dataHoraInicio={agendamento.dataHoraInicio}
+              observacaoSolicitacao={agendamento.observacaoSolicitacao}
+              statusTransacaoItem={agendamento.statusTransacaoItem}
+            />
+          ))
+        )}
       </div>
     </div>
   );

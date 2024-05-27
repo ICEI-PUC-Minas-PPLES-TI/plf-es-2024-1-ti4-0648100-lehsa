@@ -3,6 +3,7 @@
 import React from "react";
 import ImageComp from "./ImageComp";
 import { Item, Tecnico, Professor, Solicitante } from "./types";
+import { translateStatus } from "@/utils/translateStatus";
 
 interface AgendamentoProps {
   items: Item[];
@@ -71,7 +72,7 @@ const Agendamento: React.FC<AgendamentoProps> = ({
                 : "bg-gray-500 text-white"
             }`}
           >
-            {statusTransacaoItem}
+            {translateStatus(statusTransacaoItem)}
           </span>
           <h1 className="my-2" />
           <li className="flex space-x-2">
