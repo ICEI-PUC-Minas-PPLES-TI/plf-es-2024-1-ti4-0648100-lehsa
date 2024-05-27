@@ -3,7 +3,6 @@ package com.gerenciadorlehsa.repository;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,6 +16,9 @@ public interface ItemRepository extends JpaRepository<Item, UUID> {
 
     @Query(value = "SELECT i from Item i WHERE i.nome LIKE :nome%")
     List<Item> findByNome(@Param("nome") String nome);
+
+    @Query(value = "SELECT i FROM Item i WHERE i.emprestavel = true")
+    List<Item> findEmprestaveis();
 
   /*  @Modifying
     @Query(value = "DELETE FROM AGENDAMENTO_ITEM_QUANTIDADE WHERE ITEM_ID = :itemId", nativeQuery = true)
