@@ -16,6 +16,7 @@ type Props = {
   nome: string;
   quantidade: number;
   tipo_item: string;
+  emprestavel: boolean;
 };
 
 const ItensDisplay = ({ searchTerm }: ItensCardProps) => {
@@ -55,6 +56,7 @@ const ItensDisplay = ({ searchTerm }: ItensCardProps) => {
             nome={item.nome}
             tipo_item={item.tipo_item}
             quantidade={item.quantidade}
+            emprestavel={item.emprestavel}
           />
         </Link>
       ))}
