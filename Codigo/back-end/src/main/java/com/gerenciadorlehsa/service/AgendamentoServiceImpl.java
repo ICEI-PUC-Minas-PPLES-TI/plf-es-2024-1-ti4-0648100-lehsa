@@ -45,7 +45,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     @Autowired
     public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
                                    AgendamentoRepository agendamentoRepository,
-                                   MensagemEmailService mensagemEmailService,) {
+                                   MensagemEmailService mensagemEmailService) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
