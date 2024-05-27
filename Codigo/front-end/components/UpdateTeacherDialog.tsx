@@ -88,6 +88,9 @@ export const UpdateTeacherDialog: React.FC<UpdateTeacherDialogProps> = ({ childr
     try {
       await updateTeacherData(id, formData);
       showSuccessMessage("Professor atualizado!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Erro ao atualizar o professor:", error);
     }

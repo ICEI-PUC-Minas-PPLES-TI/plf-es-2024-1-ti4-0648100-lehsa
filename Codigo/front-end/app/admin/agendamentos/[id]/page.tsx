@@ -12,6 +12,19 @@ import { Separator } from "@/components/ui/separator";
 import Cookie from "js-cookie";
 import Link from "next/link";
 import { translateStatus } from "@/utils/translateStatus";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { showSuccessMessage } from "@/utils/toast";
 
 type Solicitante = {
   id: string;
@@ -19,6 +32,10 @@ type Solicitante = {
   telefone: string;
   email: string;
   curso: string | null;
+};
+
+type Tecnico = {
+  email: string;
 };
 
 type Item = {
@@ -33,7 +50,7 @@ type AgendamentoProps = {
   statusTransacaoItem: string;
   dataHoraInicio: string;
   dataHoraFim: string;
-  tecnico: string | null;
+  tecnico: Tecnico | null;
   solicitantes: Solicitante[];
   itens: Item[];
   observacaoSolicitacao: string;
@@ -63,6 +80,7 @@ const fetchItem = async (id: string | string[]) => {
 
 const ValidarAgendamento = () => {
   const [agendamento, setAgendamento] = useState<AgendamentoProps | null>(null);
+  const [tecnicoEmail, setTecnicoEmail] = useState<string>("");
 
   const handleAcao = async (status: string) => {
     try {
@@ -75,7 +93,7 @@ const ValidarAgendamento = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -86,17 +104,50 @@ const ValidarAgendamento = () => {
         ...agendamento!,
         statusTransacaoItem: status,
       });
-
     } catch (error) {
       console.error("Error updating status:", error);
+    }
+  };
+
+  const handleAddTecnico = async () => {
+    try {
+      const token = Cookie.get("token");
+      const response = await fetch(
+        `http://localhost:8080/agendamento/${agendamento?.id}/tecnico/${tecnicoEmail}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update tecnico");
+      }
+
+      showSuccessMessage("Técnico adicionado!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
+      const data = await response.json();
+
+      setAgendamento({
+        ...agendamento!,
+        tecnico: data.tecnico,
+      });
+    } catch (error) {
+      console.error("Error updating tecnico:", error);
     }
   };
 
   useEffect(() => {
     const fetchItemData = async () => {
       const router = window.location.pathname;
-      const id = router.split('/')[3];
-      const status = router.split('/')[4];
+      const id = router.split("/")[3];
+      const status = router.split("/")[4];
 
       if (!id) return;
 
@@ -107,7 +158,7 @@ const ValidarAgendamento = () => {
         handleAcao(status);
       }
 
-      console.log(data)
+      console.log(data);
     };
 
     fetchItemData();
@@ -137,14 +188,27 @@ const ValidarAgendamento = () => {
                       <h2 className="font-bold">Status:</h2>
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          agendamento?.statusTransacaoItem === 'APROVADO' ? "bg-green-100 text-green-800" :
-                          agendamento?.statusTransacaoItem === 'EM_ANALISE' ? "bg-yellow-100 text-yellow-800" :
-                          agendamento?.statusTransacaoItem === 'RECUSADO' ? "bg-red-100 text-red-800" :
-                          'bg-gray-500 text-white'
+                          agendamento?.statusTransacaoItem === "APROVADO"
+                            ? "bg-green-100 text-green-800"
+                            : agendamento?.statusTransacaoItem === "EM_ANALISE"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : agendamento?.statusTransacaoItem === "RECUSADO"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-500 text-white"
                         }`}
                       >
-                        {translateStatus(agendamento?.statusTransacaoItem || '')}
+                        {translateStatus(
+                          agendamento?.statusTransacaoItem || "",
+                        )}
                       </span>
+                    </li>
+                    <li className="flex space-x-2">
+                      <h2 className="font-bold">Técnico:</h2>
+                      <p>
+                        {agendamento?.tecnico
+                          ? `${agendamento.tecnico.email}`
+                          : "Nenhum técnico designado"}
+                      </p>
                     </li>
                     <li className="flex space-x-2">
                       <h2 className="font-bold">Observação:</h2>
@@ -153,16 +217,41 @@ const ValidarAgendamento = () => {
                   </ul>
                 </div>
                 <div className="flex items-center space-x-4 mb-14">
-                  <Select>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Técnico" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="lucca">Lucca</SelectItem>
-                      <SelectItem value="vitor">Vitor</SelectItem>
-                      <SelectItem value="lucas">Lucas</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline">Adicionar técnico</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Adicionar técnico</DialogTitle>
+                        <DialogDescription>
+                          Insira o e-mail do técnico abaixo e clique em Salvar
+                          para adicionar.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="name" className="text-right">
+                            E-mail
+                          </Label>
+                          <Input
+                            id="tecnico-email"
+                            placeholder="ex@email.com"
+                            className="col-span-3"
+                            value={tecnicoEmail}
+                            onChange={(e) => setTecnicoEmail(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <DialogClose>
+                          <Button type="submit" onClick={handleAddTecnico}>
+                            Salvar
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                   <Button
                     type="submit"
                     className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline"
@@ -196,7 +285,9 @@ const ValidarAgendamento = () => {
                       </li>
 
                       <li className="flex space-x-2">
-                        <h2 className="font-bold">Quantidade para agendamento:</h2>
+                        <h2 className="font-bold">
+                          Quantidade para agendamento:
+                        </h2>
                         <p>{item.quantidade}</p>
                       </li>
                     </ul>
