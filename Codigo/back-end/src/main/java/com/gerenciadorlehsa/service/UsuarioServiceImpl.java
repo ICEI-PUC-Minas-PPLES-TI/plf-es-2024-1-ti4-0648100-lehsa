@@ -17,6 +17,7 @@ import com.gerenciadorlehsa.repository.UsuarioRepository;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
@@ -39,6 +40,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     private final UsuarioRepository usuarioRepository;
 
     private final PasswordEncoderServiceImpl passwordEncoder;
+
 
     /**
      * Encontra um usuário a partir do seu id

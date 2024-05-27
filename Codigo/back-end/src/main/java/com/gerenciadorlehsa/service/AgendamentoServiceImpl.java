@@ -16,13 +16,13 @@ import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
@@ -38,6 +38,8 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     private final MensagemEmailService mensagemEmailService;
 
+    @Lazy
+    private UsuarioService usuarioService;
 
 
     @Autowired
@@ -48,6 +50,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
     }
+
 
 //----------------CRUD - INÍCIO---------------------------------------
 
@@ -184,9 +187,9 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
 
     @Override
-    public void atualizarTecnico(User tecnico, @NotNull UUID id) {
+    public void atualizarTecnico(String email, @NotNull UUID id) {
         log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
-        //User tecnico = usuarioService.encontrarPorEmail(email);
+        User tecnico = usuarioService.encontrarPorEmail(email);
         Agendamento agendamento = encontrarPorId(id);
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         verificarPerfilTecnico(tecnico);
