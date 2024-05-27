@@ -23,7 +23,7 @@ const UserPage: React.FC = () => {
   return (
     <div className="max-w-7xl m-auto space-y-5">
       <TopMenu title="Dashboard" />
-      <div className="flex flex-col space-x-5">
+      <div className="flex flex-col">
         <UserTabs activeTab={activeTab} setActiveTab={setActiveTab} />
         {activeTab === "Agendamentos" ? (
           <UserAgendamentos />
