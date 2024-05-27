@@ -55,10 +55,10 @@ const Agendamento: React.FC<AgendamentoProps> = ({
             {solicitantes.map((solicitante) => solicitante.email).join(", ")}
           </li> */}
           <li className="flex space-x-2">
-            <strong>Data Hora Início:</strong> {dataHoraInicio}
+            <strong>Data de início:</strong> {dataHoraInicio}
           </li>
           <li className="flex space-x-2">
-            <strong>Data Hora Fim:</strong> {dataHoraFim}
+            <strong>Data do fim:</strong> {dataHoraFim}
           </li>
           <h1 className="my-4" />
           <span

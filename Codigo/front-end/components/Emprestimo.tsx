@@ -32,7 +32,7 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
     const end = parse(dataHoraFim, dateFormat, new Date());
     const now = new Date();
     // const now = new Date(
-    //   "Sat June 25 2024 11:36:22 GMT-0300 (Horário Padrão de Brasília)"
+    //   "Sat May 27 2024 11:36:22 GMT-0300 (Horário Padrão de Brasília)"
     // );
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
@@ -137,10 +137,11 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
           <h2 className="text-xl font-bold mb-2">Detalhes</h2>
           <ul className="text-gray-500 dark:text-gray-400">
             <li className="flex space-x-2">
-              <strong>Data Hora Início:</strong> {dataHoraInicio}
+              <strong>Data de início:</strong> {dataHoraInicio}
             </li>
             <li className="flex space-x-2">
-              <strong>Data Hora Fim:</strong> {dataHoraFim}
+              <strong>Data do fim:</strong>
+              {dataHoraFim}
             </li>
             <h1 className="my-4" />
             <span
