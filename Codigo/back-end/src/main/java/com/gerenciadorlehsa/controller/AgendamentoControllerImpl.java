@@ -45,7 +45,6 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
     private final AgendamentoService agendamentoService;
     private final MapaTransacaoItemService<Agendamento> mapaTransacaoItemService;
-    private final UsuarioService usuarioService;
     TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> agendamentoEntityConverterComp;
 
 
@@ -117,12 +116,12 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
     @Override
-    @PatchMapping("/tecnico/{id}/{email}")
-    public ResponseEntity<Map<String, Object>> atualizarTecnico (@PathVariable UUID id,
-                                                                 @PathVariable String email) {
+    @PatchMapping("/{id}/tecnico/{email}")
+    public ResponseEntity<Map<String, Object>> atualizarTecnico(@PathVariable UUID id,
+                                                                @PathVariable String email) {
         log.info(">>> atualizarTecnico: recebendo requisição para atualizar tecnico do agendamento");
 
-        agendamentoService.atualizarTecnico(usuarioService.encontrarPorEmail (email), id);
+        agendamentoService.atualizarTecnico(email, id);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
     }
