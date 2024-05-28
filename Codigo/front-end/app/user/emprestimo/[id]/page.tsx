@@ -28,8 +28,14 @@ import { Input } from "@/components/ui/input";
 import { jwtDecode } from "jwt-decode";
 import { Label } from "@/components/ui/label";
 import TopMenu from "@/components/topMenu";
-import SingleItemCard from "@/components/SingleItemCard";
 import SimplifiedItem from "@/components/SimplifiedItem";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EmailObject {
   email: string;
@@ -47,26 +53,67 @@ interface ItemSend {
   quantidade_transacao: number;
 }
 
-const Agendar = ({ params }: { params: { id: string } }) => {
-  const router = useRouter();
+const estados = [
+  { nome: "AC", valor: "ACRE" },
+  { nome: "AL", valor: "ALAGOAS" },
+  { nome: "AP", valor: "AMAPA" },
+  { nome: "AM", valor: "AMAZONAS" },
+  { nome: "BA", valor: "BAHIA" },
+  { nome: "CE", valor: "CEARA" },
+  { nome: "DF", valor: "DISTRITO_FEDERAL" },
+  { nome: "ES", valor: "ESPIRITO_SANTO" },
+  { nome: "GO", valor: "GOIAS" },
+  { nome: "MA", valor: "MARANHAO" },
+  { nome: "MT", valor: "MATO_GROSSO" },
+  { nome: "MS", valor: "MATO_GROSSO_DO_SUL" },
+  { nome: "MG", valor: "MINAS_GERAIS" },
+  { nome: "PA", valor: "PARA" },
+  { nome: "PB", valor: "PARAIBA" },
+  { nome: "PR", valor: "PARANA" },
+  { nome: "PE", valor: "PERNAMBUCO" },
+  { nome: "PI", valor: "PIAUI" },
+  { nome: "RJ", valor: "RIO_DE_JANEIRO" },
+  { nome: "RN", valor: "RIO_GRANDE_DO_NORTE" },
+  { nome: "RS", valor: "RIO_GRANDE_DO_SUL" },
+  { nome: "RO", valor: "RONDONIA" },
+  { nome: "RR", valor: "RORAIMA" },
+  { nome: "SC", valor: "SANTA_CATARINA" },
+  { nome: "SP", valor: "SAO_PAULO" },
+  { nome: "SE", valor: "SERGIPE" },
+  { nome: "TO", valor: "TOCANTINS" },
+];
 
-  const [data, setData] = React.useState<Date>();
-  const [timeInicio, setTimeInicio] = useState("");
-  const [timeFim, setTimeFim] = useState("");
-  const [obs, setObs] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [email, setEmail] = useState<string>("");
-  const [solicitantes, setSolicitantes] = useState<string[]>([]);
-  const [emailProfessor, setEmailProfessor] = useState("");
-  const [itensDisplay, setItensDisplay] = useState<ItemDisplay[]>([]);
-  const [allItens, setAllItens] = useState<ItemDisplay[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [open, setOpen] = React.useState(false);
+const formatCEP = (value: string): string => {
+  value = value.replace(/\D/g, "");
+  value = value.replace(/^(\d{5})(\d)/, "$1-$2");
+  return value;
+};
+
+const Emprestimo = ({ params }: { params: { id: string } }) => {
+  const router = useRouter();
   const token = Cookie.get("token");
   let decoded = "";
   if (token) {
     decoded = jwtDecode(token);
   }
+  const [dataInicio, setDataInicio] = React.useState<Date>();
+  const [dataFim, setDataFim] = React.useState<Date>();
+  const [timeInicio, setTimeInicio] = useState("");
+  const [timeFim, setTimeFim] = useState("");
+  const [obs, setObs] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [emailProfessor, setEmailProfessor] = useState("");
+  const [itensDisplay, setItensDisplay] = useState<ItemDisplay[]>([]);
+  const [allItens, setAllItens] = useState<ItemDisplay[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [open, setOpen] = React.useState(false);
+  const [selectedEstado, setSelectedEstado] = useState<string>("");
+  const [cep, setCep] = useState<string>("");
+  const [cidade, setCidade] = useState<string>("");
+  const [bairro, setBairro] = useState<string>("");
+  const [rua, setRua] = useState<string>("");
+  const [numero, setNumero] = useState<number>(0);
+  const [complemento, setComplemento] = useState<string>("");
 
   useEffect(() => {
     getItem();
@@ -119,41 +166,6 @@ const Agendar = ({ params }: { params: { id: string } }) => {
     }
   };
 
-  const filteredItems = allItens.filter((item) =>
-    item.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleNewItem = (
-    id: string,
-    nome: string,
-    qtde: number,
-    tipo_item: string
-  ) => {
-    const newItem: ItemDisplay = {
-      id: id,
-      nome: nome,
-      quantidade: qtde,
-      tipo_item: tipo_item,
-    };
-    setItensDisplay([...itensDisplay, newItem]);
-    setOpen(false);
-  };
-
-  const handleChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handleAddEmail = () => {
-    if (email && !solicitantes.includes(email)) {
-      setSolicitantes([...solicitantes, email]);
-      setEmail("");
-    }
-  };
-
-  const handleRemoveEmail = (mail: string) => {
-    setSolicitantes((prevEmails) => prevEmails.filter((item) => item !== mail));
-  };
-
   const handleChangeInicio = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     let cleanValue = value.replace(/[^0-9]/g, "");
@@ -174,6 +186,26 @@ const Agendar = ({ params }: { params: { id: string } }) => {
     setTimeFim(cleanValue);
   };
 
+  const filteredItems = allItens.filter((item) =>
+    item.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleNewItem = (
+    id: string,
+    nome: string,
+    qtde: number,
+    tipo_item: string
+  ) => {
+    const newItem: ItemDisplay = {
+      id: id,
+      nome: nome,
+      quantidade: qtde,
+      tipo_item: tipo_item,
+    };
+    setItensDisplay([...itensDisplay, newItem]);
+    setOpen(false);
+  };
+
   const handleQuantityChange = (id: string, newQuantity: number) => {
     if (isNaN(newQuantity) || newQuantity < 0) return;
     setItensDisplay((prevItemList) =>
@@ -189,6 +221,15 @@ const Agendar = ({ params }: { params: { id: string } }) => {
     );
   };
 
+  const handleChangeCep = (e: ChangeEvent<HTMLInputElement>) => {
+    const formattedCEP = formatCEP(e.target.value);
+    setCep(formattedCEP);
+  };
+
+  const handleChangeEstado = (value: string) => {
+    setSelectedEstado(value);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -198,16 +239,12 @@ const Agendar = ({ params }: { params: { id: string } }) => {
       quantidade_transacao: item.quantidade,
     }));
     const userMailObj: EmailObject = { email: `${decoded.sub}` };
-    const emailObjects: EmailObject[] = solicitantes.map((email) => ({
-      email,
-    }));
-    emailObjects.push(userMailObj);
-    const dateFormat = format(data ? data : "", "dd/MM/yyyy");
-    const dataHoraInicio = `${dateFormat} ${timeInicio}:00`;
-    const dataHoraFim = `${dateFormat} ${timeFim}:00`;
-    const observacaoSolicitacao = obs;
+    const dateInicioFormat = format(dataInicio ? dataInicio : "", "dd/MM/yyyy");
+    const dateFimFormat = format(dataFim ? dataFim : "", "dd/MM/yyyy");
+    const dataHoraInicio = `${dateInicioFormat} ${timeInicio}:00`;
+    const dataHoraFim = `${dateFimFormat} ${timeFim}:00`;
     try {
-      const response = await fetch("http://localhost:8080/agendamento", {
+      const response = await fetch("http://localhost:8080/emprestimo", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -217,9 +254,18 @@ const Agendar = ({ params }: { params: { id: string } }) => {
           dataHoraInicio,
           dataHoraFim,
           itens: simplifiedList,
-          solicitantes: emailObjects,
-          observacaoSolicitacao,
+          solicitante: userMailObj,
+          observacaoSolicitacao: obs,
           professor: professor,
+          endereco: {
+            cep,
+            uf: selectedEstado,
+            cidade,
+            bairro,
+            rua,
+            numero,
+            complemento,
+          },
         }),
       });
       if (!response.ok) {
@@ -245,39 +291,41 @@ const Agendar = ({ params }: { params: { id: string } }) => {
           className="bg-white p-8 rounded-md w-[600px] m-auto"
         >
           <div className="space-y-4">
-            <Popover>
-              <PopoverTrigger asChild>
-                <div className="flex flex-col">
-                  <Label htmlFor="calendario" className="mb-1">Data desejada</Label>
-                  <Button
-                    name="calendario"
-                    variant={"outline"}
-                    className={cn(
-                      "w-[280px] justify-start text-left font-normal",
-                      !data && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {data ? (
-                      format(data, "dd/MM/yyyy")
-                    ) : (
-                      <span>Selecione a data</span>
-                    )}
-                  </Button>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={data}
-                  onSelect={setData}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            <div className="flex space-x-4">
-              <div>
-                <Label htmlFor="horaInicio">Horário de Início</Label>
+            <div className="flex space-x-4 items-center">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="flex flex-col">
+                    <Label htmlFor="calendario" className="mb-1">
+                      Data de retirada
+                    </Label>
+                    <Button
+                      name="calendario"
+                      variant={"outline"}
+                      className={cn(
+                        "w-[210px] justify-start text-left font-normal rounded-xl",
+                        !dataInicio && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dataInicio ? (
+                        format(dataInicio, "dd/MM/yyyy")
+                      ) : (
+                        <span>Selecione a data</span>
+                      )}
+                    </Button>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={dataInicio}
+                    onSelect={setDataInicio}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <div className="flex flex-col items-start">
+                <Label htmlFor="horaInicio" className="mb-1">Horário de retirada</Label>
                 <Input
                   placeholder="00:00"
                   value={timeInicio}
@@ -285,8 +333,42 @@ const Agendar = ({ params }: { params: { id: string } }) => {
                   name="horaInicio"
                 />
               </div>
-              <div>
-                <Label htmlFor="horaFim">Horário de Término</Label>
+            </div>
+            <div className="flex space-x-4">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="flex flex-col">
+                    <Label htmlFor="calendario" className="mb-1">
+                      Data de entrega
+                    </Label>
+                    <Button
+                      name="calendario"
+                      variant={"outline"}
+                      className={cn(
+                        "w-[210px] justify-start text-left font-normal rounded-xl",
+                        !dataInicio && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dataFim ? (
+                        format(dataFim, "dd/MM/yyyy")
+                      ) : (
+                        <span>Selecione a data</span>
+                      )}
+                    </Button>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={dataFim}
+                    onSelect={setDataFim}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <div className="flex flex-col items-start">
+                <Label htmlFor="horaFim" className="mb-1">Horário de entrega</Label>
                 <Input
                   placeholder="00:00"
                   value={timeFim}
@@ -304,34 +386,6 @@ const Agendar = ({ params }: { params: { id: string } }) => {
                 onChange={(e) => setEmailProfessor(e.target.value)}
                 type="email"
               />
-            </div>
-            <div>
-              <div className="flex flex-col mb-3">
-                <Label htmlFor="emails" className="mb-1">
-                  Outros participantes:
-                </Label>
-                <div className="flex items-center gap-3">
-                  <Input
-                    placeholder="Digite um email..."
-                    value={email}
-                    onChange={handleChangeEmail}
-                    type="email"
-                  />
-                  <Plus
-                    onClick={handleAddEmail}
-                    className="hover:cursor-pointer"
-                  />
-                </div>
-              </div>
-              {solicitantes.map((mail) => (
-                <div className="flex space-x-2 items-center">
-                  <span className="text-[14px]">{mail}</span>
-                  <X
-                    className="cursor-pointer w-5"
-                    onClick={() => handleRemoveEmail(mail)}
-                  />
-                </div>
-              ))}
             </div>
             <div>
               <div className="space-x-4">
@@ -405,6 +459,86 @@ const Agendar = ({ params }: { params: { id: string } }) => {
                 name="observacoes"
               />
             </div>
+            <div className="flex flex-wrap gap-2">
+              <div>
+                <Label htmlFor="cep">CEP</Label>
+                <Input
+                  name="cep"
+                  value={cep}
+                  placeholder="00000-000"
+                  onChange={handleChangeCep}
+                  maxLength={9}
+                  className="w-28"
+                />
+              </div>
+              <div>
+                <Label htmlFor="uf">Estado</Label>
+                <Select onValueChange={handleChangeEstado}>
+                  <SelectTrigger className="w-[100px] rounded-xl">
+                    <SelectValue placeholder="UF" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {estados.map((estado) => (
+                      <SelectItem value={estado.valor}>
+                        {estado.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="cidade">Cidade</Label>
+                <Input
+                  name="cidade"
+                  placeholder="Nome cidade"
+                  value={cidade}
+                  onChange={(e) => setCidade(e.target.value)}
+                  className="w-80"
+                />
+              </div>
+              <div>
+                <Label htmlFor="bairro">Bairro</Label>
+                <Input
+                  name="bairro"
+                  placeholder="Nome bairro"
+                  value={bairro}
+                  onChange={(e) => setBairro(e.target.value)}
+                
+                />
+              </div>
+              <div>
+                <Label htmlFor="rua">Rua</Label>
+                <Input
+                  name="rua"
+                  placeholder="Nome rua"
+                  value={rua}
+                  onChange={(e) => setRua(e.target.value)}
+                  className="w-96"
+                />
+              </div>
+              <div>
+                <Label htmlFor="numero">Numero</Label>
+                <Input
+                  name="numero"
+                  type="number"
+                  placeholder="000"
+                  value={numero}
+                  onChange={(e) => setNumero(parseInt(e.target.value, 10))}
+                  className="w-20"
+                />
+              </div>
+              <div>
+                <Label htmlFor="complemento">Complemento</Label>
+                <Input
+                  name="complemento"
+                  placeholder="Complemento"
+                  value={complemento}
+                  onChange={(e) => setComplemento(e.target.value)}
+                  className="w-52"
+                />
+              </div>
+            </div>
+
             <Button type="submit">Confirmar agendamento</Button>
 
             {errorMessage && (
@@ -419,4 +553,4 @@ const Agendar = ({ params }: { params: { id: string } }) => {
   );
 };
 
-export default Agendar;
+export default Emprestimo;
