@@ -283,7 +283,7 @@ const Emprestimo = ({ params }: { params: { id: string } }) => {
         <Link href="/user">
           <ArrowLeftToLine className="bg-white p-1 size-8 text-primary rounded-full" />
         </Link>
-        <TopMenu title="Solicitar agendamento" />
+        <TopMenu title="Solicitar empréstimo" />
       </div>
       <div className="pt-12">
         <form
@@ -389,7 +389,7 @@ const Emprestimo = ({ params }: { params: { id: string } }) => {
             </div>
             <div>
               <div className="space-x-4">
-                <Label htmlFor="itens">Itens no agendamento</Label>
+                <Label htmlFor="itens">Itens no empréstimo</Label>
                 <Dialog open={open} onOpenChange={setOpen}>
                   <DialogTrigger className="text-sm p-0 text-primary">
                     Adicionar outros
@@ -539,7 +539,7 @@ const Emprestimo = ({ params }: { params: { id: string } }) => {
               </div>
             </div>
 
-            <Button type="submit">Confirmar agendamento</Button>
+            <Button type="submit">Confirmar empréstimo</Button>
 
             {errorMessage && (
               <p className="font-semibold text-red-600 mt-3 text-center">
