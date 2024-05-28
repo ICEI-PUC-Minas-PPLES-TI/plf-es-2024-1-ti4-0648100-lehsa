@@ -24,5 +24,7 @@ public interface UsuarioService{
 
     List<Emprestimo> listarEmprestimoUsuario(@NotNull UUID id);
 
+    void removerUsuarioDaListaDeAgendamentos(User user);
+
     List<String> listarEmailUsuarios();
 }

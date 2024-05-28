@@ -2,8 +2,8 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Emprestimo;
+import com.gerenciadorlehsa.events.AgendamentoUsuarioEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
-import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import jakarta.transaction.Transactional;
@@ -17,8 +17,7 @@ import com.gerenciadorlehsa.repository.UsuarioRepository;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.USUARIO_SERVICE;
@@ -35,7 +34,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
-    private final AgendamentoService agendamentoService;
+    private ApplicationEventPublisher eventPublisher;
 
     private final UsuarioRepository usuarioRepository;
 
@@ -178,6 +177,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         usuarioRepository.save (usuarioAtulizado);
     }
 
+    @Override
     public void removerUsuarioDaListaDeAgendamentos(User user) {
         List<Agendamento> agendamentos = user.getAgendamentosRealizados();
 
@@ -188,7 +188,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
                 agendamento.getSolicitantes().remove(user);
 
                 if (agendamento.getSolicitantes().isEmpty()) {
-                    agendamentoService.deletarAgendamentoSeVazio (agendamento.getId ());
+                    eventPublisher.publishEvent(new AgendamentoUsuarioEvent (this, user));
                 }
             }
         }

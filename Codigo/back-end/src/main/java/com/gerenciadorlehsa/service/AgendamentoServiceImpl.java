@@ -5,6 +5,7 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.events.UsuarioEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
@@ -16,6 +17,7 @@ import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
@@ -38,17 +40,18 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     private final MensagemEmailService mensagemEmailService;
 
-    @Lazy
-    private UsuarioService usuarioService;
+    private ApplicationEventPublisher eventPublisher;
 
 
     @Autowired
     public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
                                    AgendamentoRepository agendamentoRepository,
-                                   MensagemEmailService mensagemEmailService) {
+                                   MensagemEmailService mensagemEmailService,
+                                   ApplicationEventPublisher eventPublisher) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
+        this.eventPublisher = eventPublisher;
     }
 
 
@@ -189,12 +192,18 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     @Override
     public void atualizarTecnico(String email, @NotNull UUID id) {
         log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
-        User tecnico = usuarioService.encontrarPorEmail(email);
+        User tecnico = obterTecnico (email);
         Agendamento agendamento = encontrarPorId(id);
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         verificarPerfilTecnico(tecnico);
         agendamento.setTecnico(tecnico);
         this.agendamentoRepository.save(agendamento);
+    }
+
+    public User obterTecnico(String email) {
+        UsuarioEvent event = new UsuarioEvent(this, email, UsuarioEvent.EventType.ENCONTRAR_POR_EMAIL);
+        eventPublisher.publishEvent(event);
+        return event.getUser();
     }
 
     @Override
