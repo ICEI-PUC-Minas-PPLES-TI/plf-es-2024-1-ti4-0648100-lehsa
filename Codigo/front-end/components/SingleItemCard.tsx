@@ -18,13 +18,13 @@ interface Props {
 const SingleItemCard = ({ id, nome, tipo_item, quantidade, emprestavel }: Props) => {
   return (
     <div>
-      <Card className="rounded-lg overflow-hidden shadow-lg mx-auto my-6 hover:shadow-xl transition-all duration-200 w-80">
+      <Card className="rounded-lg overflow-hidden shadow-lg mx-auto my-6 hover:shadow-xl transition-all duration-200 w-70">
         <ImageComp
           src={`http://localhost:8080/item/img/${id}`}
           alt="item picture"
           width={400}
           height={60}
-          className="object-fit w-400 h-60"
+          className="object-contain w-400 h-60"
         />
         <CardHeader>
           <CardTitle>{nome}</CardTitle>
