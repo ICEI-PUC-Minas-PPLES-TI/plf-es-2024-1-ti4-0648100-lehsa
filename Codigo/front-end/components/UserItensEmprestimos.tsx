@@ -57,7 +57,7 @@ const UserItensEmprestimo = () => {
           {/* <FilterSelect /> */}
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredItems.map((item: Props) => (
           <Link href={`/user/emprestimo/${item.id}`} key={item.id}>
             <SingleItemCard
