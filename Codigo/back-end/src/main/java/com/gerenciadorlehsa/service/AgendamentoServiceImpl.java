@@ -200,6 +200,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         this.agendamentoRepository.save(agendamento);
     }
 
+    @Override
     public User obterTecnico(String email) {
         UsuarioEvent event = new UsuarioEvent(this, email, UsuarioEvent.EventType.ENCONTRAR_POR_EMAIL);
         eventPublisher.publishEvent(event);

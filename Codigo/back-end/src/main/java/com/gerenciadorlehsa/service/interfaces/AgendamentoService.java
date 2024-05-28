@@ -12,6 +12,8 @@ public interface AgendamentoService {
 
     void atualizarTecnico (String email, @NotNull UUID id);
 
+    User obterTecnico(String email);
+
     void deletarAgendamentoSeVazio(UUID id);
 
     List<Object[]> listarDatasOcupadas();
