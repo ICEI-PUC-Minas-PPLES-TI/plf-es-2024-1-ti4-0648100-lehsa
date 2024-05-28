@@ -5,7 +5,7 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
-import com.gerenciadorlehsa.events.UsuarioEvent;
+import com.gerenciadorlehsa.events.ObterTecnicoPorEmailEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
@@ -200,7 +200,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     @Override
     public User obterTecnico(String email) {
-        UsuarioEvent event = new UsuarioEvent(this, email, UsuarioEvent.EventType.ENCONTRAR_POR_EMAIL);
+        ObterTecnicoPorEmailEvent event = new ObterTecnicoPorEmailEvent (this, email);
         eventPublisher.publishEvent(event);
         return event.getUser();
     }
