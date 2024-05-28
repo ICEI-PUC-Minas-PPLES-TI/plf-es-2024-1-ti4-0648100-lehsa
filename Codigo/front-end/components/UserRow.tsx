@@ -45,6 +45,8 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
       return "ADM";
     } else if (perfil_usuario === 2) {
       return "Usuário";
+    } else if (perfil_usuario === 3) {
+      return "Técnico";
     } else {
       return "Erro";
     }
