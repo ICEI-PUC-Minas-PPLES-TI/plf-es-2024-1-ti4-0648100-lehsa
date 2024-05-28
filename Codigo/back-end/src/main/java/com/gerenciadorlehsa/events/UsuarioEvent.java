@@ -15,6 +15,8 @@ public class UsuarioEvent extends ApplicationEvent {
 
     public enum EventType {
         ENCONTRAR_POR_EMAIL,
+
+        USUARIO_REMOVIDO,
     }
 
 
@@ -23,6 +25,15 @@ public class UsuarioEvent extends ApplicationEvent {
         this.email = email;
         this.eventType = eventType;
     }
+
+
+    public UsuarioEvent(Object source, User user, EventType eventType) {
+        super(source);
+        this.user = user;
+        this.eventType = eventType;
+    }
+
+
 
 
 

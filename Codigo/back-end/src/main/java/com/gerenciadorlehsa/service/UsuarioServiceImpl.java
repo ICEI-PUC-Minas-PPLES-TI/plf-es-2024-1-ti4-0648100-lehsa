@@ -2,7 +2,7 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Emprestimo;
-import com.gerenciadorlehsa.events.AgendamentoUsuarioEvent;
+import com.gerenciadorlehsa.events.UsuarioEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.security.UsuarioDetails;
@@ -188,7 +188,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
                 agendamento.getSolicitantes().remove(user);
 
                 if (agendamento.getSolicitantes().isEmpty()) {
-                    eventPublisher.publishEvent(new AgendamentoUsuarioEvent (this, user));
+                    eventPublisher.publishEvent(new UsuarioEvent (this, user, UsuarioEvent.EventType.USUARIO_REMOVIDO));
                 }
             }
         }

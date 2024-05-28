@@ -11,14 +11,12 @@ import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
@@ -40,7 +38,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     private final MensagemEmailService mensagemEmailService;
 
-    private ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Autowired
@@ -394,14 +392,6 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         }
     }
 
-    @Override
-    public void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
-        atributosIguais.add("tecnico");
-        atributosIguais.add("statusTransacaoItem");
-        atributosIguais.add("id");
-        String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
-        copyProperties(source, target, propriedadesIgnoradas);
-    }
 
     @Override
     public void verificarCondicoesDeConfirmacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
@@ -474,6 +464,14 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
             throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
                     "aprovada, confirmada ou em análise");
 
+    }
+
+    public void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
+        atributosIguais.add("tecnico");
+        atributosIguais.add("statusTransacaoItem");
+        atributosIguais.add("id");
+        String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
+        copyProperties(source, target, propriedadesIgnoradas);
     }
 
 }

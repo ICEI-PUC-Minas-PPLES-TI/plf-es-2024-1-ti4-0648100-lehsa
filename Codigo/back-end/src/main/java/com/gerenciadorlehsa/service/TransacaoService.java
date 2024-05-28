@@ -12,6 +12,7 @@ import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoSer
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -24,15 +25,12 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_SERVICE;
 
 @Slf4j(topic = TRANSACAO_SERVICE)
 @Service
+@AllArgsConstructor
 @Schema(description = "Superclasse abstrata que contém métodos e atributos em comum para qualquer tipo que é subtipo " +
         "de TransacaoItem")
 public abstract class TransacaoService<T extends Transacao> {
 
     protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
-
-    public TransacaoService (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
-        this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
-    }
 
     public abstract int calcularQuantidadeTransacao(Item item, List<T> transacao);
 
@@ -55,8 +53,6 @@ public abstract class TransacaoService<T extends Transacao> {
 
     public abstract void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(T transacao, StatusTransacaoItem status);
 
-
-    public abstract void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais);
 
     public abstract void verificarCondicoesDeConfirmacao(T transacao, StatusTransacaoItem statusTransacaoItem);
 
