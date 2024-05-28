@@ -59,7 +59,7 @@ public abstract class TransacaoService<T extends Transacao> {
 
     public abstract void verificarCondicoesDeAprovacao(T agendamento, StatusTransacaoItem statusUpperCase);
 
-    protected boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
+    public boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
         log.info(">>> Verificando datas conflitantes: barrando transacao solicitado em uma mesma data");
 
         if (transacaoExistente.getId() == novaTransacao.getId())
