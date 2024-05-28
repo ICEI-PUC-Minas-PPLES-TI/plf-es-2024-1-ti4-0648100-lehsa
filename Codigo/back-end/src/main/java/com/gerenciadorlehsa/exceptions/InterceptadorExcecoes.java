@@ -116,6 +116,25 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TransacaoException.class)
+    public ResponseEntity<Object> capturarTransacaoException(@NotNull TransacaoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] TransacaoException: falha em transação: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ItemException.class)
+    public ResponseEntity<Object> capturarTransacaoException(@NotNull ItemException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ItemException: falha no item: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
+
+
     /**
      * Captura exceções do tipo DataIntegrityViolationException
      *
@@ -138,12 +157,12 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
      * @param request requisição
      * @return tratamento da exceção (log e resposta da requisição)
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AtualizarStatusException.class)
     public ResponseEntity<Object> capturarAtualizarStatusException(@NotNull AtualizarStatusException e, WebRequest request) {
         String msgErro = e.getMessage();
         log.error(format("[ERRO] AtualizarStatusException: falha ao atualizar status do usuário: %s", msgErro));
-        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -154,33 +173,71 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(MensagemEmailException.class)
+    public ResponseEntity<Object> capturarMensagemEmailException(@NotNull MensagemEmailException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] MensagemEmailExeption: falha no envio de e-mail: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
 
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(DataConflitanteAgendamentoException.class)
-    public ResponseEntity<Object> capturarDataConflitanteAgendamentoException(@NotNull DataConflitanteAgendamentoException e, WebRequest request) {
+    @ExceptionHandler(ProfessorConfirmaCadastroException.class)
+    public ResponseEntity<Object> capturarProfessorConfirmaCadastroException(@NotNull ProfessorConfirmaCadastroException e,WebRequest request) {
         String msgErro = e.getMessage();
-        log.error(format("[ERRO] DataConflitanteAgendamenteException: conflito de data: %s", msgErro));
+        log.error(format("[ERRO] ProfessorConfirmaCadastroException: falha na confirmação de e-mail do professor: %s",
+                msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(SolicitantesAgendamentoException.class)
-    public ResponseEntity<Object> capturarSolicitantesAgendamentoException(@NotNull SolicitantesAgendamentoException e, WebRequest request) {
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProfessorException.class)
+    public ResponseEntity<Object> capturarProfessorException(@NotNull ProfessorException e,WebRequest request) {
         String msgErro = e.getMessage();
-        log.error(format("[ERRO] SolicitantesAgendamentoException: erro ao atribuir solicitantes para o agendamento: " +
-                "%s", msgErro));
-        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+        log.error(format("[ERRO] ProfessorException: recurso do professor não encontrado: %s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.NOT_FOUND, request);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(TempoExpiradoException.class)
+    public ResponseEntity<Object> capturarTempoExpiradoException(@NotNull TempoExpiradoException e,WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] TempoExpiradoException: Tempo esgotado: %s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ConflitoDataException.class)
+    public ResponseEntity<Object> capturarConflitoDataException(@NotNull ConflitoDataException e,WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ConflitoDataException: Data conflitante: %s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ItensAgendamentoException.class)
-    public ResponseEntity<Object> capturarItensAgendamentoException(@NotNull ItensAgendamentoException e, WebRequest request) {
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(AtualizarAgendamentoException.class)
+    public ResponseEntity<Object> capturarAtualiazarAgendamentoException(@NotNull AtualizarAgendamentoException e, WebRequest request) {
         String msgErro = e.getMessage();
-        log.error(format("[ERRO] ItemAgendamentoException: erro ao escolher item: " +
-                "%s", msgErro));
-        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+        log.error(format("[ERRO] AtualizarAgendamentoException: Falha ao atualizar o agendamento: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.UNPROCESSABLE_ENTITY, request);
+    }
+
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ProfessorConfirmaAgendamentoException.class)
+    public ResponseEntity<Object> capturarProfessorConfirmaAgendamentoException(@NotNull ProfessorConfirmaAgendamentoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] ProfessorConfirmaAgendamentoException: falha na confirmação de agendamento por " +
+                        "parte do professor: " +
+                        "%s",
+                msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.CONFLICT, request);
     }
 
 
@@ -279,6 +336,15 @@ public class InterceptadorExcecoes extends DefaultHandlerExceptionResolver imple
         log.error(format("[ERRO] %s: %s", e.getClass().getSimpleName(),msgErro));
         return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EmprestimoException.class)
+    public ResponseEntity<Object> capturarEmprestimoException(@NotNull EmprestimoException e, WebRequest request) {
+        String msgErro = e.getMessage();
+        log.error(format("[ERRO] EmprestimoException: erro no empréstimo: %s", msgErro));
+        return construirMsgErro(e, msgErro, HttpStatus.BAD_REQUEST, request);
+    }
+
 
     /**
      * Constrói mensagem de erro (4 parâmetros)

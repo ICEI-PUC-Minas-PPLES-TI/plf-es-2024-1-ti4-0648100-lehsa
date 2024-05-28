@@ -29,9 +29,22 @@ const Agendamentos = () => {
   }, []);
 
   return (
-    <div>
+    <div className="flex flex-col items-center p-4">
       {agendamentos.map((agendamento) => (
-        <Link href={`/admin/agendamentos/${agendamento.id}`}><Agendamento key={agendamento.id} items={agendamento.itens} tecnico={agendamento.tecnico} dataHoraFim={agendamento.dataHoraFim} dataHoraInicio={agendamento.dataHoraInicio} /></Link>
+        <Link key={agendamento.id} href={`/admin/agendamentos/${agendamento.id}`}>
+          <div className="block mb-4 cursor-pointer">
+            <Agendamento
+              items={agendamento.itens}
+              tecnico={agendamento.tecnico}
+              professor={agendamento.professor}
+              solicitantes={agendamento.solicitantes}
+              dataHoraFim={agendamento.dataHoraFim}
+              dataHoraInicio={agendamento.dataHoraInicio}
+              observacaoSolicitacao={agendamento.observacaoSolicitacao}
+              statusTransacaoItem={agendamento.statusTransacaoItem}
+            />
+          </div>
+        </Link>
       ))}
     </div>
   );

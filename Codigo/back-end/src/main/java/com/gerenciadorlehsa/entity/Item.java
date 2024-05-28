@@ -8,7 +8,10 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -21,7 +24,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class Item {
 
-    public static final String NOME_TABELA = "item";
+    public static final String NOME_TABELA = "TB_ITEM";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -51,9 +54,5 @@ public class Item {
 
     @Column(name = "caminho_img", nullable = false)
     private String nomeImg;
-
-    @ManyToMany(mappedBy = "itens")
-    private List<Agendamento> agendamentos;
-
 
 }

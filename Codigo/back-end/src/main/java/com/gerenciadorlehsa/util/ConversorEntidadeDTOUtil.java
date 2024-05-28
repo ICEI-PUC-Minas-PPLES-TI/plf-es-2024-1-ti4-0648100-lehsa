@@ -1,12 +1,11 @@
 package com.gerenciadorlehsa.util;
 
 import com.gerenciadorlehsa.dto.*;
-import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.entity.*;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import com.gerenciadorlehsa.entity.User;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +40,24 @@ public class ConversorEntidadeDTOUtil {
     }
 
 
+    public static ProfessorDTO converterParaDTO(@NotNull Professor professor) {
+        log.info(format(">>> converterParaDTO: convertendo Professor (id: %s) para DTO", professor.getId()));
+        return ProfessorDTO.builder()
+                .campus (professor.getCampus ())
+                .areaAtuacao (professor.getAreaAtuacao ())
+                .confirmaCadastro (professor.getConfirmaCadastro () ? "Cadastro confirmado" : "Cadastro sem " +
+                        "confirmação")
+                .lotacao (professor.getLotacao ())
+                .matricula (professor.getMatricula ())
+                .nome (professor.getNome ())
+                .id (professor.getId ())
+                .laboratorio (professor.getLaboratorio ())
+                .email (professor.getEmail ())
+                .dataHoraCadastro (converterDataHora (professor.getDataHoraCriacao ()))
+                .build();
+    }
+
+
     /**
      * Converter uma entidade Item para ItemDTO
      * @param item
@@ -69,10 +86,14 @@ public class ConversorEntidadeDTOUtil {
                         .collect(Collectors.toList()) :
                 null;
 
-
-        List<ItemDTORes> itensDTO = agendamento.getItens() != null ?
-                agendamento.getItens().stream()
-                        .map(ConversorEntidadeDTOUtil::converterItemParaDTORes)
+        List<ItemDTORes> itensDTO = agendamento.getItensQuantidade() != null ?
+                agendamento.getItensQuantidade().entrySet().stream()
+                        .map(entry -> {
+                            Item item = entry.getKey();
+                            Integer quantidade = entry.getValue();
+                            ItemDTORes itemDTO = ConversorEntidadeDTOUtil.converterItemParaDTORes(item, quantidade);
+                            return itemDTO;
+                        })
                         .collect(Collectors.toList()) :
                 null;
 
@@ -93,7 +114,51 @@ public class ConversorEntidadeDTOUtil {
                 .build();
     }
 
+    public static EmprestimoDTORes converterParaDtoRes(@NotNull Emprestimo emprestimo) {
+        log.info(format(">>> converterParaDTORes: convertendo Emprestimo (id: %s) para DTORes", emprestimo.getId()));
 
+        UsuarioShortDTORes solicitanteDTO = emprestimo.getSolicitante() != null ?
+                converterUsuarioParaShortDTORes(emprestimo.getSolicitante()) :
+                null;
+
+        List<ItemDTORes> itensDTO = emprestimo.getItensQuantidade() != null ?
+                emprestimo.getItensQuantidade().entrySet().stream()
+                        .map(entry -> {
+                            Item item = entry.getKey();
+                            Integer quantidade = entry.getValue();
+                            return ConversorEntidadeDTOUtil.converterItemParaDTORes(item, quantidade);
+                        })
+                        .collect(Collectors.toList()) :
+                null;
+
+        EnderecoDTORes enderecoDTORes = emprestimo.getLocalUso() != null ?
+                converterEnderecoParaEnderecoDTORes(emprestimo.getLocalUso()) :
+                null;
+
+        return EmprestimoDTORes.builder()
+                .id(emprestimo.getId())
+                .dataHoraInicio(converterDataHora(emprestimo.getDataHoraInicio()))
+                .dataHoraFim(converterDataHora(emprestimo.getDataHoraFim()))
+                .observacaoSolicitacao(emprestimo.getObservacaoSolicitacao())
+                .statusTransacaoItem(emprestimo.getStatusTransacaoItem())
+                .solicitante(solicitanteDTO)
+                .itens(itensDTO)
+                .endereco(enderecoDTORes)
+                .build();
+    }
+
+    private EnderecoDTORes converterEnderecoParaEnderecoDTORes (@NotNull Endereco endereco) {
+        return EnderecoDTORes.builder()
+                .id (endereco.getId())
+                .cep (endereco.getCep())
+                .uf (endereco.getUf())
+                .cidade (endereco.getCidade())
+                .bairro (endereco.getBairro())
+                .rua (endereco.getRua())
+                .numero (endereco.getNumero())
+                .complemento (endereco.getComplemento())
+                .build();
+    }
     public static UsuarioShortDTORes converterUsuarioParaShortDTORes (@NotNull User usuario){
         return UsuarioShortDTORes.builder ()
                 .nome (usuario.getNome ())
@@ -103,11 +168,12 @@ public class ConversorEntidadeDTOUtil {
                 .build ();
     }
 
-    public static ItemDTORes converterItemParaDTORes (@NotNull Item item) {
+    public static ItemDTORes converterItemParaDTORes (@NotNull Item item, Integer qtd) {
         return ItemDTORes.builder ()
                 .id (item.getId ())
                 .nome (item.getNome ())
                 .tipoItem (item.getTipoItem () != null ? String.valueOf (item.getTipoItem ()) : null)
+                .quantidade (qtd)
                 .build ();
     }
 

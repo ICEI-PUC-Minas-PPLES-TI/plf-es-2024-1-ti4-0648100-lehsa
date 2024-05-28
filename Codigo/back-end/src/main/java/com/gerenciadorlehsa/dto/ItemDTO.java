@@ -11,6 +11,7 @@ import java.util.UUID;
 public record ItemDTO (
     UUID id,
     @JsonProperty("tipo_item")String tipoItem,
+    @JsonProperty("quantidade_transacao")Integer quantidadeTransacao,
     Integer quantidade,
     @JsonProperty("valor_unitario")Float valorUnitario,
     String nome,

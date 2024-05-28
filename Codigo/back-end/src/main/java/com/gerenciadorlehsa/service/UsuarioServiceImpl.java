@@ -1,20 +1,23 @@
 package com.gerenciadorlehsa.service;
 
+import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
+import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
+import com.gerenciadorlehsa.exceptions.lancaveis.*;
+import com.gerenciadorlehsa.security.UsuarioDetails;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.dto.SenhaDTO;
 import com.gerenciadorlehsa.entity.enums.PerfilUsuario;
-import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarSenhaException;
-import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
-import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.repository.UsuarioRepository;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.USUARIO_SERVICE;
@@ -31,9 +34,11 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
+    private final AgendamentoService agendamentoService;
+
     private final UsuarioRepository usuarioRepository;
 
-    private final PasswordEncoderImpl passwordEncoder;
+    private final PasswordEncoderServiceImpl passwordEncoder;
 
     /**
      * Encontra um usuário a partir do seu id
@@ -69,6 +74,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         return usuario;
     }
 
+
     /**
      * Atualiza um usuário previamente cadastrado
      *
@@ -95,9 +101,11 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
      * @param id id do usuário
      */
     @Override
+    @Transactional
     public void deletar(@NotNull UUID id) {
         log.info(">>> deletar: deletando usuário");
-        encontrarPorId(id);
+        User user = encontrarPorId(id);
+        removerUsuarioDaListaDeAgendamentos (user);
         try {
             this.usuarioRepository.deleteById(id);
             log.info(format(">>> deletar: usuário deletado, id: %s", id));
@@ -105,6 +113,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
             throw new DeletarEntidadeException(format("existem entidades relacionadas: %s", e));
         }
     }
+
 
     /**
      * Encontra um usuário a partir do seu email
@@ -155,6 +164,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     }
 
 
+    @Override
     public void atualizarPerfil(@NotNull UUID id, Integer code) {
         log.info(">>> atualizarStatus: atualizando status");
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
@@ -165,6 +175,47 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         usuarioAtulizado.setPerfilUsuario (code);
         usuarioRepository.save (usuarioAtulizado);
     }
-    
 
+    public void removerUsuarioDaListaDeAgendamentos(User user) {
+        List<Agendamento> agendamentos = user.getAgendamentosRealizados();
+
+        if(agendamentos != null && !agendamentos.isEmpty ()) {
+
+            for (Agendamento agendamento : agendamentos) {
+
+                agendamento.getSolicitantes().remove(user);
+
+                if (agendamento.getSolicitantes().isEmpty()) {
+                    agendamentoService.deletarAgendamentoSeVazio (agendamento.getId ());
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<String> listarEmailUsuarios () {
+        log.info(">>> listarEmailUsuarios: listando email de usuarios");
+        return this.usuarioRepository.findEmailUsuarios();
+    }
+
+    @Override
+    public List<Agendamento> listarAgendamentoUsuario (@NotNull UUID id) {
+        User usuario = encontrarPorId(id);
+        log.info(">>> listarAgendamentoUsuario: listando todos agendamentos do usuario de id: " + usuario.getId());
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
+            return this.usuarioRepository.findAgendamentosRealizadosById(id);
+
+        throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses agendamentos");
+    }
+
+    @Override
+    public List<Emprestimo> listarEmprestimoUsuario (@NotNull UUID id) {
+        User usuario = encontrarPorId(id);
+        log.info(">>> listarEmprestimoUsuario: listando todos emprestimo do usuario de id: " + usuario.getId());
+        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
+            return this.usuarioRepository.findEmprestimosById(id);
+        throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses emprestimos");
+    }
 }

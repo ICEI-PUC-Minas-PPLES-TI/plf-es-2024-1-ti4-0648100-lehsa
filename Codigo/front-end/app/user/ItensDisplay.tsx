@@ -1,80 +1,67 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import Cookie from 'js-cookie'
-import SingleItemCard from '@/components/SingleItemCard';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import FormAgendamento from './FormAgendamento';
+import React, { useEffect, useState } from "react";
+import Cookie from "js-cookie";
+import SingleItemCard from "@/components/SingleItemCard";
+import Link from "next/link";
+import { jwtDecode } from "jwt-decode";
 
 interface ItensCardProps {
-    searchTerm: string;
+  searchTerm: string;
 }
 
 type Props = {
-    id: string;
-    img: File;
-    nome: string;
-    quantidade: number;
-    tipo_item: string;
+  id: string;
+  img: File;
+  nome: string;
+  quantidade: number;
+  tipo_item: string;
+  emprestavel: boolean;
 };
 
 const ItensDisplay = ({ searchTerm }: ItensCardProps) => {
+  const [items, setItems] = useState<Props[]>([]);
 
-    const [items, setItems] = useState<Props[]>([]);
-    const token = Cookie.get("token");
+  const token = Cookie.get("token");
+  let decoded = "";
+  if (token) {
+    decoded = jwtDecode(token);
+  }
 
-    useEffect(() => {
-        fetch("http://localhost:8080/item", {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": `Bearer ${token}`
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                setItems(data)
-            })
-            .catch(error => console.error('Error fetching items:', error));
-    }, []);
+  useEffect(() => {
+    fetch("http://localhost:8080/item", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setItems(data);
+      })
+      .catch((error) => console.error("Error fetching items:", error));
+  }, []);
 
-    const filteredItems = items.filter(item =>
-        item.nome.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const filteredItems = items.filter((item) =>
+    item.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {filteredItems.map((item: Props) => (
+        <Link href={`/user/agendar/${item.id}`} key={item.id}>
+          <SingleItemCard
+            id={item.id}
+            nome={item.nome}
+            tipo_item={item.tipo_item}
+            quantidade={item.quantidade}
+            emprestavel={item.emprestavel}
+          />
+        </Link>
+      ))}
+    </div>
+  );
+};
 
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredItems.map((item: Props) => (
-                <Dialog>
-                    <DialogTrigger >
-                        <SingleItemCard id={item.id} nome={item.nome} tipo_item={item.tipo_item} quantidade={item.quantidade} />
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Solicitação de agendamento</DialogTitle>
-                            <DialogDescription>
-                                This action cannot be undone. This will permanently delete your account
-                                and remove your data from our servers.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div>
-                            <FormAgendamento id={item.id} />
-                            
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            ))}
-        </div>
-    )
-}
-
-export default ItensDisplay
+export default ItensDisplay;

@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.entity.enums;
 
 public enum StatusTransacaoItem {
+    AGUARDANDO_CONFIRMACAO_PROFESSOR,
     EM_ANALISE,
     APROVADO, // Admin
     RECUSADO, // Admin

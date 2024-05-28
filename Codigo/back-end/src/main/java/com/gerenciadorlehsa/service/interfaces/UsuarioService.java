@@ -1,8 +1,11 @@
 package com.gerenciadorlehsa.service.interfaces;
 
+import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Emprestimo;
 import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.dto.SenhaDTO;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -16,4 +19,10 @@ public interface UsuarioService{
     boolean existEmail(String email);
 
     void atualizarPerfil(@NotNull UUID id, Integer code);
+
+    List<Agendamento> listarAgendamentoUsuario(@NotNull UUID id);
+
+    List<Emprestimo> listarEmprestimoUsuario(@NotNull UUID id);
+
+    List<String> listarEmailUsuarios();
 }

@@ -3,6 +3,17 @@ enum TipoItem {
   "EQUIPAMENTO",
 }
 
+// enum StatusTransacaoItem {
+//   AGUARDANDO_CONFIRMACAO_PROFESSOR,
+//   EM_ANALISE,
+//   APROVADO, // Admin
+//   RECUSADO, // Admin
+//   CANCELADO, // Usuário pode cancelar
+//   CONFIRMADO, //unico valor utilizado por usuário comum
+//   NAO_COMPARECEU, //Admin
+//   CONCLUIDO // Admin
+// }
+
 export interface Item {
   id: string;
   imagem: File;
@@ -16,10 +27,28 @@ export interface Item {
 
 export interface Tecnico {
   id: string;
-  curso: null;
+  curso: null | string;
   email: string;
   nome: string;
   telefone: string;
+}
+
+export interface Professor {
+  email: string;
+}
+
+export interface Solicitante {
+  email: string;
+}
+
+export interface Endereco {
+  cep: string,
+  uf: string,
+  cidade: string,
+  bairro: string,
+  rua: string,
+  numero: string,
+  complemento: string
 }
 
 export interface Agendamento {
@@ -30,4 +59,19 @@ export interface Agendamento {
   contato: string; // Contato do responsavel
   itens: Item[];
   tecnico: Tecnico;
+  professor: Professor;
+  solicitantes: Solicitante[];
+  observacaoSolicitacao: string;
+  statusTransacaoItem: string;
+}
+
+export interface Emprestimo {
+  id: string;
+  dataHoraFim: string;
+  dataHoraInicio: string;
+  itens: Item[];
+  solicitante: Solicitante;
+  endereco: Endereco;
+  observacaoSolicitacao: string;
+  statusTransacaoItem: string;
 }

@@ -1,49 +1,56 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
-import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.DataConflitanteAgendamentoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
-import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
-import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
+import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
-import com.gerenciadorlehsa.util.DataHoraUtil;
+import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
+
+import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
+import static com.gerenciadorlehsa.util.DataHoraUtil.dataValida;
+import static java.lang.String.format;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
-@AllArgsConstructor
-public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>, AgendamentoService {
-
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
 
     private final AgendamentoRepository agendamentoRepository;
 
-    private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
+    private final MensagemEmailService mensagemEmailService;
 
 
-    /**
-     * Procura um agendamento por id
-     * @param id o id do agendamento
-     * @return objeto agendamento cujo id foi o passado como argumento
-     */
+
+    @Autowired
+    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
+                                   AgendamentoRepository agendamentoRepository,
+                                   MensagemEmailService mensagemEmailService) {
+        super (validadorAutorizacaoRequisicaoService);
+        this.agendamentoRepository = agendamentoRepository;
+        this.mensagemEmailService = mensagemEmailService;
+    }
+
+//----------------CRUD - INÍCIO---------------------------------------
+
     @Override
     public Agendamento encontrarPorId(UUID id) {
         log.info(">>> encontrarPorId: encontrando agendamento por id");
@@ -62,96 +69,57 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     }
 
 
-//Você já tem um agendamento para essa data
     @Override
+    @Transactional
     public Agendamento criar (Agendamento obj) {
         log.info(">>> criando: criando agendamento");
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
-        checkTecnicoNaoSolicita (obj);
-        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
-        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
+        verificarConfirmacaoCadastroProfessor (obj);
 
-        DataHoraUtil.dataValida (dataHoraInicio, dataHoraFim);
-        verificarConflitoData (dataHoraInicio, dataHoraFim);
-        verificarLimiteAgendamentosEmAnaliseDosParticipantes (obj.getSolicitantes ());
-        verificarAgendamentosDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
+        //Enviar e-mail confirmação:
+        //enviarEmailParaProfessor (obj);
+        //Caso não envie e-mail:
+        //obj.setStatusTransacaoItem (EM_ANALISE);
+
+        checkTecnicoNaoSolicita (obj);
+
+        dataValida (obj.getDataHoraInicio (), obj.getDataHoraFim ());
+
+        verificarConflitosDeAgendamento(obj.getDataHoraInicio (), obj.getDataHoraFim ());
+
+        verificarLimiteTransacaoEmAnalise (obj.getSolicitantes ());
+
+        verificarTransacaoDeMesmaDataDoProfessor(obj.getProfessor (), obj);
+
+        verificarTransacaoDeMesmaDataDoUsuario (obj.getSolicitantes (), obj);
 
         obj.setId (null);
-        obj.setTecnico(null);
-        obj.setStatusTransacaoItem (EM_ANALISE);
 
         return agendamentoRepository.save (obj);
     }
 
-    private void checkTecnicoNaoSolicita(Agendamento agendamento) {
-        log.info(">>> Verificar solicitação de técnico: Barrando solicitação de agendamento do técnico");
-        if(agendamento.getTecnico () != null)
-            if(agendamento.getSolicitantes ().contains (agendamento.getTecnico ()))
-                throw new AgendamentoException ("O técnico encarregado não pode ser solicitante");
-    }
-
-
-    // nao atualiza o status
     @Override
-    public Agendamento atualizar (Agendamento obj) {
+    public Agendamento atualizar(Agendamento obj) {
         log.info(">>> atualizar: atualizando agendamento");
+
         Agendamento agendamentoAtt = encontrarPorId(obj.getId());
 
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        verificarNovoProfessor (obj, agendamentoAtt);
 
+        verificarAutorizacaoDoUsuario(agendamentoAtt);
 
-        if (!ehSolicitante(obj, usuarioLogado)) {
-            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
-        }
+        List<String> atributosIguais = encontrarAtributosIguais(agendamentoAtt, obj);
 
-        List<String> atributosIguais = atributosIguais(agendamentoAtt, obj);
+        validarDataHora(atributosIguais, obj);
 
+        copiarAtributosRelevantes(obj, agendamentoAtt, atributosIguais);
 
+        //agendamentoAtt.setStatusTransacaoItem (CONFIRMADO);
 
-        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
-        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
-
-        if (!(atributosIguais.contains("dataHoraInicio") && atributosIguais.contains("dataHoraFim"))) {
-            DataHoraUtil.dataValida(dataHoraInicio, dataHoraFim);
-            verificarConflitoData(dataHoraInicio, dataHoraFim);
-            verificarAgendamentosDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
-        }
-        atributosIguais.add("tecnico");
-        atributosIguais.add("statusTransacaoItem");
-        atributosIguais.add("id");
-        String[] propriedadesIgnoradas = new String[atributosIguais.size()];
-        propriedadesIgnoradas = atributosIguais.toArray(propriedadesIgnoradas);
-
-        copyProperties(obj, agendamentoAtt, propriedadesIgnoradas);
-        log.info("Tencnic " + (agendamentoAtt.getTecnico()==null));
-
-        log.info("Teste");
-        return this.agendamentoRepository.save(agendamentoAtt);
+        return agendamentoRepository.save(agendamentoAtt);
     }
 
-    @Override
-    public void deletar (UUID id) {
-        /*
-        //Codigo onde todos do agendamento podem deletar (Adimns, Participantes e tecnico do agendamento)
-        Agendamento agendamento = encontrarPorId(id);
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-
-        if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
-            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para deletar o agendamento");
-        }
-        */
-        //Somente Admins podem apagar
-        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
-        encontrarPorId(id);
-        log.info(">>> deletar: deletando agendamento");
-        try{
-            this.agendamentoRepository.deleteById(id);
-        } catch (Exception e){
-            // como se comporta?? os outros registros vao se apagar?
-            throw new RuntimeException(e.getMessage());
-        }
-    }
 
     @Override
     public List<Agendamento> listarTodos () {
@@ -161,139 +129,213 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
     }
 
     @Override
-    public List<Agendamento> listarAgendamentoUsuario (@NotNull User usuario) {
-        log.info(">>> listarAgendamentoUsuario: listando todos agendamentos do usuario de id: " + usuario.getId());
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-        log.info(""+usuarioLogado.getId());
-        if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
-            return this.agendamentoRepository.findBySolicitantes(usuario);
+    @Transactional
+    public void deletar (UUID id) {
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        Agendamento agendamento = encontrarPorId(id);
+        deletarAgendamentoDaListaDosUsuarios (agendamento);
+        log.info(">>> deletar: deletando agendamento");
+        try{
+            this.agendamentoRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new DeletarEntidadeException (format("existem entidades relacionadas: %s", e));
+        }
+    }
 
-        throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses agendamentos");
+//----------------CRUD - FIM ---------------------------------------
+
+
+
+//----------------AgendamentoService - INÍCIO ---------------------------
+
+
+
+    @Override
+    public void verificarConfirmacaoCadastroProfessor(Agendamento agendamento) {
+        if(!agendamento.getProfessor ().getConfirmaCadastro ())
+            throw new ProfessorConfirmaCadastroException ("O Professor ainda não confirmou cadastro");
     }
 
     @Override
-    public void atualizarStatus (@NotNull String status, @NotNull UUID id) {
-        log.info(">>> atualizarStatus: atualizando status do agendamento");
+    public void enviarEmailParaProfessor(Agendamento agendamento) {
+
+       /* String linkConfirmacao = ".../agendamento/professor-confirma?id=" + agendamento.getProfessor ().getId ();*/
+
+        String linkConfirmacao = "https://www.youtube.com/watch?v=1bMOsJcigIw&t=10162s";
+
+        String email = agendamento.getProfessor ().getEmail();
         try {
-            //Pegando uma string e vendo se tem o tipo correspondente
-            StatusTransacaoItem statusUpperCase =
-                    Enum.valueOf(StatusTransacaoItem.class, status.toUpperCase());
+            mensagemEmailService.enviarEmailConfirmacaoAgendamento(email,
+                    EstilizacaoEmailUtil.estilizaConfirmacaoAgendamento (linkConfirmacao,
+                            agendamento.getDataHoraInicio (), agendamento.getDataHoraFim ()));
+        } catch (Exception e) {
+            throw new MensagemEmailException ("Envio de e-mail falhou.");
+        }
+    }
 
-            Agendamento agendamento = encontrarPorId(id);
 
-            if (statusUpperCase.equals(StatusTransacaoItem.CANCELADO) ||
-                    statusUpperCase.equals(StatusTransacaoItem.CONFIRMADO)) {
-                UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-                if (!ehUsuarioAutorizado(agendamento, usuarioLogado)) {
-                    throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar o agendamento");
-                }
-            } else
-                validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+    @Override
+    public Agendamento professorConfirmaAgendamento(UUID id) {
+        Agendamento agendamento = encontrarPorId (id);
+        log.info(">>> professorConfirmaAgendamento: professor confirma agendamento");
+        agendamento.setStatusTransacaoItem (EM_ANALISE);
+        return agendamentoRepository.save (agendamento);
+    }
 
-            agendamento.setStatusTransacaoItem(statusUpperCase);
-            this.agendamentoRepository.save(agendamento);
-            log.info(">>> atualizarStatus: status do agendamento "+agendamento.getId()
-                    + " atualizado para "+agendamento.getStatusTransacaoItem());
 
-        } catch (IllegalArgumentException e) {
-            throw new EnumNaoEncontradoException ("O status passado não existe: " + status);
+    @Override
+    public void atualizarTecnico(User tecnico, @NotNull UUID id) {
+        log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
+        //User tecnico = usuarioService.encontrarPorEmail(email);
+        Agendamento agendamento = encontrarPorId(id);
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+        verificarPerfilTecnico(tecnico);
+        agendamento.setTecnico(tecnico);
+        this.agendamentoRepository.save(agendamento);
+    }
+
+    @Override
+    @Transactional
+    public void deletarAgendamentoSeVazio(UUID id) {
+        encontrarPorId(id);
+        log.info(">>> deletar: deletando agendamento sem solicitantes");
+        try{
+            this.agendamentoRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new DeletarEntidadeException (format("existem entidades relacionadas: %s", e));
         }
     }
 
     @Override
-    public void atualizarTecnico (User tecnico, @NotNull UUID id) {
-        log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
-        Agendamento agendamento = encontrarPorId(id);
-        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
+    public List<Object[]> listarDatasOcupadas () {
+        log.info(">>> listarDatasOcupadas: listando datas ocupadas de agendamento");
+        return this.agendamentoRepository.findDataHoraInicioAndFim();
+    }
+
+    @Override
+    public boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+        log.info(">>> ehTecnico: Verificando se o usuário logado é o técnico do agendamento");
+        if (agendamento.getTecnico() == null)
+            return false;
+        return Objects.equals(agendamento.getTecnico().getEmail(), usuarioLogado.getEmail());
+    }
+
+    @Override
+    public void checkTecnicoNaoSolicita(Agendamento agendamento) {
+        log.info(">>> Verificar solicitação de técnico: Barrando solicitação de agendamento do técnico");
+        if(agendamento.getTecnico () != null)
+            if(agendamento.getSolicitantes ().contains (agendamento.getTecnico ()))
+                throw new AgendamentoException ("O técnico encarregado não pode ser solicitante");
+    }
+
+
+    @Override
+    public void verificarPerfilTecnico(User tecnico) {
+        log.info(">>> Verificando perfil de técnico: barrando usuário que não é técnico");
         if(tecnico != null) {
             if(tecnico.getPerfilUsuario () != 3)
                 throw new AgendamentoException ("O usuário encarregado para ser técnico não tem o perfil " +
                         "correspondente");
         }
-
-        agendamento.setTecnico(tecnico);
-        this.agendamentoRepository.save(agendamento);
     }
 
+    @Override
+    public Agendamento verificarNovoProfessor(Agendamento novoAgedamento, Agendamento velhoAgendamento) {
+        if(novoAgedamento.getProfessor () != velhoAgendamento.getProfessor ()) {
+            verificarMudancaProfessor (novoAgedamento);
+            velhoAgendamento.setStatusTransacaoItem (AGUARDANDO_CONFIRMACAO_PROFESSOR);
+            //enviarEmailParaProfessor (velhoAgendamento);
+        }
+        return velhoAgendamento;
+    }
 
-    private void verificarTecnicoAgendamento(Agendamento agendamento) {
-        log.info(">>> Verificando perfil de técnico: barrando usuário que não é técnico");
-        if(agendamento.getTecnico () != null) {
-            if(agendamento.getTecnico ().getPerfilUsuario () != 3)
-                throw new AgendamentoException ("O usuário encarregado para ser técnico não tem o perfil " +
-                        "correspondente");
+    @Override
+    public void verificarTransacaoDeMesmaDataDoProfessor(Professor professor, Agendamento agendamento) {
+        log.info (">>> Verificar conflito de data do professor: barrando agendamento de mesma data de um professor");
+        List<Agendamento> agendamentosDoProfessor = professor.getAgendamentos ();
+        boolean conflitoDeData = false;
+        if(agendamentosDoProfessor != null && !agendamentosDoProfessor.isEmpty ()) {
+            conflitoDeData = professor.getAgendamentos ()
+                    .stream ()
+                    .anyMatch (agendamentoAVista -> temConflitoDeData (agendamentoAVista, agendamento));
+        }
+
+        if (conflitoDeData) {
+            throw new ConflitoDataException ("O Professor tem um agendamento marcado pra essa data");
+        }
+    }
+
+//----------------AgendamentoService - FIM ---------------------------
+
+
+//----------------TransacaoService - INÍCIO ---------------------------
+@Override
+public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
+    log.info(">>> atualizarStatus: atualizando status do agendamento");
+
+    StatusTransacaoItem statusUpperCase = getStatusUpperCase(status);
+
+    Agendamento agendamento = encontrarPorId(id);
+
+    verificarAutorizacaoDoUsuario(agendamento, statusUpperCase);
+
+    verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(agendamento, statusUpperCase);
+
+    verificarCondicoesDeConfirmacao(agendamento, statusUpperCase);
+
+    verificarCondicoesDeAprovacao(agendamento, statusUpperCase);
+
+    agendamento.setStatusTransacaoItem(statusUpperCase);
+    agendamentoRepository.save(agendamento);
+
+    log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
+            " atualizado para " + agendamento.getStatusTransacaoItem());
+}
+
+    @Override
+    public void verificarCondicoesDeAprovacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
+        if (statusUpperCase == APROVADO) {
+            if(!agendamento.getStatusTransacaoItem ().equals (EM_ANALISE))
+                throw new AtualizarStatusException ("O agendamento precisa estar EM_ANALISE para ser APROVADO");
         }
     }
 
 
-    private void verificarAgendamentosDeMesmaDataDoUsuario(List<User> solicitantes, Agendamento agendamento) {
-        log.info(">>> Verificar conflito de data de um solicitante: barrando agendamento de mesma data de um solicitante");
-        for (User solicitante : solicitantes) {
-            boolean conflitoDeData = solicitante.getAgendamentosRealizados().stream()
-                    .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
-
-            if (conflitoDeData) {
-                throw new AgendamentoException ("Um dos solicitantes já fez uma agendamento na mesma data");
-            }
-        }
-    }
-
-    // Método para verificar se há conflito de datas entre dois agendamentos
-    private boolean temConflitoDeData(Agendamento agendamentoExistente, Agendamento novoAgendamento) {
-        log.info(">>> Verificando datas conflitantes: barrando agendamento solicitado em uma mesma data");
-
-        if (agendamentoExistente.getId() == novoAgendamento.getId())
-            return false;
-
-        LocalDateTime dataHoraInicioExistente = agendamentoExistente.getDataHoraInicio();
-        LocalDateTime dataHoraFimExistente = agendamentoExistente.getDataHoraFim();
-        LocalDateTime dataHoraInicioNovo = novoAgendamento.getDataHoraInicio();
-        LocalDateTime dataHoraFimNovo = novoAgendamento.getDataHoraFim();
-
-        return (dataHoraInicioNovo.isBefore(dataHoraFimExistente) ||
-                dataHoraInicioNovo.isEqual(dataHoraFimExistente)) &&
-                (dataHoraFimNovo.isAfter(dataHoraInicioExistente) ||
-                        dataHoraFimNovo.isEqual(dataHoraInicioExistente));
-    }
-
-
-
-    private void verificarLimiteAgendamentosEmAnaliseDosParticipantes(List<User> solicitantes) {
-        log.info(">>> Verificar limite de solicitação: Barrando limite excedente de solicitação");
-        long agendamentosEmAnalise;
-
-        for (User solicitante : solicitantes) {
-
-            agendamentosEmAnalise = solicitante.getAgendamentosRealizados().stream()
-                    .filter(agendamento -> agendamento.getStatusTransacaoItem() == EM_ANALISE)
-                    .count();
-
-            if(agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE)
-                throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
-        }
-
-    }
-
-
-    public void verificarConflitoData(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+    @Override
+    public List<Agendamento> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
         log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
                 "confirmado ou aprovado");
-        List<Agendamento> agendamentosConflitantes =
-                agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
+        return agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
+    }
 
-        if(!agendamentosConflitantes.isEmpty ())
-            throw new DataConflitanteAgendamentoException ("Já existe um agendamento para essa data");
+    @Override
+    public void verificarLimiteTransacaoEmAnalise(User participante) {
+        long agendamentosEmAnalise = participante.getAgendamentosRealizados ()
+                .stream ()
+                .filter(agendamento -> agendamento.getStatusTransacaoItem() == EM_ANALISE)
+                .count();
+        if(agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE)
+            throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
+    }
+
+    @Override
+    public void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, Agendamento agendamento) {
+
+        List<Agendamento> agendamentosDoSolicitante = solicitante.getAgendamentosRealizados ();
+        boolean conflitoDeData = false;
+
+        if(agendamentosDoSolicitante != null && !agendamentosDoSolicitante.isEmpty ())
+            conflitoDeData = agendamentosDoSolicitante.stream()
+                    .anyMatch(agendamentoExistente -> temConflitoDeData(agendamentoExistente, agendamento));
+
+        if (conflitoDeData) {
+            throw new ConflitoDataException ("Um dos solicitantes já fez uma agendamento na mesma data");
+        }
     }
 
 
-    /**
-     * Verifica se o usuário logado é autorizado para acessar o agendamento.
-     *
-     * @param agendamento   Agendamento
-     * @param usuarioLogado Usuário logado
-     * @return true se o usuário é autorizado, false caso contrário
-     */
-    private boolean ehUsuarioAutorizado(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+    @Override
+    public boolean ehUsuarioAutorizado(Agendamento agendamento, UsuarioDetails usuarioLogado) {
         log.info(">>> Verificar autorização do usuário: Verificando se usuário é o técnico, adm ou solicitante do " +
                 "agendamento");
         return ehSolicitante(agendamento, usuarioLogado) ||
@@ -301,59 +343,124 @@ public class AgendamentoServiceImpl implements OperacoesCRUDService<Agendamento>
                 usuarioLogado.getPerfilUsuario().getCodigo() == 1;
     }
 
-
-    /**
-     * Verifica se o usuário logado é solicitante do agendamento.
-     *
-     * @param agendamento   Agendamento
-     * @param usuarioLogado Usuário logado
-     * @return true se o usuário é solicitante, false caso contrário
-     */
-    private boolean ehSolicitante(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+    @Override
+    public boolean ehSolicitante(Agendamento agendamento, UsuarioDetails usuarioLogado) {
         log.info(">>> ehSolicitante: Verificando se o usuário logado é o solicitante do agendamento procurado");
         return agendamento.getSolicitantes().stream()
                 .anyMatch(solicitante -> Objects.equals(solicitante.getEmail(), usuarioLogado.getEmail()));
     }
 
-    /**
-     * Verifica se o usuário logado é técnico do agendamento.
-     *
-     * @param agendamento   Agendamento
-     * @param usuarioLogado Usuário logado
-     * @return true se o usuário é técnico, false caso contrário
-     */
-    private boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado) {
-        log.info(">>> ehTecnico: Verificando se o usuário logado é o técnico do agendamento");
-        if (agendamento.getTecnico() == null)
-            return false;
-        return Objects.equals(agendamento.getTecnico().getEmail(), usuarioLogado.getEmail());
-    }
 
-    private List<String> atributosIguais (Agendamento a, Agendamento b) {
-        List<String> atributosIguais = new ArrayList<>();
-
-        if (a.getDataHoraInicio().isEqual(b.getDataHoraInicio()))
-            atributosIguais.add("dataHoraInicio");
-        if (a.getDataHoraFim().isEqual(b.getDataHoraFim()))
-            atributosIguais.add("dataHoraFim");
-        if (a.getObservacaoSolicitacao().equals(b.getObservacaoSolicitacao()))
-            atributosIguais.add("observacaoSolicitacao");
-
-        return atributosIguais;
-    }
-
-   /* public void excluirAgendamentoSeSemSolicitantes(UUID agendamentoId) {
-        Agendamento agendamento = encontrarPorId (agendamentoId);
-        if(!agendamento.getSolicitantes().isEmpty())
-            throw new DataIntegrityViolationException ()
-
-
-        if (agendamento.getSolicitantes().isEmpty()) {
-            agendamentoRepository.delete (agendamento);
-        } else {
-            throw new RuntimeException("Não é possível excluir o agendamento, pois possui solicitantes vinculados.");
+    @Override
+    public int calcularQuantidadeTransacao(Item item, List<Agendamento> agendamentos) {
+        int quantidadeAgendada = 0;
+        for (Agendamento agendamento : agendamentos) {
+            Integer quantidade = agendamento.getItensQuantidade().getOrDefault(item, 0);
+            quantidadeAgendada += quantidade;
         }
-    }*/
+        return quantidadeAgendada;
+    }
 
+    @Override
+    public void deletarItensAssociados(Item item) {
+        List<Agendamento> agendamentos = agendamentoRepository.findByItem(item);
+
+        if(agendamentos != null && !agendamentos.isEmpty ()) {
+            for (Agendamento agendamento : agendamentos) {
+                agendamento.getItensQuantidade().remove(item);
+                agendamentoRepository.save(agendamento);
+            }
+        }
+    }
+
+    @Override
+    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(Agendamento agendamento, StatusTransacaoItem status) {
+        if (!agendamentoRepository.findAprovadosOuConfirmadosConflitantes(agendamento.getDataHoraInicio(), agendamento.getDataHoraFim()).isEmpty()
+                && (status == APROVADO || status == CONFIRMADO)) {
+            throw new AtualizarStatusException ("Um agendamento para essa data já foi aprovado ou confirmado.");
+        }
+    }
+
+    @Override
+    public void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
+        atributosIguais.add("tecnico");
+        atributosIguais.add("statusTransacaoItem");
+        atributosIguais.add("id");
+        String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
+        copyProperties(source, target, propriedadesIgnoradas);
+    }
+
+    @Override
+    public void verificarCondicoesDeConfirmacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
+        if (statusUpperCase.equals(CONFIRMADO)) {
+            if (!agendamento.getStatusTransacaoItem().equals(APROVADO)) {
+                throw new AtualizarStatusException("Para confirmar o agendamento é preciso que ele esteja aprovado");
+            }
+
+            if (tempoExpirado(agendamento.getDataHoraInicio())) {
+                agendamento.setStatusTransacaoItem(NAO_COMPARECEU);
+                agendamentoRepository.save(agendamento);
+                throw new TempoExpiradoException("A confirmação deve ser feita até 24h antes da data e hora de início" +
+                        " " +
+                        "do agendamento");
+            }
+        }
+    }
+
+
+//----------------TransacaoService - FIM ---------------------------
+
+
+
+    private void verificarTransacaoDeMesmaDataDoUsuario(List<User> solicitantes, Agendamento agendamento) {
+        log.info(">>> Verificar conflito de data de um solicitante: barrando agendamento de mesma data de um solicitante");
+        for (User solicitante : solicitantes) {
+            verificarTransacaoDeMesmaDataDoUsuario (solicitante, agendamento);
+        }
+    }
+
+
+    private void verificarLimiteTransacaoEmAnalise(List<User> solicitantes) {
+        log.info(">>> Verificar limite de solicitação: Barrando limite excedente de solicitação");
+        for (User solicitante : solicitantes) {
+            verificarLimiteTransacaoEmAnalise (solicitante);
+        }
+    }
+
+
+    public void deletarAgendamentoDaListaDosUsuarios(Agendamento agendamento) {
+
+        if(agendamento.getSolicitantes () != null && !agendamento.getSolicitantes ().isEmpty ())
+            for (User solicitante : agendamento.getSolicitantes()) {
+                solicitante.getAgendamentosRealizados ().remove (agendamento);
+            }
+    }
+
+
+    private void validarDataHora(List<String> atributosIguais, Agendamento obj){
+        LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
+        LocalDateTime dataHoraFim = obj.getDataHoraFim ();
+        if (!atributosIguais.contains("dataHoraInicio") || !atributosIguais.contains("dataHoraFim")) {
+            dataValida(dataHoraInicio, dataHoraFim);
+            if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty())
+                throw new AgendamentoException("Já existe agendamento para essa data");
+            verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
+        }
+    }
+
+
+    private void verificarConflitosDeAgendamento(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+        if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty()) {
+            throw new AgendamentoException("Já existe agendamento aprovado pelo administrador ou confirmado pelo usuário para essa data");
+        }
+    }
+
+    private void verificarMudancaProfessor(Agendamento agendamento) {
+        StatusTransacaoItem statusTransacaoItem = agendamento.getStatusTransacaoItem ();
+        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO) && !statusTransacaoItem.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
+            throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
+                    "aprovada, confirmada ou em análise");
+
+    }
 
 }
