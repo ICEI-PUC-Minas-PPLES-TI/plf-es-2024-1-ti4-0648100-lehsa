@@ -6,9 +6,12 @@ import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.ProfessorDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.service.ItemService;
+import com.gerenciadorlehsa.service.ItemServiceImpl;
+import com.gerenciadorlehsa.service.interfaces.ItemService;
+import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,8 +36,9 @@ public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp
 
 
     @Autowired
-    public AgendamentoEntityConverterComp (UsuarioService usuarioService, ItemService itemService, ProfessorService professorService,TransacaoDTOValidadadorComp<AgendamentoDTO> agendamentoDTOValidadadorComp) {
-        super (usuarioService, itemService);
+    public AgendamentoEntityConverterComp (UsuarioService usuarioService, OperacoesCRUDServiceImg<Item> operacoesCRUDServiceImg,
+                                           ProfessorService professorService, TransacaoDTOValidadadorComp<AgendamentoDTO> agendamentoDTOValidadadorComp) {
+        super (usuarioService, operacoesCRUDServiceImg);
         this.professorService = professorService;
         this.agendamentoDTOValidadadorComp = agendamentoDTOValidadadorComp;
     }

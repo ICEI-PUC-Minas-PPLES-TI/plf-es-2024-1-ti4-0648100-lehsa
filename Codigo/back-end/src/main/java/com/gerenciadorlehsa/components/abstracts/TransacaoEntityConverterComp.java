@@ -6,7 +6,9 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
-import com.gerenciadorlehsa.service.ItemService;
+import com.gerenciadorlehsa.service.ItemServiceImpl;
+import com.gerenciadorlehsa.service.interfaces.ItemService;
+import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 public abstract class TransacaoEntityConverterComp<T extends Transacao,DTO> {
 
     protected final UsuarioService usuarioService;
-    protected final ItemService itemService;
+    private final OperacoesCRUDServiceImg<Item> operacoesCRUDServiceImg;
 
     public abstract T convertToEntity(DTO dto);
 
@@ -45,7 +47,7 @@ public abstract class TransacaoEntityConverterComp<T extends Transacao,DTO> {
     protected List<Item> acharItens(List<ItemDTO> itensDTO) {
 
         return itensDTO.stream()
-                .map(itemDTO -> itemService.encontrarPorId(itemDTO.id()))
+                .map(itemDTO -> operacoesCRUDServiceImg.encontrarPorId(itemDTO.id()))
                 .collect(Collectors.toList());
     }
 

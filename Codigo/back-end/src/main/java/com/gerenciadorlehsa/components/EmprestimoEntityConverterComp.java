@@ -6,7 +6,9 @@ import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EnderecoDTO;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Endereco;
-import com.gerenciadorlehsa.service.ItemService;
+import com.gerenciadorlehsa.entity.Item;
+import com.gerenciadorlehsa.service.ItemServiceImpl;
+import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
@@ -26,8 +27,9 @@ public class EmprestimoEntityConverterComp extends TransacaoEntityConverterComp<
     TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp;
 
     @Autowired
-    public EmprestimoEntityConverterComp (UsuarioService usuarioService, ItemService itemService, TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp) {
-        super (usuarioService, itemService);
+    public EmprestimoEntityConverterComp (UsuarioService usuarioService,
+                                          TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp, OperacoesCRUDServiceImg<Item> operacoesCRUDServiceImg) {
+        super (usuarioService, operacoesCRUDServiceImg);
         this.emprestimoDTOValidadadorComp = emprestimoDTOValidadadorComp;
     }
 

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public interface ProfessorService {
+public interface ProfessorService extends OperacoesImagemService{
     Professor confirmaEmail(UUID id, Boolean value);
 
     Professor encontrarPorEmail(@NotNull String email);
