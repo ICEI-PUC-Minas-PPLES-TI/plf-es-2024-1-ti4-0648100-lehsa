@@ -13,6 +13,7 @@ import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
+@Schema(description = "Contém as regras de negócio para agendar o uso do laboratório")
 public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
 
     private final AgendamentoRepository agendamentoRepository;
@@ -281,6 +283,15 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         return agendamentoRepository.save (agendamento);
     }
 
+    @Override
+    public void verificarMudancaProfessor(Agendamento agendamento) {
+        StatusTransacaoItem statusTransacaoItem = agendamento.getStatusTransacaoItem ();
+        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO) && !statusTransacaoItem.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
+            throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
+                    "aprovada, confirmada ou em análise");
+
+    }
+
 //----------------AgendamentoService - FIM ---------------------------
 
 
@@ -461,14 +472,6 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty()) {
             throw new AgendamentoException("Já existe agendamento aprovado pelo administrador ou confirmado pelo usuário para essa data");
         }
-    }
-
-    private void verificarMudancaProfessor(Agendamento agendamento) {
-        StatusTransacaoItem statusTransacaoItem = agendamento.getStatusTransacaoItem ();
-        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO) && !statusTransacaoItem.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
-            throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
-                    "aprovada, confirmada ou em análise");
-
     }
 
     public void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {

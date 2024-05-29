@@ -34,6 +34,8 @@ public interface AgendamentoService {
 
     Agendamento verificarNovoProfessor(Agendamento novoAgedamento, Agendamento velhoAgendamento);
 
+    void verificarMudancaProfessor(Agendamento agendamento);
+
     Agendamento saveAgendamento(Agendamento agendamento);
 
 }

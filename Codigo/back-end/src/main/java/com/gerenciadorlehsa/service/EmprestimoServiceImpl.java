@@ -9,6 +9,7 @@ import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import static java.lang.String.format;
 
 @Slf4j(topic = EMPRESTIMO_SERVICE)
 @Service
+@Schema(description = "Contém as regras de negócio para concessão de empréstimo de itens do laboratório")
 public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>, EmprestimoService{
 
     private final EmprestimoRepository emprestimoRepository;

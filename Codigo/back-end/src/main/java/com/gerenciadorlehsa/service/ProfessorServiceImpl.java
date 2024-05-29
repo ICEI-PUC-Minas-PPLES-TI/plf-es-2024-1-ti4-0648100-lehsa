@@ -13,6 +13,7 @@ import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.ConstantesImgUtil;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +38,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = PROFESSOR_SERVICE)
 @Service
 @AllArgsConstructor
+@Schema(description = "Serviço responsável por gerenciar professor encarregado do agendamento")
 public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>, ProfessorService, OperacoesImagemService {
 
     private final ProfessorRepository professorRepository;

@@ -12,6 +12,12 @@ import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +40,13 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 
+
 @Slf4j(topic = AGENDAMENTO_CONTROLLER)
 @RestController
 @Validated
 @RequestMapping(ENDPOINT_AGENDAMENTO)
 @AllArgsConstructor
+@Tag(name = "Agendamento", description = "APIs relacionadas a operações de agendamento")
 public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>, AgendamentoController {
 
     private final TransacaoService<Agendamento> transacaoService;
@@ -49,6 +57,12 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
 
 
     @Override
+    @Operation(summary = "Encontrar agendamento por ID", description = "Retorna um agendamento específico pelo ID fornecido")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Agendamento encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgendamentoDTORes.class))),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
+            @ApiResponse(responseCode = "400", description = "ID inválido")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<AgendamentoDTORes> encontrarPorId (@PathVariable  UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar usuário por id");
@@ -58,6 +72,11 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
 
 
     @Override
+    @Operation(summary = "Criar novo agendamento", description = "Cria um novo agendamento com os detalhes fornecidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Agendamento criado com sucesso", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos para criar o agendamento")
+    })
     @PostMapping
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody AgendamentoDTO agendamentoDTO) {
 
@@ -74,6 +93,12 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
     @Override
+    @Operation(summary = "Atualizar agendamento", description = "Atualiza um agendamento existente com os detalhes fornecidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Agendamento atualizado com sucesso", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos para atualizar o agendamento")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
                                                           @Valid @RequestBody AgendamentoDTO obj) {
@@ -87,6 +112,11 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
     @Override
+    @Operation(summary = "Deletar agendamento", description = "Deleta um agendamento específico pelo ID fornecido")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Agendamento deletado com sucesso", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deletar (@PathVariable UUID id) {
         log.info(">>> deletar: recebendo requisição para deletar agendamento");
@@ -96,6 +126,10 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
     @Override
+    @Operation(summary = "Listar todos os agendamentos", description = "Lista todos os agendamentos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de agendamentos", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgendamentoDTORes.class))),
+    })
     @GetMapping
     public ResponseEntity<List<AgendamentoDTORes>> listarTodos () {
         log.info(">>> listarTodos: recebendo requisição para listar todos agendamentos");
@@ -105,6 +139,12 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
     @Override
+    @Operation(summary = "Atualizar status do agendamento", description = "Atualiza o status de um agendamento específico pelo ID fornecido")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Status do agendamento atualizado com sucesso", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
+            @ApiResponse(responseCode = "400", description = "Status inválido fornecido")
+    })
     @PatchMapping("/{id}/{status}")
     public ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
                                                                 @PathVariable String status) {
@@ -116,6 +156,12 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     }
 
     @Override
+    @Operation(summary = "Atualizar técnico do agendamento", description = "Atualiza o técnico responsável por um agendamento específico pelo ID fornecido")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Técnico do agendamento atualizado com sucesso", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
+            @ApiResponse(responseCode = "400", description = "Email do técnico inválido fornecido")
+    })
     @PatchMapping("/{id}/tecnico/{email}")
     public ResponseEntity<Map<String, Object>> atualizarTecnico(@PathVariable UUID id,
                                                                 @PathVariable String email) {
@@ -126,7 +172,11 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, id)));
     }
 
-
+    @Override
+    @Operation(summary = "Listar datas ocupadas", description = "Lista as datas ocupadas dos agendamentos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de datas ocupadas", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String[].class))),
+    })
     @GetMapping("/datasOcupadas")
     public ResponseEntity<List<String[]>> listarDatasOcupadas () {
         log.info(">>> listarDatasOcupadas: recebendo requisição para listar datas ocupadas de agendamento");
@@ -146,6 +196,12 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
 
 
     @Override
+    @Operation(summary = "Confirmar agendamento pelo professor", description = "Confirma um agendamento por parte do professor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Agendamento confirmado com sucesso", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Agendamento não encontrado"),
+            @ApiResponse(responseCode = "400", description = "ID inválido")
+    })
     @PatchMapping("/professor-confirma")
     public ResponseEntity<Map<String, Object>> confirmarAgendamento(@RequestParam("id") UUID id) {
         log.info (" >>> Confirmando o agendamento por parte do professor");

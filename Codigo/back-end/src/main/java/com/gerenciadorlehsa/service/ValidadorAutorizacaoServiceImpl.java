@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.service;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +23,7 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 
 @Slf4j(topic = VALIDADOR_AUTORIZACAO_REQUISICAO_SERVICE)
 @Service
+@Schema(description = "Serviço responsável por validar permissões de acesso")
 public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequisicaoService {
 
     private final List<Validador> validadores;

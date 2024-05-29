@@ -9,6 +9,7 @@ import com.gerenciadorlehsa.repository.ItemRepository;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.OperacoesImagemService;
 import com.gerenciadorlehsa.util.ConstantesImgUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ import static java.lang.String.format;
 @Service
 @Slf4j(topic = ITEM_SERVICE)
 @AllArgsConstructor
+@Schema(description = "Contém as regras de negócio para os itens do laboratório")
 public class ItemService implements OperacoesCRUDServiceImg<Item>, OperacoesImagemService {
 
 

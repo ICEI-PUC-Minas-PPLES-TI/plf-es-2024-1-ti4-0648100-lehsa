@@ -4,6 +4,7 @@ import com.gerenciadorlehsa.entity.Endereco;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.repository.EnderecoRepository;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import static java.lang.String.format;
 
 @Service
 @AllArgsConstructor
+@Schema(description = "Contém as regras de negócio para endereço")
 public class EnderecoService {
 
     private final EnderecoRepository enderecoRepository;

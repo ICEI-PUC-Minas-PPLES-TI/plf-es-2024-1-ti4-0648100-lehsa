@@ -7,6 +7,7 @@ import com.gerenciadorlehsa.events.AgendamentoSemTecnicoEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.security.UsuarioDetails;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = USUARIO_SERVICE)
 @Service
 @AllArgsConstructor
+@Schema(description = "Serviço responsável pelo gerenciamento dos usuários")
 public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService{
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
