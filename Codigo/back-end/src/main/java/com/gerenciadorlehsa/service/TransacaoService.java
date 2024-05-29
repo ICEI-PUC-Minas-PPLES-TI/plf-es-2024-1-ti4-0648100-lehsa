@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,12 +26,16 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_SERVICE;
 
 @Slf4j(topic = TRANSACAO_SERVICE)
 @Service
-@AllArgsConstructor
 @Schema(description = "Superclasse abstrata que contém métodos e atributos em comum para qualquer tipo que é subtipo " +
         "de TransacaoItem")
 public abstract class TransacaoService<T extends Transacao> {
 
     protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
+
+    @Autowired
+    public TransacaoService(ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
+        this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
+    }
 
     public abstract int calcularQuantidadeTransacao(Item item, List<T> transacao);
 

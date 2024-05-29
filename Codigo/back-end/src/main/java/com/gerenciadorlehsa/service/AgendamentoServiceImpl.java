@@ -276,6 +276,11 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         }
     }
 
+    @Override
+    public Agendamento saveAgendamento(Agendamento agendamento) {
+        return agendamentoRepository.save (agendamento);
+    }
+
 //----------------AgendamentoService - FIM ---------------------------
 
 
@@ -473,5 +478,6 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
         copyProperties(source, target, propriedadesIgnoradas);
     }
+
 
 }

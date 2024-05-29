@@ -3,6 +3,7 @@ package com.gerenciadorlehsa.service;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.events.AgendamentoSemSolicitantesEvent;
+import com.gerenciadorlehsa.events.AgendamentoSemTecnicoEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.security.UsuarioDetails;
@@ -151,7 +152,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
             throw new AtualizarSenhaException(format("senha original incorreta, id do usuário: %s", id));
     }
 
-
     /**
      * Lista todos os usuários criados
      *
@@ -181,19 +181,12 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     public void removerUsuarioDaListaDeAgendamentos(User user) {
         List<Agendamento> agendamentos = user.getAgendamentosRealizados();
 
-        if(agendamentos != null && !agendamentos.isEmpty ()) {
-
+        if (agendamentos != null && !agendamentos.isEmpty()) {
             for (Agendamento agendamento : agendamentos) {
-
-                agendamento.getSolicitantes().remove(user);
-
-                if (agendamento.getSolicitantes().isEmpty()) {
-                    eventPublisher.publishEvent(new AgendamentoSemSolicitantesEvent (this, user));
-                }
+                removerUsuarioDoAgendamento(agendamento, user);
             }
         }
     }
-
     @Override
     public List<String> listarEmailUsuarios () {
         log.info(">>> listarEmailUsuarios: listando email de usuarios");
@@ -219,5 +212,26 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
             return this.usuarioRepository.findEmprestimosById(id);
         throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses emprestimos");
+    }
+
+    private void removerUsuarioDoAgendamento(Agendamento agendamento, User user) {
+        agendamento.getSolicitantes().remove(user);
+        verificarAgendamentoSemSolicitantes(agendamento, user);
+        verificarAgendamentoSemTecnico(agendamento, user);
+    }
+
+    private void verificarAgendamentoSemSolicitantes(Agendamento agendamento, User user) {
+        if (agendamento.getSolicitantes().isEmpty()) {
+            eventPublisher.publishEvent(new AgendamentoSemSolicitantesEvent(this, user));
+        }
+    }
+
+    private void verificarAgendamentoSemTecnico(Agendamento agendamento, User user) {
+        if (agendamento.getTecnico() != null
+                && agendamento.getTecnico().getId() != null
+                && agendamento.getTecnico().getId().equals(user.getId())) {
+
+            eventPublisher.publishEvent(new AgendamentoSemTecnicoEvent(this, agendamento));
+        }
     }
 }

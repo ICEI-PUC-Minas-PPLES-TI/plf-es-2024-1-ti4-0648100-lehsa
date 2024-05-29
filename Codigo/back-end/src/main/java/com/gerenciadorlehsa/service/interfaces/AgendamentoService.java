@@ -34,4 +34,6 @@ public interface AgendamentoService {
 
     Agendamento verificarNovoProfessor(Agendamento novoAgedamento, Agendamento velhoAgendamento);
 
+    Agendamento saveAgendamento(Agendamento agendamento);
+
 }
