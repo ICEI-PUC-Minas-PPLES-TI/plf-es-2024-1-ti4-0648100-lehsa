@@ -1,8 +1,12 @@
 package com.gerenciadorlehsa.controller;
 
+import com.gerenciadorlehsa.controller.interfaces.ItemController;
+import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
+import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDControllerImg;
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.service.ItemService;
+import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -16,10 +20,16 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.ENDPOINT_ITEM;
+
+import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ITEM_CONTROLLER;
+import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirRespostaJSON;
 import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDTO;
+import static java.util.Arrays.asList;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 
 @Slf4j(topic = ITEM_CONTROLLER)
@@ -27,10 +37,11 @@ import static com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil.converterParaDT
 @Validated
 @RequestMapping(ENDPOINT_ITEM)
 @AllArgsConstructor
-public class ItemController {
+public class ItemControllerImpl implements ItemController, OperacoesCRUDControllerImg<Item, ItemDTO> {
 
     private final ItemService itemService;
 
+    @Override
     @GetMapping("/img/{id}")
     public ResponseEntity<?> encontrarImagemPorId (@PathVariable UUID id) {
         log.info(">>> encontrarImagemPorId: recebendo requisição para encontrar imagem por id");
@@ -40,6 +51,7 @@ public class ItemController {
                 .body(img);
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> encontrarPorId (@PathVariable UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar item por id");
@@ -47,6 +59,7 @@ public class ItemController {
         return ResponseEntity.ok().body(converterParaDTO(item));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<List<ItemDTO>> listarTodos () {
         log.info(">>> listarTodos: recebendo requisição para listar todos itens");
@@ -54,6 +67,7 @@ public class ItemController {
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
+    @Override
     @GetMapping("/emprestaveis")
     public ResponseEntity<List<ItemDTO>> listarEmprestaveis () {
         log.info(">>> listarEmprestaveis: recebendo requisição para listar itens emprestaveis");
@@ -61,6 +75,7 @@ public class ItemController {
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
+    @Override
     @GetMapping("/tipo/{tipo}")
     public ResponseEntity<List<ItemDTO>> encontrarPorTipo (@PathVariable String tipo) {
         log.info(">>> encontrarPorTipo: recebendo requisição para encontrar itens por tipo");
@@ -68,6 +83,7 @@ public class ItemController {
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
+    @Override
     @GetMapping("/nome/{nome}")
     public ResponseEntity<List<ItemDTO>> encontrarPorNome (@PathVariable String nome) {
         log.info(">>> encontrarPorNome: recebendo requisição para encontrar itens por nome");
@@ -75,32 +91,36 @@ public class ItemController {
         return ResponseEntity.ok().body(itens.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
     }
 
+    @Override
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> criar (@Valid @RequestPart("item") Item item,
-                                       @NotNull @RequestPart("imagem") MultipartFile img){
+    public ResponseEntity<Map<String, Object>> criar (@Valid @RequestPart("item") Item item,
+                                                      @NotNull @RequestPart("imagem") MultipartFile img){
         log.info(">>> criar: recebendo requisição para criar item");    
         Item novoItem = this.itemService.criar(item, img);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(novoItem.getId()).toUri();
-        return ResponseEntity.created(uri).build();
+
+        return ResponseEntity.created (URI.create("/item/" + novoItem.getId())).body (construirRespostaJSON(CHAVES_ITEM_CONTROLLER, asList(CREATED.value(), MSG_ITEM_CRIADO, novoItem.getId())));
     }
 
+    @Override
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> atualizar (@PathVariable UUID id,
+    public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
                                            @Valid @RequestPart("item") Item item,
                                             @RequestPart("imagem") MultipartFile img) {
         log.info(">>> atualizar: recebendo requisição para atualizar item");
         item.setId(id);
-        this.itemService.atualizar(item, img);
+        Item itemAtt = itemService.atualizar(item, img);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_ITEM_CONTROLLER, asList(OK.value(),
+                MSG_ITEM_ATUALIZADO, itemAtt.getId())));
     }
 
+    @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar (@PathVariable UUID id) {
+    public ResponseEntity<Map<String, Object>> deletar (@PathVariable UUID id) {
         log.info(">>> deletar: recebendo requisição para deletar item");
         this.itemService.deletar(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_ITEM_CONTROLLER, asList(OK.value(),
+                MSG_ITEM_DELETADO, id)));
     }
 }

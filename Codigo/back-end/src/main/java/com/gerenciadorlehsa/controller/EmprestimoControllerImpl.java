@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.components.abstracts.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
+import com.gerenciadorlehsa.controller.interfaces.TransacaoController;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EmprestimoDTORes;
 import com.gerenciadorlehsa.entity.Emprestimo;
@@ -35,11 +36,10 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_EMPRESTIMO)
 @AllArgsConstructor
-public class EmprestimoControllerImpl implements OperacoesCRUDController<EmprestimoDTO, EmprestimoDTORes> {
+public class EmprestimoControllerImpl implements OperacoesCRUDController<EmprestimoDTO, EmprestimoDTORes>, TransacaoController {
 
     private final TransacaoService<Emprestimo> transacaoService;
     private final OperacoesCRUDService<Emprestimo> operacoesCRUDService;
-    private final EmprestimoService emprestimoService;
     private final MapaTransacaoItemService<Emprestimo> mapaTransacaoItemService;
     TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> emprestimoEntityConverterComp;
 
@@ -84,6 +84,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
         return ResponseEntity.ok().body(emprestimos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
 
+    @Override
     @PatchMapping("/{id}/{status}")
     public ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
                                                                 @PathVariable String status) {

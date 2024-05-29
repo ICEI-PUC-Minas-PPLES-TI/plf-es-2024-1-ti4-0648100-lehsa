@@ -10,11 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public interface AgendamentoController {
-
-    @PatchMapping("/{id}/{status}")
-    ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
-                                                                @PathVariable String status);
+public interface AgendamentoController extends TransacaoController{
 
     @PatchMapping("/tecnico/{id}/{email}")
     ResponseEntity<Map<String, Object>> atualizarTecnico (@PathVariable UUID id,

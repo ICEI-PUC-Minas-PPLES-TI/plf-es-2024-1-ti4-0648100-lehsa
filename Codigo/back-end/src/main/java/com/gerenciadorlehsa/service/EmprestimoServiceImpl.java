@@ -221,18 +221,21 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     }
 
 
-    private void deletarEmprestimoDaListaDoUsuario(Emprestimo emprestimo) {
+    @Override
+    public void deletarEmprestimoDaListaDoUsuario(Emprestimo emprestimo) {
         if(emprestimo.getSolicitante () != null)
             emprestimo.getSolicitante().getEmprestimos().remove (emprestimo);
     }
 
-    private void verificarConflitosDeEmprestimo(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+    @Override
+    public void verificarConflitosDeEmprestimo(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
         if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty()) {
             throw new EmprestimoException("Já existe emprestimo ou agendamento aprovado pelo administrador ou confirmado pelo usuário para essa data");
         }
     }
 
-    private void validarDataHoraAtt(List<String> atributosIguais, Emprestimo obj){
+    @Override
+    public void validarDataHoraAtt(List<String> atributosIguais, Emprestimo obj){
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
         if (!atributosIguais.contains("dataHoraInicio") || !atributosIguais.contains("dataHoraFim")) {
@@ -247,7 +250,8 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         }
     }
 
-    private void deletarEndereco (Endereco endereco) {
+    @Override
+    public void deletarEndereco (Endereco endereco) {
         int nEmprestimosComEndereco = emprestimoRepository.countEmprestimoByLocalUso(endereco);
 
         if (nEmprestimosComEndereco == 1 || nEmprestimosComEndereco == 0) {

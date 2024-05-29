@@ -104,6 +104,7 @@ public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Profe
     }
 
 
+    @Override
     @GetMapping("/{id}/agendamentos")
     public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoProfessor(@PathVariable UUID id) {
         log.info(">>> listarAgendamento: recebendo requisição para listar todos agendamentos de um professor");
