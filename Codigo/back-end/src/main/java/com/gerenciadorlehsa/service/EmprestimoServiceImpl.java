@@ -218,10 +218,6 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         }
     }
 
-    @Override
-    public void copiarAtributosRelevantes (Agendamento source, Agendamento target, List<String> atributosIguais) {
-
-    }
 
     private void deletarEmprestimoDaListaDoUsuario(Emprestimo emprestimo) {
         if(emprestimo.getSolicitante () != null)

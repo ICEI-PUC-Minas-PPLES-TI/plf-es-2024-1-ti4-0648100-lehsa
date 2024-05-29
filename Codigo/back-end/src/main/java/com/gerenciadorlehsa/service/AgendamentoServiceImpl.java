@@ -5,24 +5,24 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.events.ObterTecnicoPorEmailEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
@@ -38,16 +38,20 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     private final MensagemEmailService mensagemEmailService;
 
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Autowired
     public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
                                    AgendamentoRepository agendamentoRepository,
-                                   MensagemEmailService mensagemEmailService) {
+                                   MensagemEmailService mensagemEmailService,
+                                   ApplicationEventPublisher eventPublisher) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
+        this.eventPublisher = eventPublisher;
     }
+
 
 //----------------CRUD - INÍCIO---------------------------------------
 
@@ -184,14 +188,21 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
 
     @Override
-    public void atualizarTecnico(User tecnico, @NotNull UUID id) {
+    public void atualizarTecnico(String email, @NotNull UUID id) {
         log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
-        //User tecnico = usuarioService.encontrarPorEmail(email);
+        User tecnico = obterTecnico (email);
         Agendamento agendamento = encontrarPorId(id);
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         verificarPerfilTecnico(tecnico);
         agendamento.setTecnico(tecnico);
         this.agendamentoRepository.save(agendamento);
+    }
+
+    @Override
+    public User obterTecnico(String email) {
+        ObterTecnicoPorEmailEvent event = new ObterTecnicoPorEmailEvent (this, email);
+        eventPublisher.publishEvent(event);
+        return event.getUser();
     }
 
     @Override
@@ -263,6 +274,11 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         if (conflitoDeData) {
             throw new ConflitoDataException ("O Professor tem um agendamento marcado pra essa data");
         }
+    }
+
+    @Override
+    public Agendamento saveAgendamento(Agendamento agendamento) {
+        return agendamentoRepository.save (agendamento);
     }
 
 //----------------AgendamentoService - FIM ---------------------------
@@ -381,14 +397,6 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         }
     }
 
-    @Override
-    public void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
-        atributosIguais.add("tecnico");
-        atributosIguais.add("statusTransacaoItem");
-        atributosIguais.add("id");
-        String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
-        copyProperties(source, target, propriedadesIgnoradas);
-    }
 
     @Override
     public void verificarCondicoesDeConfirmacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
@@ -462,5 +470,14 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
                     "aprovada, confirmada ou em análise");
 
     }
+
+    public void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
+        atributosIguais.add("tecnico");
+        atributosIguais.add("statusTransacaoItem");
+        atributosIguais.add("id");
+        String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
+        copyProperties(source, target, propriedadesIgnoradas);
+    }
+
 
 }

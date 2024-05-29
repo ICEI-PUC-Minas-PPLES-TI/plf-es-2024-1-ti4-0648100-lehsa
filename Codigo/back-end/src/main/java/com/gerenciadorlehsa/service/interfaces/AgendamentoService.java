@@ -10,7 +10,9 @@ import java.util.UUID;
 
 public interface AgendamentoService {
 
-    void atualizarTecnico (User tecnico, @NotNull UUID id);
+    void atualizarTecnico (String email, @NotNull UUID id);
+
+    User obterTecnico(String email);
 
     void deletarAgendamentoSeVazio(UUID id);
 
@@ -31,5 +33,7 @@ public interface AgendamentoService {
     void verificarConfirmacaoCadastroProfessor(Agendamento agendamento);
 
     Agendamento verificarNovoProfessor(Agendamento novoAgedamento, Agendamento velhoAgendamento);
+
+    Agendamento saveAgendamento(Agendamento agendamento);
 
 }

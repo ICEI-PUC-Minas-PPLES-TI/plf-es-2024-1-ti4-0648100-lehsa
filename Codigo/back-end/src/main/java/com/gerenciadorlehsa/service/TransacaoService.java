@@ -12,7 +12,9 @@ import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoSer
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +32,8 @@ public abstract class TransacaoService<T extends Transacao> {
 
     protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
-    public TransacaoService (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
+    @Autowired
+    public TransacaoService(ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
         this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
     }
 
@@ -56,14 +59,12 @@ public abstract class TransacaoService<T extends Transacao> {
     public abstract void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(T transacao, StatusTransacaoItem status);
 
 
-    public abstract void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais);
-
     public abstract void verificarCondicoesDeConfirmacao(T transacao, StatusTransacaoItem statusTransacaoItem);
 
 
     public abstract void verificarCondicoesDeAprovacao(T agendamento, StatusTransacaoItem statusUpperCase);
 
-    protected boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
+    public boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
         log.info(">>> Verificando datas conflitantes: barrando transacao solicitado em uma mesma data");
 
         if (transacaoExistente.getId() == novaTransacao.getId())
