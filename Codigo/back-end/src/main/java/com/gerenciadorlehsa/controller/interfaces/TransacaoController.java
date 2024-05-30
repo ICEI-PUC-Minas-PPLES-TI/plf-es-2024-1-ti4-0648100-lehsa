@@ -13,13 +13,13 @@ public interface TransacaoController {
     ResponseEntity<Map<String, Object>> atualizarStatus (@PathVariable UUID id,
                                                          @PathVariable String status);
 
-    default <T extends Transacao> ValidarMapaTransacaoItemEvent<T> generateEvent(T transacao) {
+    default <T extends Transacao> ValidarMapaTransacaoItemEvent<T> generateEventObject(T transacao) {
         return new ValidarMapaTransacaoItemEvent<> (transacao,
                 transacao,
                 transacao.getId ());
     }
 
-    default <T extends Transacao> ValidarMapaTransacaoItemEvent<T> generateEvent(T transacao, UUID id) {
+    default <T extends Transacao> ValidarMapaTransacaoItemEvent<T> generateEventObject(T transacao, UUID id) {
         return new ValidarMapaTransacaoItemEvent<> (transacao,
                 transacao,
                 id);

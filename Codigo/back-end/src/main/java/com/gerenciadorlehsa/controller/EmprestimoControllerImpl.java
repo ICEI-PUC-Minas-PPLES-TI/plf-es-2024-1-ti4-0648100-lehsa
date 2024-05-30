@@ -62,7 +62,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
 
         emprestimo.setId (null);
-        eventPublisher.publishEvent(generateEvent (emprestimo));
+        eventPublisher.publishEvent(generateEventObject (emprestimo));
 
         Emprestimo emprestimoCriado = operacoesCRUDService.criar(emprestimo);
         return ResponseEntity.created (URI.create("/emprestimo/" + emprestimoCriado.getId())).body (construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(CREATED.value(), MSG_EMPRESTIMO_CRIADO, emprestimoCriado.getId())));
@@ -74,7 +74,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
                                                           @Valid @RequestBody EmprestimoDTO obj) {
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
 
-        eventPublisher.publishEvent(generateEvent (emprestimo, id));
+        eventPublisher.publishEvent(generateEventObject (emprestimo, id));
 
         emprestimo.setId(id);
         Emprestimo emprestimoAtt = operacoesCRUDService.atualizar(emprestimo);

@@ -92,7 +92,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         agendamento.setId (null);
 
         log.info (">>> Validar o mapa que rege a relação entre itens e agendamento");
-        eventPublisher.publishEvent(generateEvent (agendamento));
+        eventPublisher.publishEvent(generateEventObject (agendamento));
 
 
         log.info (">>> Criar um agendamento");
@@ -115,7 +115,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (obj);
 
         log.info (">>> Validar o mapa que rege a relação entre itens e agendamento");
-        eventPublisher.publishEvent(generateEvent (agendamento, id));
+        eventPublisher.publishEvent(generateEventObject (agendamento, id));
 
         Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
 
