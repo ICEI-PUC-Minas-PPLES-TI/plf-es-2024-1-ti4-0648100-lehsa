@@ -10,6 +10,8 @@ import java.util.UUID;
 
 public interface AgendamentoService {
 
+    boolean agendamentoExiste(UUID id);
+
     void atualizarTecnico (String email, @NotNull UUID id);
 
     User obterTecnico(String email);

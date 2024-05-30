@@ -9,7 +9,7 @@ import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.dto.SenhaDTO;
@@ -20,6 +20,7 @@ import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.USUARIO_SERVICE;
@@ -31,17 +32,22 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = USUARIO_SERVICE)
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor // Gera construtor para aqueles atributos final ou @NonNull
 @Schema(description = "Serviço responsável pelo gerenciamento dos usuários")
-public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService{
+public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService, ApplicationEventPublisherAware {
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
-
-    private ApplicationEventPublisher eventPublisher;
 
     private final UsuarioRepository usuarioRepository;
 
     private final PasswordEncoderServiceImpl passwordEncoder;
+    private ApplicationEventPublisher eventPublisher;
+
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
 
     /**
@@ -216,6 +222,8 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses emprestimos");
     }
 
+
+
     private void removerUsuarioDoAgendamento(Agendamento agendamento, User user) {
         agendamento.getSolicitantes().remove(user);
         verificarAgendamentoSemSolicitantes(agendamento, user);
@@ -224,16 +232,28 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
 
     private void verificarAgendamentoSemSolicitantes(Agendamento agendamento, User user) {
         if (agendamento.getSolicitantes().isEmpty()) {
-            eventPublisher.publishEvent(new AgendamentoSemSolicitantesEvent(this, user));
+            publish (new AgendamentoSemSolicitantesEvent(this, user, agendamento));
         }
     }
 
     private void verificarAgendamentoSemTecnico(Agendamento agendamento, User user) {
-        if (agendamento.getTecnico() != null
-                && agendamento.getTecnico().getId() != null
-                && agendamento.getTecnico().getId().equals(user.getId())) {
-
-            eventPublisher.publishEvent(new AgendamentoSemTecnicoEvent(this, agendamento));
+        if (agendamento.getTecnico() != null && agendamento.getTecnico().getId().equals(user.getId())) {
+            publish (new AgendamentoSemTecnicoEvent(this, agendamento));
         }
     }
+
+
+    private void publish(AgendamentoSemSolicitantesEvent event) {
+        if (this.eventPublisher != null) {
+            this.eventPublisher.publishEvent(event);
+        }
+    }
+
+
+    private void publish(AgendamentoSemTecnicoEvent event) {
+        if (this.eventPublisher != null) {
+            this.eventPublisher.publishEvent(event);
+        }
+    }
+
 }

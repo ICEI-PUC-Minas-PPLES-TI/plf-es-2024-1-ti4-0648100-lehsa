@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @AllArgsConstructor
 public class AgendamentoSemTecnicoListener {
@@ -18,10 +20,12 @@ public class AgendamentoSemTecnicoListener {
 
     @EventListener
     public void handleAgendamentoSemTecnicoEvent(AgendamentoSemTecnicoEvent event) {
-        Agendamento agendamentoAtt = operacoesCRUDService.encontrarPorId (event.getAgendamento ().getId ());
-        agendamentoAtt.setTecnico (null);
-        agendamentoService.saveAgendamento (agendamentoAtt);
-
+        UUID AgendamentoId = event.getAgendamento ().getId ();
+        if(agendamentoService.agendamentoExiste (AgendamentoId)) {
+            Agendamento agendamentoAtt = operacoesCRUDService.encontrarPorId (AgendamentoId);
+            agendamentoAtt.setTecnico (null);
+            agendamentoService.saveAgendamento (agendamentoAtt);
+        }
     }
 
 }

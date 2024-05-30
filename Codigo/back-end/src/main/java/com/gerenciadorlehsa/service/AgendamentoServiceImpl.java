@@ -13,11 +13,13 @@ import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
@@ -34,23 +36,26 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
 @Schema(description = "Contém as regras de negócio para agendar o uso do laboratório")
-public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService, ApplicationEventPublisherAware {
 
     private final AgendamentoRepository agendamentoRepository;
 
     private final MensagemEmailService mensagemEmailService;
 
-    private final ApplicationEventPublisher eventPublisher;
+    private ApplicationEventPublisher eventPublisher;
 
 
     @Autowired
     public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
                                    AgendamentoRepository agendamentoRepository,
-                                   MensagemEmailService mensagemEmailService,
-                                   ApplicationEventPublisher eventPublisher) {
+                                   MensagemEmailService mensagemEmailService) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
+    }
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
 
@@ -155,6 +160,12 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 //----------------AgendamentoService - INÍCIO ---------------------------
 
 
+    @Override
+    @Operation(description = "Retorna verdadeiro se o agendamento existir")
+    public boolean agendamentoExiste(UUID id) {
+        return agendamentoRepository.existsById(id);
+    }
+
 
     @Override
     public void verificarConfirmacaoCadastroProfessor(Agendamento agendamento) {
@@ -203,7 +214,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     @Override
     public User obterTecnico(String email) {
         ObterTecnicoPorEmailEvent event = new ObterTecnicoPorEmailEvent (this, email);
-        eventPublisher.publishEvent(event);
+        publish (event);
         return event.getUser();
     }
 
@@ -482,5 +493,10 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         copyProperties(source, target, propriedadesIgnoradas);
     }
 
+    public void publish(ObterTecnicoPorEmailEvent event) {
+        if (this.eventPublisher != null) {
+            this.eventPublisher.publishEvent(event);
+        }
+    }
 
 }
