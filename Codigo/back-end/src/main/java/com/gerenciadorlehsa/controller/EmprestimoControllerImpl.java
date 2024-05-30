@@ -6,18 +6,18 @@ import com.gerenciadorlehsa.controller.interfaces.TransacaoController;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EmprestimoDTORes;
 import com.gerenciadorlehsa.entity.Emprestimo;
-import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.TransacaoService;
-import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -35,13 +35,19 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @Validated
 @RequestMapping(ENDPOINT_EMPRESTIMO)
-@AllArgsConstructor
-public class EmprestimoControllerImpl implements OperacoesCRUDController<EmprestimoDTO, EmprestimoDTORes>, TransacaoController {
+@RequiredArgsConstructor
+public class EmprestimoControllerImpl implements OperacoesCRUDController<EmprestimoDTO, EmprestimoDTORes>, TransacaoController, ApplicationEventPublisherAware {
 
     private final TransacaoService<Emprestimo> transacaoService;
     private final OperacoesCRUDService<Emprestimo> operacoesCRUDService;
-    private final MapaTransacaoItemService<Emprestimo> mapaTransacaoItemService;
-    TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> emprestimoEntityConverterComp;
+    private final TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> emprestimoEntityConverterComp;
+
+    private ApplicationEventPublisher eventPublisher;
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @Override
     @GetMapping("/{id}")
@@ -54,7 +60,10 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     @PostMapping
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody EmprestimoDTO obj) {
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
-        mapaTransacaoItemService.validarMapaParaCriacao (emprestimo);
+
+        emprestimo.setId (null);
+        eventPublisher.publishEvent(generateEvent (emprestimo));
+
         Emprestimo emprestimoCriado = operacoesCRUDService.criar(emprestimo);
         return ResponseEntity.created (URI.create("/emprestimo/" + emprestimoCriado.getId())).body (construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(CREATED.value(), MSG_EMPRESTIMO_CRIADO, emprestimoCriado.getId())));
     }
@@ -64,7 +73,9 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
                                                           @Valid @RequestBody EmprestimoDTO obj) {
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
-        mapaTransacaoItemService.validarMapaParaAtualizacao (id, emprestimo);
+
+        eventPublisher.publishEvent(generateEvent (emprestimo, id));
+
         emprestimo.setId(id);
         Emprestimo emprestimoAtt = operacoesCRUDService.atualizar(emprestimo);
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_ATUALIZADO, emprestimoAtt.getId())));

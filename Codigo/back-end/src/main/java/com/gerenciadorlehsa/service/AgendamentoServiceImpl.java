@@ -36,7 +36,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
 @Schema(description = "Contém as regras de negócio para agendar o uso do laboratório")
-public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService, ApplicationEventPublisherAware {
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService, ApplicationEventPublisherAware{
 
     private final AgendamentoRepository agendamentoRepository;
 
@@ -85,6 +85,8 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     public Agendamento criar (Agendamento obj) {
         log.info(">>> criando: criando agendamento");
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+
+        obj.setId (null);
 
         verificarConfirmacaoCadastroProfessor (obj);
 
@@ -338,6 +340,11 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         }
     }
 
+    @Override
+    public void removeIfMatchingId(UUID id, List<Agendamento> transacoes) {
+        transacoes.removeIf(transacao -> transacao.getId().equals(id));
+    }
+
 
     @Override
     public List<Agendamento> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
@@ -400,7 +407,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
     @Override
-    public void deletarItensAssociados(Item item) {
+    public void deletarItemAssociado(Item item) {
         List<Agendamento> agendamentos = agendamentoRepository.findByItem(item);
 
         if(agendamentos != null && !agendamentos.isEmpty ()) {
@@ -458,7 +465,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
 
-    public void deletarAgendamentoDaListaDosUsuarios(Agendamento agendamento) {
+    private void deletarAgendamentoDaListaDosUsuarios(Agendamento agendamento) {
 
         if(agendamento.getSolicitantes () != null && !agendamento.getSolicitantes ().isEmpty ())
             for (User solicitante : agendamento.getSolicitantes()) {
@@ -485,7 +492,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         }
     }
 
-    public void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
+    private void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
         atributosIguais.add("tecnico");
         atributosIguais.add("statusTransacaoItem");
         atributosIguais.add("id");
@@ -493,10 +500,14 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         copyProperties(source, target, propriedadesIgnoradas);
     }
 
-    public void publish(ObterTecnicoPorEmailEvent event) {
+
+
+
+    private void publish(ObterTecnicoPorEmailEvent event) {
         if (this.eventPublisher != null) {
             this.eventPublisher.publishEvent(event);
         }
     }
+
 
 }

@@ -7,10 +7,8 @@ import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.service.TransacaoService;
-import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,8 +17,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,15 +46,20 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @Validated
 @RequestMapping(ENDPOINT_AGENDAMENTO)
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Agendamento", description = "APIs relacionadas a operações de agendamento")
-public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>, AgendamentoController {
+public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>, AgendamentoController, ApplicationEventPublisherAware {
 
     private final TransacaoService<Agendamento> transacaoService;
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
     private final AgendamentoService agendamentoService;
-    private final MapaTransacaoItemService<Agendamento> mapaTransacaoItemService;
-    TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> agendamentoEntityConverterComp;
+    private final TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> agendamentoEntityConverterComp;
+    private ApplicationEventPublisher eventPublisher;
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
 
     @Override
@@ -83,8 +89,11 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         log.info (">>> Convertendo DTO para entidade");
         Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity(agendamentoDTO);
 
+        agendamento.setId (null);
+
         log.info (">>> Validar o mapa que rege a relação entre itens e agendamento");
-        mapaTransacaoItemService.validarMapaParaCriacao(agendamento);
+        eventPublisher.publishEvent(generateEvent (agendamento));
+
 
         log.info (">>> Criar um agendamento");
         Agendamento agendamentoCriado = operacoesCRUDService.criar(agendamento);
@@ -104,8 +113,10 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
                                                           @Valid @RequestBody AgendamentoDTO obj) {
         log.info(">>> atualizar: recebendo requisição para atualizar agendamento");
         Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (obj);
-        mapaTransacaoItemService.validarMapaParaAtualizacao (id, agendamento);
-        agendamento.setId(id);
+
+        log.info (">>> Validar o mapa que rege a relação entre itens e agendamento");
+        eventPublisher.publishEvent(generateEvent (agendamento, id));
+
         Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_ATUALIZADO, agendamentoAtt.getId())));
@@ -209,7 +220,5 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
 
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_AGENDAMENTO_CONTROLLER, asList(OK.value(), MSG_AGENDAMENTO_PROFESSOR_CONFIRMA, id)));
     }
-
-
 
 }

@@ -2,22 +2,24 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
+import com.gerenciadorlehsa.events.DeletarItemEmTransacoesEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
 import com.gerenciadorlehsa.repository.ItemRepository;
 import com.gerenciadorlehsa.service.interfaces.ItemService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
-import com.gerenciadorlehsa.service.interfaces.OperacoesImagemService;
 import com.gerenciadorlehsa.util.ConstantesImgUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.beans.PropertyDescriptor;
@@ -31,14 +33,18 @@ import static java.lang.String.format;
 
 @Service
 @Slf4j(topic = ITEM_SERVICE)
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Schema(description = "Contém as regras de negócio para os itens do laboratório")
-public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemService {
+public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemService, ApplicationEventPublisherAware {
 
 
     private final ItemRepository itemRepository;
-    private final MapaTransacaoItemService<?> mapaTransacaoItemService;
+    private ApplicationEventPublisher eventPublisher;
 
+    @Override
+    public void setApplicationEventPublisher (@org.jetbrains.annotations.NotNull ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     // --------------- CRUD - INICIO ---------------------------------------
 
@@ -105,7 +111,7 @@ public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemServi
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
-        mapaTransacaoItemService.deletarItensAssociados (item);
+        publish (new DeletarItemEmTransacoesEvent (this, item));
         try {
             deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
@@ -245,5 +251,10 @@ public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemServi
         return emptyNames.stream().toList();
     }
 
+    private void publish(DeletarItemEmTransacoesEvent event) {
+        if (this.eventPublisher != null) {
+            this.eventPublisher.publishEvent(event);
+        }
+    }
 
 }

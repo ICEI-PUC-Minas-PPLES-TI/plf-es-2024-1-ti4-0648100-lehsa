@@ -134,6 +134,11 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     }
 
     @Override
+    public void removeIfMatchingId (UUID id, List<Emprestimo> transacoes) {
+        transacoes.removeIf(transacao -> transacao.getId().equals(id));
+    }
+
+    @Override
     public void verificarCondicoesDeConfirmacao(Emprestimo emprestimo, StatusTransacaoItem statusUpperCase) {
         if(statusUpperCase.equals (CONFIRMADO)) {
 
@@ -201,7 +206,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     }
 
     @Override
-    public void deletarItensAssociados (Item item) {
+    public void deletarItemAssociado (Item item) {
         List<Emprestimo> emprestimos = emprestimoRepository.findByItem(item);
 
         if(emprestimos != null && !emprestimos.isEmpty ()) {

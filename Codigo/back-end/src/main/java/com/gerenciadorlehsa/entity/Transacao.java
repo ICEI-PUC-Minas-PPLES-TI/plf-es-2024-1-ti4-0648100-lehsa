@@ -8,6 +8,7 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,6 +43,7 @@ public abstract class Transacao implements Serializable {
 
 
     public abstract void preRemove();
+
 
     public abstract Map<Item, Integer> getItensQuantidade();
 
