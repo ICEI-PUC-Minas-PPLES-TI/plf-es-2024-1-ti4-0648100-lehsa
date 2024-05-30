@@ -52,6 +52,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<EmprestimoDTORes> encontrarPorId (@PathVariable UUID id) {
+        log.info(">>> encontrarPorId: recebendo requisição para encontrar emprestimo por id");
         Emprestimo emprestimo = operacoesCRUDService.encontrarPorId(id);
         return ResponseEntity.ok().body(converterParaDtoRes(emprestimo));
     }
@@ -59,6 +60,8 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     @Override
     @PostMapping
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody EmprestimoDTO obj) {
+        log.info(">>> Criar: recebendo requisição para criar emprestimo");
+
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
 
         emprestimo.setId (null);
@@ -72,6 +75,8 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
                                                           @Valid @RequestBody EmprestimoDTO obj) {
+        log.info(">>> atualizar: recebendo requisição para atualizar emprestimo");
+
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
 
         eventPublisher.publishEvent(generateEventObject (emprestimo, id));
@@ -84,6 +89,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deletar (@PathVariable UUID id) {
+        log.info(">>> deletar: recebendo requisição para deletar emprestimo");
         operacoesCRUDService.deletar(id);
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_DELETADO, id)));
     }
@@ -91,6 +97,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     @Override
     @GetMapping
     public ResponseEntity<List<EmprestimoDTORes>> listarTodos () {
+        log.info(">>> listarTodos: recebendo requisição para listar todos emprestimos");
         List<Emprestimo> emprestimos = operacoesCRUDService.listarTodos();
         return ResponseEntity.ok().body(emprestimos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
     }
