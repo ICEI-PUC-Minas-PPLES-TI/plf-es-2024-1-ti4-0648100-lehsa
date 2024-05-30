@@ -86,8 +86,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         log.info(">>> criando: criando agendamento");
         validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
-        obj.setId (null);
-
         verificarConfirmacaoCadastroProfessor (obj);
 
         //Enviar e-mail confirmação:
