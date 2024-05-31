@@ -83,8 +83,8 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
         log.info(">>> atualizar: recebendo requisição para atualizar agendamento");
         Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (obj);
 
+        agendamento.setId (id);
         mapaTransacaoItemService.validarMapa (id, agendamento);
-
 
         Agendamento agendamentoAtt = operacoesCRUDService.atualizar(agendamento);
 

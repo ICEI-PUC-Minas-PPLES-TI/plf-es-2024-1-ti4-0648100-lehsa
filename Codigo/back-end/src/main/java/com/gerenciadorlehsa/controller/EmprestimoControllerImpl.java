@@ -72,9 +72,9 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
 
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
 
+        emprestimo.setId(id);
         mapaTransacaoItemService.validarMapa (id, emprestimo);
 
-        emprestimo.setId(id);
         Emprestimo emprestimoAtt = operacoesCRUDService.atualizar(emprestimo);
         return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(OK.value(), MSG_EMPRESTIMO_ATUALIZADO, emprestimoAtt.getId())));
     }
