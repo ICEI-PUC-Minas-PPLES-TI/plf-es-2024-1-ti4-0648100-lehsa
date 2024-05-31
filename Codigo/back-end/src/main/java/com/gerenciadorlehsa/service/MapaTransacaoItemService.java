@@ -1,54 +1,49 @@
-package com.gerenciadorlehsa.listeners;
+package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
-import com.gerenciadorlehsa.events.ValidarMapaTransacaoItemEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
-import com.gerenciadorlehsa.service.TransacaoService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Component
+import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.MAPA_TRANSACAO_ITEM_SERVICE;
+
+@Slf4j(topic = MAPA_TRANSACAO_ITEM_SERVICE)
+@Service
 @AllArgsConstructor
-public class ValidarMapaTransacaoItemListener<T extends Transacao> {
+@Schema(description = "Responsável por lidar com a relação entre item e transação")
+public class MapaTransacaoItemService<T extends Transacao> {
 
     private final TransacaoService<Emprestimo> transacaoEmprestimoService;
     private final TransacaoService<Agendamento> transacaoAgendamentoService;
 
-    @EventListener
-    @Order(1)
-    public void verificarQuantidadeDeItemInValida(ValidarMapaTransacaoItemEvent<T> event){
-        for (Map.Entry<Item, Integer> entrada : event.getTransacao ().getItensQuantidade ().entrySet()) {
-            Item item = entrada.getKey();
-            Integer quantidadeInformada = entrada.getValue();
-
-            if (quantidadeInformada < 0) {
-                throw new AgendamentoException ("A quantidade informada é menor que zero");
-            }
-
-            if (quantidadeInformada > item.getQuantidade()) {
-                throw new AgendamentoException("A quantidade informada é maior do que a quantidade que existe em estoque");
-            }
-        }
+    public void validarMapa(T transacao) {
+        log.info(">>> Validando Mapa para criação de Transacao");
+        verificarQuantidadeDeItemInValida(transacao.getItensQuantidade());
+        verificarQuantidadeSelecionada(null, transacao);
     }
 
-    @EventListener
-    @Order(2)
-    public void verificarQuantidadeSelecionada(ValidarMapaTransacaoItemEvent<T> event) {
-        for (Map.Entry<Item, Integer> entry : event.getTransacao ().getItensQuantidade ().entrySet()) {
+    public void validarMapa(UUID id, T transacao) {
+        log.info(">>> Validando Mapa para atualização de Transacao");
+        verificarQuantidadeDeItemInValida(transacao.getItensQuantidade());
+        verificarQuantidadeSelecionada(id, transacao);
+    }
+
+    public void verificarQuantidadeSelecionada(UUID id, T transacao) {
+        log.info (">>> Verificando disponibilidade do número de itens");
+        for (Map.Entry<Item, Integer> entry : transacao.getItensQuantidade().entrySet()) {
             Item item = entry.getKey();
             int quantidadeSelecionada = entry.getValue();
-            int quantidadeDisponivel = calcularQuantidadeDisponivelParaItem(event.getTransacao (), event.getTransacaoId (), item);
+            int quantidadeDisponivel = calcularQuantidadeDisponivelParaItem(transacao, id, item);
 
             if (quantidadeSelecionada > quantidadeDisponivel) {
                 throw new TransacaoException ("Quantidade selecionada para o item " + item.getNome() + " excede a quantidade disponível.");
@@ -56,8 +51,7 @@ public class ValidarMapaTransacaoItemListener<T extends Transacao> {
         }
     }
 
-
-    private int calcularQuantidadeDisponivelParaItem(T transacao, UUID id, Item item) {
+    public int calcularQuantidadeDisponivelParaItem(T transacao, UUID id, Item item) {
         LocalDateTime inicio = transacao.getDataHoraInicio ();
         LocalDateTime fim = transacao.getDataHoraFim ();
 
@@ -83,6 +77,22 @@ public class ValidarMapaTransacaoItemListener<T extends Transacao> {
 
     private List<Agendamento> buscarAgendamentosEmConflito(LocalDateTime inicio, LocalDateTime fim) {
         return transacaoAgendamentoService.transacoesAprovadasOuConfirmadasConflitantes(inicio, fim);
+    }
+
+    private void verificarQuantidadeDeItemInValida(Map<Item, Integer> itensQuantidade) {
+        log.info (">>> Validando a quantidade de item da transação");
+        for (Map.Entry<Item, Integer> entrada : itensQuantidade.entrySet()) {
+            Item item = entrada.getKey();
+            Integer quantidadeInformada = entrada.getValue();
+
+            if (quantidadeInformada < 0) {
+                throw new AgendamentoException ("A quantidade informada é menor que zero");
+            }
+
+            if (quantidadeInformada > item.getQuantidade()) {
+                throw new AgendamentoException("A quantidade informada é maior do que a quantidade que existe em estoque");
+            }
+        }
     }
 
 

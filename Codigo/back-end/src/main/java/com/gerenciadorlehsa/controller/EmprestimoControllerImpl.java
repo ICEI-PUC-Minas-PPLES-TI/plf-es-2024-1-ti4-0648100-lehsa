@@ -6,7 +6,9 @@ import com.gerenciadorlehsa.controller.interfaces.TransacaoController;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EmprestimoDTORes;
 import com.gerenciadorlehsa.entity.Emprestimo;
+import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.TransacaoService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
@@ -35,19 +37,15 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @Validated
 @RequestMapping(ENDPOINT_EMPRESTIMO)
-@RequiredArgsConstructor
-public class EmprestimoControllerImpl implements OperacoesCRUDController<EmprestimoDTO, EmprestimoDTORes>, TransacaoController, ApplicationEventPublisherAware {
+@AllArgsConstructor
+public class EmprestimoControllerImpl implements OperacoesCRUDController<EmprestimoDTO, EmprestimoDTORes>, TransacaoController{
 
     private final TransacaoService<Emprestimo> transacaoService;
     private final OperacoesCRUDService<Emprestimo> operacoesCRUDService;
     private final TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> emprestimoEntityConverterComp;
+    private final MapaTransacaoItemService<Emprestimo> mapaTransacaoItemService;
 
-    private ApplicationEventPublisher eventPublisher;
 
-    @Override
-    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
 
     @Override
     @GetMapping("/{id}")
@@ -65,7 +63,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
 
         emprestimo.setId (null);
-        eventPublisher.publishEvent(generateEventObject (emprestimo));
+        mapaTransacaoItemService.validarMapa (emprestimo);
 
         Emprestimo emprestimoCriado = operacoesCRUDService.criar(emprestimo);
         return ResponseEntity.created (URI.create("/emprestimo/" + emprestimoCriado.getId())).body (construirRespostaJSON(CHAVES_EMPRESTIMO_CONTROLLER, asList(CREATED.value(), MSG_EMPRESTIMO_CRIADO, emprestimoCriado.getId())));
@@ -79,7 +77,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
 
         Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
 
-        eventPublisher.publishEvent(generateEventObject (emprestimo, id));
+        mapaTransacaoItemService.validarMapa (id, emprestimo);
 
         emprestimo.setId(id);
         Emprestimo emprestimoAtt = operacoesCRUDService.atualizar(emprestimo);
