@@ -110,9 +110,10 @@ public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemServi
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
-        publishEvent (new DeletarItemEmTransacoesEvent (this, item));
+        DeletarItemEmTransacoesEvent event = new DeletarItemEmTransacoesEvent (this, item);
+        publishEvent (event);
         try {
-            deleteImage(item.getNomeImg());
+            deleteImage(event.getItem ().getNomeImg());
             this.itemRepository.deleteById(id);
             log.info(format(">>> deletar: item deletado, id: %s", id));
         } catch (IOException e) {
