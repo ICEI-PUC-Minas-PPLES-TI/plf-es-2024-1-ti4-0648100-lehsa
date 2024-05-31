@@ -2,7 +2,7 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
-import com.gerenciadorlehsa.events.DeletarItemEmTransacoesEvent;
+import com.gerenciadorlehsa.events.ItemEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
@@ -20,9 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.beans.PropertyDescriptor;
@@ -110,10 +108,9 @@ public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemServi
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
         Item item = encontrarPorId(id);
-        DeletarItemEmTransacoesEvent event = new DeletarItemEmTransacoesEvent (this, item);
-        publishEvent (event);
+        publishEvent (new ItemEvents.DeletarItemEmTransacoesEvent (this, item));
         try {
-            deleteImage(event.getItem ().getNomeImg());
+            deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
             log.info(format(">>> deletar: item deletado, id: %s", id));
         } catch (IOException e) {

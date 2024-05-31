@@ -5,7 +5,7 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
-import com.gerenciadorlehsa.events.ObterTecnicoPorEmailEvent;
+import com.gerenciadorlehsa.events.AgendamentoEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
@@ -19,9 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
@@ -210,7 +208,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
     @Override
     public User obterTecnico(String email) {
-        ObterTecnicoPorEmailEvent event = new ObterTecnicoPorEmailEvent (this, email);
+        AgendamentoEvents.ObterTecnicoPorEmailEvent event = new AgendamentoEvents.ObterTecnicoPorEmailEvent(this, email);
         publishEvent (event);
         return event.getUser();
     }
