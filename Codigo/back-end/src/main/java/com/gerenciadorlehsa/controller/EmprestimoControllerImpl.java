@@ -9,14 +9,10 @@ import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.TransacaoService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +40,6 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     private final OperacoesCRUDService<Emprestimo> operacoesCRUDService;
     private final TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> emprestimoEntityConverterComp;
     private final MapaTransacaoItemService<Emprestimo> mapaTransacaoItemService;
-
 
 
     @Override

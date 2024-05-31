@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-public interface ItemController extends OperacoesImagemController{
+public interface ItemController {
 
     @GetMapping("/tipo/{tipo}")
     ResponseEntity<List<ItemDTO>> encontrarPorTipo (@PathVariable String tipo);

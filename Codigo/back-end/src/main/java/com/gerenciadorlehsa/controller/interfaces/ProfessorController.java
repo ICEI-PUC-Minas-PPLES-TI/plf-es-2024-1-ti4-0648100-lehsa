@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public interface ProfessorController extends OperacoesImagemController{
+public interface ProfessorController {
     @PatchMapping("/confirmacao-cadastro")
     ResponseEntity<Map<String, Object>> confirmarCadastro(@RequestParam("id") UUID id);
 

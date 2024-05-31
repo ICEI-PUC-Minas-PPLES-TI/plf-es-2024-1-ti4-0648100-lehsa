@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.controller.interfaces.ItemController;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDControllerImg;
+import com.gerenciadorlehsa.controller.interfaces.OperacoesImagemController;
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.service.ItemServiceImpl;
@@ -37,7 +38,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_ITEM)
 @AllArgsConstructor
-public class ItemControllerImpl implements ItemController, OperacoesCRUDControllerImg<Item, ItemDTO> {
+public class ItemControllerImpl implements ItemController, OperacoesCRUDControllerImg<Item, ItemDTO>, OperacoesImagemController {
 
     private final ItemService itemService;
     private final OperacoesCRUDServiceImg<Item> operacoesCRUDServiceImg;

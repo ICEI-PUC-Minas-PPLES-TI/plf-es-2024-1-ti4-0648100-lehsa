@@ -14,11 +14,8 @@ import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,13 +34,11 @@ import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-
-
 @Slf4j(topic = AGENDAMENTO_CONTROLLER)
 @RestController
 @Validated
 @RequestMapping(ENDPOINT_AGENDAMENTO)
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Tag(name = "Agendamento", description = "APIs relacionadas a operações de agendamento")
 public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>, AgendamentoController {
 

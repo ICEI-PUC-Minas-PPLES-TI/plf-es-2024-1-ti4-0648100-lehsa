@@ -10,6 +10,7 @@ import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
+import com.gerenciadorlehsa.service.interfaces.EventPublisher;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
 @Schema(description = "Contém as regras de negócio para agendar o uso do laboratório")
-public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService, ApplicationEventPublisherAware{
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService, EventPublisher {
 
     private final AgendamentoRepository agendamentoRepository;
 
@@ -52,11 +54,6 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
-    }
-
-    @Override
-    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
     }
 
 
@@ -214,7 +211,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     @Override
     public User obterTecnico(String email) {
         ObterTecnicoPorEmailEvent event = new ObterTecnicoPorEmailEvent (this, email);
-        publish (event);
+        publishEvent (event);
         return event.getUser();
     }
 
@@ -446,6 +443,19 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 //----------------TransacaoService - FIM ---------------------------
 
 
+// --------------- EventPublish - INICIO ------------------------------------
+    @Override
+    public ApplicationEventPublisher getEventPublisher () {
+        return this.eventPublisher;
+    }
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+// --------------- EventPublish - FIM ------------------------------------
+
 
     private void verificarTransacaoDeMesmaDataDoUsuario(List<User> solicitantes, Agendamento agendamento) {
         log.info(">>> Verificar conflito de data de um solicitante: barrando agendamento de mesma data de um solicitante");
@@ -498,14 +508,6 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         copyProperties(source, target, propriedadesIgnoradas);
     }
 
-
-
-
-    private void publish(ObterTecnicoPorEmailEvent event) {
-        if (this.eventPublisher != null) {
-            this.eventPublisher.publishEvent(event);
-        }
-    }
 
 
 }

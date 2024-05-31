@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.controller;
 
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDControllerImg;
+import com.gerenciadorlehsa.controller.interfaces.OperacoesImagemController;
 import com.gerenciadorlehsa.controller.interfaces.ProfessorController;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.dto.ProfessorDTO;
@@ -37,7 +38,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_PROFESSOR)
 @AllArgsConstructor
-public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Professor, ProfessorDTO>, ProfessorController {
+public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Professor, ProfessorDTO>, ProfessorController, OperacoesImagemController {
 
     OperacoesCRUDServiceImg<Professor> operacoesCRUDService;
 

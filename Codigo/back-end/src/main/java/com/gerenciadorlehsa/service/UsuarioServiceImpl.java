@@ -7,6 +7,7 @@ import com.gerenciadorlehsa.events.AgendamentoSemTecnicoEvent;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.service.interfaces.EventPublisher;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import com.gerenciadorlehsa.repository.UsuarioRepository;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Service
 @RequiredArgsConstructor // Gera construtor para aqueles atributos final ou @NonNull
 @Schema(description = "Serviço responsável pelo gerenciamento dos usuários")
-public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService, ApplicationEventPublisherAware {
+public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService, EventPublisher {
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
@@ -42,12 +44,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
 
     private final PasswordEncoderServiceImpl passwordEncoder;
     private ApplicationEventPublisher eventPublisher;
-
-
-    @Override
-    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
 
 
     /**
@@ -222,38 +218,43 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses emprestimos");
     }
 
+// --------------- EventPublish - INICIO -----------------------------
+
+    @Override
+    public ApplicationEventPublisher getEventPublisher () {
+        return this.eventPublisher;
+    }
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull  ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+// --------------- EventPublish - FIM -----------------------------
 
 
     private void removerUsuarioDoAgendamento(Agendamento agendamento, User user) {
         agendamento.getSolicitantes().remove(user);
+        verificarCondicoesAposRemocao(agendamento, user);
+    }
+
+    private void verificarCondicoesAposRemocao(Agendamento agendamento, User user) {
         verificarAgendamentoSemSolicitantes(agendamento, user);
         verificarAgendamentoSemTecnico(agendamento, user);
     }
 
     private void verificarAgendamentoSemSolicitantes(Agendamento agendamento, User user) {
         if (agendamento.getSolicitantes().isEmpty()) {
-            publish (new AgendamentoSemSolicitantesEvent(this, user, agendamento));
+            publishEvent(new AgendamentoSemSolicitantesEvent(this, user, agendamento));
         }
     }
 
     private void verificarAgendamentoSemTecnico(Agendamento agendamento, User user) {
         if (agendamento.getTecnico() != null && agendamento.getTecnico().getId().equals(user.getId())) {
-            publish (new AgendamentoSemTecnicoEvent(this, agendamento));
+            publishEvent(new AgendamentoSemTecnicoEvent(this, agendamento));
         }
     }
 
 
-    private void publish(AgendamentoSemSolicitantesEvent event) {
-        if (this.eventPublisher != null) {
-            this.eventPublisher.publishEvent(event);
-        }
-    }
-
-
-    private void publish(AgendamentoSemTecnicoEvent event) {
-        if (this.eventPublisher != null) {
-            this.eventPublisher.publishEvent(event);
-        }
-    }
 
 }
