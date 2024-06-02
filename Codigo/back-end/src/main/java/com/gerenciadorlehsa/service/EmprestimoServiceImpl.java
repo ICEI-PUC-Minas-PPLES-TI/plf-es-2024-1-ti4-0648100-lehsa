@@ -80,13 +80,23 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
             throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar a transação");
         validarDataHoraAtt(encontrarAtributosIguais(obj, emprestimoExistente), obj);
 
-
         obj.setStatusTransacaoItem(emprestimoExistente.getStatusTransacaoItem());
         obj.setSolicitante(emprestimoExistente.getSolicitante());
         if (emprestimoRepository.countEmprestimoByLocalUso(emprestimoExistente.getLocalUso()) == 1)
             obj.getLocalUso().setId(emprestimoExistente.getLocalUso().getId());
         return emprestimoRepository.save(obj);
     }
+
+   /* public void atualizarEndereco(Emprestimo newEmprestimo, Emprestimo emprestimoAtt) {
+        Endereco enderecoNewEmprestimo = newEmprestimo.getLocalUso ();
+        if(!enderecoService.enderecoExiste (enderecoNewEmprestimo)) {
+            enderecoNewEmprestimo = enderecoService.criar (enderecoNewEmprestimo);
+            emprestimoAtt.setLocalUso (enderecoNewEmprestimo);
+        } else if (emprestimoAtt.getLocalUso () != enderecoNewEmprestimo) {
+            emprestimoAtt.setLocalUso (enderecoNewEmprestimo);
+        }
+    }*/
+
 
     @Override
     public void deletar (UUID id) {

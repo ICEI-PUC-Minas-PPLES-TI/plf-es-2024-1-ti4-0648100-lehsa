@@ -101,7 +101,6 @@ public class MapaTransacaoItemService<T extends Transacao> implements EventPubli
     }
 
 
-
     @Override
     public ApplicationEventPublisher getEventPublisher () {
         return this.eventPublisher;

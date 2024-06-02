@@ -4,10 +4,8 @@ package com.gerenciadorlehsa.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 
 @Entity
 @Table(name = "TB_EMPRESTIMO")
