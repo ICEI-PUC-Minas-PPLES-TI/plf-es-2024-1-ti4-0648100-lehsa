@@ -64,8 +64,6 @@ public abstract class TransacaoService<T extends Transacao> {
 
     public abstract void verificarCondicoesDeAprovacao(T agendamento, StatusTransacaoItem statusUpperCase);
 
-    public abstract void removeIfMatchingId(UUID id, List<T> transacoes);
-
 
     public boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
         log.info(">>> Verificando datas conflitantes: barrando transacao solicitado em uma mesma data");

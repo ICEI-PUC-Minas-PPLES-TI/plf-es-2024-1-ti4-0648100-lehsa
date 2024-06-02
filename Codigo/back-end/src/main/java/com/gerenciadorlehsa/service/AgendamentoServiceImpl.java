@@ -334,12 +334,6 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
     @Override
-    public void removeIfMatchingId(UUID id, List<Agendamento> transacoes) {
-        transacoes.removeIf(transacao -> transacao.getId().equals(id));
-    }
-
-
-    @Override
     public List<Agendamento> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
         log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
                 "confirmado ou aprovado");

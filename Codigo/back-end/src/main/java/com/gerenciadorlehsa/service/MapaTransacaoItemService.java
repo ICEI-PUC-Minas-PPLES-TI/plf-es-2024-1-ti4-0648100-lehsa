@@ -4,11 +4,16 @@ import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
+import com.gerenciadorlehsa.events.MapaTransacaoItemEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
+import com.gerenciadorlehsa.service.interfaces.EventPublisher;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,10 +26,11 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.MAPA_TRANSACAO_ITE
 @Service
 @AllArgsConstructor
 @Schema(description = "Responsável por lidar com a relação entre item e transação")
-public class MapaTransacaoItemService<T extends Transacao> {
+public class MapaTransacaoItemService<T extends Transacao> implements EventPublisher {
 
     private final TransacaoService<Emprestimo> transacaoEmprestimoService;
     private final TransacaoService<Agendamento> transacaoAgendamentoService;
+    private ApplicationEventPublisher eventPublisher;
 
     public void validarMapa(T transacao) {
         log.info(">>> Validando Mapa para criação de Transacao");
@@ -59,8 +65,7 @@ public class MapaTransacaoItemService<T extends Transacao> {
         List<Agendamento> agendamentosEmConflito = buscarAgendamentosEmConflito(inicio, fim);
 
         if (id != null) {
-            transacaoEmprestimoService.removeIfMatchingId(id, emprestimosEmConflito);
-            transacaoAgendamentoService.removeIfMatchingId(id, agendamentosEmConflito);
+            publishEvent (new MapaTransacaoItemEvents.RemoveMatchingIdEvent (this, agendamentosEmConflito, emprestimosEmConflito, id));
         }
 
         int quantidadeEmprestada = transacaoEmprestimoService.calcularQuantidadeTransacao(item, emprestimosEmConflito);
@@ -96,4 +101,14 @@ public class MapaTransacaoItemService<T extends Transacao> {
     }
 
 
+
+    @Override
+    public ApplicationEventPublisher getEventPublisher () {
+        return this.eventPublisher;
+    }
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 }
