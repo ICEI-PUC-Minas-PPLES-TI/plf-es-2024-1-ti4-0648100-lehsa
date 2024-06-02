@@ -4,7 +4,6 @@ import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
-import com.gerenciadorlehsa.events.MapaTransacaoItemEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
 import com.gerenciadorlehsa.service.interfaces.EventPublisher;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -26,11 +24,10 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.MAPA_TRANSACAO_ITE
 @Service
 @AllArgsConstructor
 @Schema(description = "Responsável por lidar com a relação entre item e transação")
-public class MapaTransacaoItemService<T extends Transacao> implements EventPublisher {
+public class MapaTransacaoItemService<T extends Transacao>{
 
     private final TransacaoService<Emprestimo> transacaoEmprestimoService;
     private final TransacaoService<Agendamento> transacaoAgendamentoService;
-    private ApplicationEventPublisher eventPublisher;
 
     public void validarMapa(T transacao) {
         log.info(">>> Validando Mapa para criação de Transacao");
@@ -65,7 +62,11 @@ public class MapaTransacaoItemService<T extends Transacao> implements EventPubli
         List<Agendamento> agendamentosEmConflito = buscarAgendamentosEmConflito(inicio, fim);
 
         if (id != null) {
-            publishEvent (new MapaTransacaoItemEvents.RemoveMatchingIdEvent (this, agendamentosEmConflito, emprestimosEmConflito, id));
+
+            if(isSameType (transacao, emprestimosEmConflito))
+                removeIfMatchingId (id, emprestimosEmConflito);
+            else
+                removeIfMatchingId (id, agendamentosEmConflito);
         }
 
         int quantidadeEmprestada = transacaoEmprestimoService.calcularQuantidadeTransacao(item, emprestimosEmConflito);
@@ -101,13 +102,16 @@ public class MapaTransacaoItemService<T extends Transacao> implements EventPubli
     }
 
 
-    @Override
-    public ApplicationEventPublisher getEventPublisher () {
-        return this.eventPublisher;
+    public void removeIfMatchingId(UUID id, List<? extends Transacao> transacoes) {
+        transacoes.removeIf(transacao -> transacao.getId().equals(id));
     }
 
-    @Override
-    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
+    public boolean isSameType(Transacao o1, List<? extends Transacao> o2) {
+        if (o1 == null || o2 == null || o2.isEmpty()) {
+            return false;
+        }
+        Transacao firstElement = o2.get(0);
+        return o1.getClass().equals(firstElement.getClass());
     }
+
 }
