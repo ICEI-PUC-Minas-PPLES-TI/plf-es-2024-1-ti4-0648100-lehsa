@@ -7,25 +7,27 @@ import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
 public class UsuarioEvents {
+
     @Getter
     @Setter
-    public static class AgendamentoSemSolicitantesEvent extends ApplicationEvent {
-
+    public static class AgendamentoEvent extends ApplicationEvent {
         private final Agendamento agendamento;
 
-        public AgendamentoSemSolicitantesEvent(Object source, Agendamento agendamento) {
+        public AgendamentoEvent(Object source, Agendamento agendamento) {
             super(source);
             this.agendamento = agendamento;
         }
     }
 
-    @Getter
-    @Setter
-    public static class AgendamentoSemTecnicoEvent extends ApplicationEvent {
-        private final Agendamento agendamento;
+    public static class AgendamentoSemSolicitantesEvent extends AgendamentoEvent {
+        public AgendamentoSemSolicitantesEvent(Object source, Agendamento agendamento) {
+            super(source, agendamento);
+        }
+    }
+
+    public static class AgendamentoSemTecnicoEvent extends AgendamentoEvent {
         public AgendamentoSemTecnicoEvent(Object source, Agendamento agendamento) {
-            super(source);
-            this.agendamento = agendamento;
+            super(source, agendamento);
         }
     }
 }

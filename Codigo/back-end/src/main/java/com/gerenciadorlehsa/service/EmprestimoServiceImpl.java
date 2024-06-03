@@ -75,15 +75,15 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     public Emprestimo atualizar (Emprestimo obj) {
         Emprestimo emprestimoExistente = encontrarPorId(obj.getId());
 
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-        if (!ehSolicitante(emprestimoExistente, usuarioLogado))
-            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar a transação");
+        verificarAutorizacaoDoUsuario (emprestimoExistente);
         validarDataHoraAtt(encontrarAtributosIguais(obj, emprestimoExistente), obj);
 
         obj.setStatusTransacaoItem(emprestimoExistente.getStatusTransacaoItem());
         obj.setSolicitante(emprestimoExistente.getSolicitante());
+
         if (emprestimoRepository.countEmprestimoByLocalUso(emprestimoExistente.getLocalUso()) == 1)
             obj.getLocalUso().setId(emprestimoExistente.getLocalUso().getId());
+
         return emprestimoRepository.save(obj);
     }
 
