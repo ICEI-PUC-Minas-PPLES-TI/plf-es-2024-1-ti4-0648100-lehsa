@@ -10,12 +10,11 @@ public class UsuarioEvents {
     @Getter
     @Setter
     public static class AgendamentoSemSolicitantesEvent extends ApplicationEvent {
-        private final User user;
+
         private final Agendamento agendamento;
 
-        public AgendamentoSemSolicitantesEvent(Object source, User user, Agendamento agendamento) {
+        public AgendamentoSemSolicitantesEvent(Object source, Agendamento agendamento) {
             super(source);
-            this.user = user;
             this.agendamento = agendamento;
         }
     }

@@ -236,13 +236,13 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     }
 
     private void verificarCondicoesAposRemocao(Agendamento agendamento, User user) {
-        verificarAgendamentoSemSolicitantes(agendamento, user);
+        verificarAgendamentoSemSolicitantes(agendamento);
         verificarAgendamentoSemTecnico(agendamento, user);
     }
 
-    private void verificarAgendamentoSemSolicitantes(Agendamento agendamento, User user) {
+    private void verificarAgendamentoSemSolicitantes(Agendamento agendamento) {
         if (agendamento.getSolicitantes().isEmpty()) {
-            publishEvent(new UsuarioEvents.AgendamentoSemSolicitantesEvent(this, user, agendamento));
+            publishEvent(new UsuarioEvents.AgendamentoSemSolicitantesEvent(this, agendamento));
         }
     }
 
