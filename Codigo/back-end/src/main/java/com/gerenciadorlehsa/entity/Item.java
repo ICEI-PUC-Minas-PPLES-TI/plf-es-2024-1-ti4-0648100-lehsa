@@ -16,20 +16,12 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name = Item.NOME_TABELA)
-@Getter
-@Setter
+@Table(name = "TB_ITEM")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-public class Item {
-
-    public static final String NOME_TABELA = "TB_ITEM";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID", unique = true, nullable = false, updatable = false)
-    private UUID id;
+@EqualsAndHashCode(callSuper = true)
+public class Item extends BaseEntity{
 
     @Column(name = "tipo_de_item", nullable = false)
     @JsonProperty("tipo_item")

@@ -22,15 +22,8 @@ import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_CEP
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Endereco implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID", unique = true, nullable = false, updatable = false)
-    private UUID id;
+@EqualsAndHashCode(callSuper = true)
+public class Endereco extends BaseEntity {
 
     @Column(name = "rua", length = 45, nullable = false)
     @NotBlank

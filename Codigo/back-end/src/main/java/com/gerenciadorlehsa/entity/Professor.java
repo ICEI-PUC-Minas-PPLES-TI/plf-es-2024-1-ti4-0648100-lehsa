@@ -46,7 +46,6 @@ public class Professor extends Pessoa{
 
     @OneToMany(mappedBy = "professor", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Agendamento> agendamentos = new ArrayList<> ();
-    // Composição: agendamento só pode existir como parte do contêiner Professor
 
     @Column(name = "caminho_img")
     private String caminhoImg;

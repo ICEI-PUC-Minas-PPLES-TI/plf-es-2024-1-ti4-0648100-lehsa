@@ -10,18 +10,11 @@ import java.io.Serializable;
 import java.util.UUID;
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.*;
 
+
 @MappedSuperclass
-@Getter
-@Setter
-public abstract class Pessoa implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID", unique = true, nullable = false, updatable = false)
-    private UUID id;
+@Data
+@EqualsAndHashCode(callSuper = true)
+public abstract class Pessoa extends BaseEntity {
 
     @Column(name = "NOME", length = 100,nullable = false)
     private String nome;

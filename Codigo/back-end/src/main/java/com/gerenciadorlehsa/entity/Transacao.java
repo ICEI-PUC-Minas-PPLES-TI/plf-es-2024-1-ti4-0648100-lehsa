@@ -12,19 +12,11 @@ import java.util.Map;
 import java.util.UUID;
 
 
+
 @MappedSuperclass
-@Getter
-@Setter
-public abstract class Transacao implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID", unique = true, nullable = false, updatable = false)
-    private UUID id;
-
+@Data
+@EqualsAndHashCode(callSuper = true)
+public abstract class Transacao extends BaseEntity {
 
     @Column(name = "DATA_HORA_INICIO", nullable = false)
     private LocalDateTime dataHoraInicio;
@@ -40,9 +32,7 @@ public abstract class Transacao implements Serializable {
     @Enumerated(EnumType.STRING)
     private StatusTransacao statusTransacao;
 
-
     public abstract void preRemove();
-
 
     public abstract Map<Item, Integer> getItensQuantidade();
 
