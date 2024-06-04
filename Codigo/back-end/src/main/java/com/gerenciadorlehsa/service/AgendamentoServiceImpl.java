@@ -1,14 +1,13 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.entity.enums.StatusTransacao;
 import com.gerenciadorlehsa.events.AgendamentoEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.service.interfaces.EventPublisher;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
@@ -26,10 +25,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
-import static com.gerenciadorlehsa.util.DataHoraUtil.dataValida;
+import static com.gerenciadorlehsa.util.DataHoraUtil.dataValidaAgendamento;
 import static java.lang.String.format;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
@@ -61,7 +60,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
     public Agendamento encontrarPorId(UUID id) {
         log.info(">>> encontrarPorId: encontrando agendamento por id");
 
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
         Agendamento agendamento = agendamentoRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(
@@ -90,7 +89,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
 
         checkTecnicoNaoSolicita (obj);
 
-        dataValida (obj.getDataHoraInicio (), obj.getDataHoraFim ());
+        dataValidaAgendamento (obj.getDataHoraInicio (), obj.getDataHoraFim ());
 
         verificarConflitosDeAgendamento(obj.getDataHoraInicio (), obj.getDataHoraFim ());
 
@@ -190,7 +189,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
     public Agendamento professorConfirmaAgendamento(UUID id) {
         Agendamento agendamento = encontrarPorId (id);
         log.info(">>> professorConfirmaAgendamento: professor confirma agendamento");
-        agendamento.setStatusTransacaoItem (EM_ANALISE);
+        agendamento.setStatusTransacao (EM_ANALISE);
         return agendamentoRepository.save (agendamento);
     }
 
@@ -232,7 +231,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
     }
 
     @Override
-    public boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+    public boolean ehTecnico(Agendamento agendamento, UserDetailsImpl usuarioLogado) {
         log.info(">>> ehTecnico: Verificando se o usuário logado é o técnico do agendamento");
         if (agendamento.getTecnico() == null)
             return false;
@@ -262,7 +261,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
     public Agendamento verificarNovoProfessor(Agendamento novoAgedamento, Agendamento velhoAgendamento) {
         if(novoAgedamento.getProfessor () != velhoAgendamento.getProfessor ()) {
             verificarMudancaProfessor (novoAgedamento);
-            velhoAgendamento.setStatusTransacaoItem (AGUARDANDO_CONFIRMACAO_PROFESSOR);
+            velhoAgendamento.setStatusTransacao (AGUARDANDO_CONFIRMACAO_PROFESSOR);
             //enviarEmailParaProfessor (velhoAgendamento);
         }
         return velhoAgendamento;
@@ -291,8 +290,8 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
 
     @Override
     public void verificarMudancaProfessor(Agendamento agendamento) {
-        StatusTransacaoItem statusTransacaoItem = agendamento.getStatusTransacaoItem ();
-        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO) && !statusTransacaoItem.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
+        StatusTransacao statusTransacao = agendamento.getStatusTransacao ();
+        if(!statusTransacao.equals (EM_ANALISE) && !statusTransacao.equals (APROVADO) && !statusTransacao.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
             throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
                     "aprovada, confirmada ou em análise");
 
@@ -313,7 +312,7 @@ protected AgendamentoRepository getTransacaoRepository() {
 public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     log.info(">>> atualizarStatus: atualizando status do agendamento");
 
-    StatusTransacaoItem statusUpperCase = getStatusUpperCase(status);
+    StatusTransacao statusUpperCase = getStatusUpperCase(status);
 
     Agendamento agendamento = encontrarPorId(id);
 
@@ -325,11 +324,11 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
     verificarCondicoesDeAprovacao(agendamento, statusUpperCase);
 
-    agendamento.setStatusTransacaoItem(statusUpperCase);
+    agendamento.setStatusTransacao (statusUpperCase);
     agendamentoRepository.save(agendamento);
 
     log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
-            " atualizado para " + agendamento.getStatusTransacaoItem());
+            " atualizado para " + agendamento.getStatusTransacao ());
 }
 
 
@@ -339,7 +338,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     public void verificarLimiteTransacaoEmAnalise(User participante) {
         long agendamentosEmAnalise = participante.getAgendamentosRealizados ()
                 .stream ()
-                .filter(agendamento -> agendamento.getStatusTransacaoItem() == EM_ANALISE)
+                .filter(agendamento -> agendamento.getStatusTransacao () == EM_ANALISE)
                 .count();
         if(agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE)
             throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
@@ -362,7 +361,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
 
     @Override
-    public boolean ehUsuarioAutorizado(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+    public boolean ehUsuarioAutorizado(Agendamento agendamento, UserDetailsImpl usuarioLogado) {
         log.info(">>> Verificar autorização do usuário: Verificando se usuário é o técnico, adm ou solicitante do " +
                 "agendamento");
         return ehSolicitante(agendamento, usuarioLogado) ||
@@ -371,7 +370,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
     @Override
-    public boolean ehSolicitante(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+    public boolean ehSolicitante(Agendamento agendamento, UserDetailsImpl usuarioLogado) {
         log.info(">>> ehSolicitante: Verificando se o usuário logado é o solicitante do agendamento procurado");
         return agendamento.getSolicitantes().stream()
                 .anyMatch(solicitante -> Objects.equals(solicitante.getEmail(), usuarioLogado.getEmail()));
@@ -380,7 +379,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
 
     @Override
-    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(Agendamento agendamento, StatusTransacaoItem status) {
+    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(Agendamento agendamento, StatusTransacao status) {
         if (!agendamentoRepository.findAprovadosOuConfirmadosConflitantes(agendamento.getDataHoraInicio(), agendamento.getDataHoraFim()).isEmpty()
                 && (status == APROVADO || status == CONFIRMADO)) {
             throw new AtualizarStatusException ("Um agendamento para essa data já foi aprovado ou confirmado.");
@@ -434,7 +433,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
         if (!atributosIguais.contains("dataHoraInicio") || !atributosIguais.contains("dataHoraFim")) {
-            dataValida(dataHoraInicio, dataHoraFim);
+            dataValidaAgendamento(dataHoraInicio, dataHoraFim);
             if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty())
                 throw new AgendamentoException("Já existe agendamento para essa data");
             verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);

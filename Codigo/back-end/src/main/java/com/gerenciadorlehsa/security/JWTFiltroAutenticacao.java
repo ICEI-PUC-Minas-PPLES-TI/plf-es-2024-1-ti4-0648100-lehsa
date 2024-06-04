@@ -70,10 +70,10 @@ public class JWTFiltroAutenticacao extends UsernamePasswordAuthenticationFilter 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, @NotNull HttpServletResponse response, FilterChain filterChain, @NotNull Authentication authentication) {
         log.info(">>> successfulAuthentication: autenticação realizada com sucesso");
-        UsuarioDetails usuarioDetails = (UsuarioDetails) authentication.getPrincipal();
-        String emailUsuario = usuarioDetails.getUsername();
-        PerfilUsuario roleUsuario = usuarioDetails.getPerfilUsuario();
-        UUID idUser = usuarioDetails.getId();
+        UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
+        String emailUsuario = userDetailsImpl.getUsername();
+        PerfilUsuario roleUsuario = userDetailsImpl.getPerfilUsuario();
+        UUID idUser = userDetailsImpl.getId();
         String token = this.jwtComp.gerarToken(emailUsuario, String.valueOf(roleUsuario).toLowerCase(), idUser);
         response.addHeader(HEADER_AUTORIZACAO, format(VALOR_HEADER_AUTORIZACAO, token));
         response.setContentType(CONTENT_TYPE);

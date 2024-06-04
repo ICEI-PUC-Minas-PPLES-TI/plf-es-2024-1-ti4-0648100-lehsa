@@ -3,13 +3,13 @@ package com.gerenciadorlehsa.service;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.entity.enums.StatusTransacao;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.TempoExpiradoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
 import com.gerenciadorlehsa.repository.TransacaoRepository;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_SERVICE;
 
 @Slf4j(topic = TRANSACAO_SERVICE)
@@ -42,9 +42,9 @@ public abstract class TransacaoService<T extends Transacao,  R extends Transacao
     protected abstract R getTransacaoRepository();
 
 
-    public abstract boolean ehSolicitante(T transacao, UsuarioDetails usuarioDetails);
+    public abstract boolean ehSolicitante(T transacao, UserDetailsImpl userDetailsImpl);
 
-    public abstract boolean ehUsuarioAutorizado(T transacao, UsuarioDetails usuarioLogado);
+    public abstract boolean ehUsuarioAutorizado(T transacao, UserDetailsImpl usuarioLogado);
 
 
     public abstract void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, T transacao);
@@ -83,14 +83,14 @@ public abstract class TransacaoService<T extends Transacao,  R extends Transacao
     }
 
 
-    public void verificarCondicoesDeConfirmacao(T transacao, StatusTransacaoItem statusUpperCase) {
-        if (statusUpperCase == StatusTransacaoItem.CONFIRMADO) {
-            if (!transacao.getStatusTransacaoItem ().equals (StatusTransacaoItem.APROVADO)) {
+    public void verificarCondicoesDeConfirmacao(T transacao, StatusTransacao statusUpperCase) {
+        if (statusUpperCase == StatusTransacao.CONFIRMADO) {
+            if (!transacao.getStatusTransacao ().equals (StatusTransacao.APROVADO)) {
                 throw new AtualizarStatusException ("Para confirmar a transação, ela precisa estar aprovada.");
             }
 
-            if (tempoExpirado (transacao.getDataHoraInicio ())) {
-                transacao.setStatusTransacaoItem (StatusTransacaoItem.NAO_COMPARECEU);
+            if (DataHoraUtil.tempoTransacaoExpirado (transacao.getDataHoraInicio ())) {
+                transacao.setStatusTransacao (StatusTransacao.NAO_COMPARECEU);
                 getTransacaoRepository ().save (transacao);
                 throw new TempoExpiradoException ("A confirmação deve ser feita até 24 horas antes da data e hora de início da transação.");
             }
@@ -98,23 +98,23 @@ public abstract class TransacaoService<T extends Transacao,  R extends Transacao
     }
 
 
-    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(T transacao, StatusTransacaoItem status) {
+    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(T transacao, StatusTransacao status) {
         R transacaoRepository = getTransacaoRepository();
         LocalDateTime inicio = transacao.getDataHoraInicio();
         LocalDateTime fim = transacao.getDataHoraFim();
 
         List<T> conflitos = transacaoRepository.findAprovadosOuConfirmadosConflitantes(inicio, fim);
 
-        if (!conflitos.isEmpty() && (status == StatusTransacaoItem.APROVADO || status == StatusTransacaoItem.CONFIRMADO)) {
+        if (!conflitos.isEmpty() && (status == StatusTransacao.APROVADO || status == StatusTransacao.CONFIRMADO)) {
             throw new AtualizarStatusException("Uma transação para essa data já foi aprovada ou confirmada.");
         }
     }
 
 
 
-    public void verificarCondicoesDeAprovacao(T transacao, StatusTransacaoItem statusUpperCase) {
+    public void verificarCondicoesDeAprovacao(T transacao, StatusTransacao statusUpperCase) {
         if (statusUpperCase == APROVADO) {
-            if(!transacao.getStatusTransacaoItem ().equals (EM_ANALISE))
+            if(!transacao.getStatusTransacao ().equals (EM_ANALISE))
                 throw new AtualizarStatusException ("O transação precisa estar EM_ANALISE para ser APROVADO");
         }
     }
@@ -136,17 +136,17 @@ public abstract class TransacaoService<T extends Transacao,  R extends Transacao
                         dataHoraFimNovo.isEqual(dataHoraInicioExistente));
     }
 
-    public StatusTransacaoItem getStatusUpperCase(String status) {
+    public StatusTransacao getStatusUpperCase(String status) {
         try {
-            return Enum.valueOf(StatusTransacaoItem.class, status.toUpperCase());
+            return Enum.valueOf(StatusTransacao.class, status.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new EnumNaoEncontradoException ("O status passado não existe: " + status);
         }
     }
 
-    public void verificarAutorizacaoDoUsuario(T transacao, StatusTransacaoItem status) {
+    public void verificarAutorizacaoDoUsuario(T transacao, StatusTransacao status) {
         if (status.equals(CANCELADO) || status.equals(CONFIRMADO)) {
-            UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+            UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
             if (!ehUsuarioAutorizado(transacao, usuarioLogado))
                 throw new UsuarioNaoAutorizadoException ("O usuário não possui permissão para atualizar a transacão");
         } else
@@ -155,15 +155,8 @@ public abstract class TransacaoService<T extends Transacao,  R extends Transacao
 
 
 
-    public boolean tempoExpirado(LocalDateTime dataHoraInicio) {
-        long difTempo = DataHoraUtil.calcularDiferencaDeTempo(LocalDateTime.now(),
-                    dataHoraInicio);
-        return difTempo < 24;
-    }
-
-
     public void verificarAutorizacaoDoUsuario(T transacao) {
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         if (!ehSolicitante(transacao, usuarioLogado)) {
             throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar a transação");
         }

@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoRepositoryBean
 public interface TransacaoRepository<T extends Transacao> extends JpaRepository<T, UUID> {
 
-    @Query("SELECT t FROM #{#entityName} t WHERE (t.statusTransacaoItem = 'APROVADO' OR t.statusTransacaoItem = 'CONFIRMADO') AND " +
+    @Query("SELECT t FROM #{#entityName} t WHERE (t.statusTransacao = 'APROVADO' OR t.statusTransacao = 'CONFIRMADO') AND " +
             "((t.dataHoraInicio <= :novaDataHoraFim AND t.dataHoraFim >= :novaDataHoraInicio) OR " +
             "(t.dataHoraInicio >= :novaDataHoraInicio AND t.dataHoraInicio <= :novaDataHoraFim) OR " +
             "(t.dataHoraFim >= :novaDataHoraInicio AND t.dataHoraFim <= :novaDataHoraFim))")

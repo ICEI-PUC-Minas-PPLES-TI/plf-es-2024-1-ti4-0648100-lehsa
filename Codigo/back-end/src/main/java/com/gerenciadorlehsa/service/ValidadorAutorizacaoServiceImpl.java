@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import com.gerenciadorlehsa.entity.enums.PerfilUsuario;
 import com.gerenciadorlehsa.exceptions.lancaveis.TopicoNaoEncontradoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import com.gerenciadorlehsa.service.interfaces.Validador;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.service.validadores.UsuarioServiceValidadorImpl;
@@ -41,21 +41,21 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
      * @return usuário autorizado
      */
     @Override
-    public UsuarioDetails validarAutorizacaoRequisicao(UUID id, String topico) {
+    public UserDetailsImpl validarAutorizacaoRequisicao(UUID id, String topico) {
 
-        UsuarioDetails usuarioDetails = autenticar(); //usuário logado
+        UserDetailsImpl userDetailsImpl = autenticar(); //usuário logado
 
         boolean usuarioAutorizado = validadores.stream().
                 filter(validador -> validador.getTopico().equals(topico))
                 .findFirst()
                 .orElseThrow(() -> new TopicoNaoEncontradoException(format("tópico não encontrado: %s", topico)))
-                .validar(id, usuarioDetails);
+                .validar(id, userDetailsImpl);
 
-        if (!(usuarioEhAdmin(requireNonNull(usuarioDetails)) || usuarioAutorizado))
-            throw new UsuarioNaoAutorizadoException(format("usuário [%s] não possui autorização para utilizar esse método", usuarioDetails.getUsername()));
+        if (!(usuarioEhAdmin(requireNonNull(userDetailsImpl)) || usuarioAutorizado))
+            throw new UsuarioNaoAutorizadoException(format("usuário [%s] não possui autorização para utilizar esse método", userDetailsImpl.getUsername()));
 
-        log.info(format(">>> validarAutorizacaoRequisicao: usuário [%s] autorizado para realizar requisição", usuarioDetails.getUsername()));
-        return usuarioDetails;
+        log.info(format(">>> validarAutorizacaoRequisicao: usuário [%s] autorizado para realizar requisição", userDetailsImpl.getUsername()));
+        return userDetailsImpl;
     }
 
     /**
@@ -65,15 +65,15 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
      * @return usuário autorizado
      */
     @Override
-    public UsuarioDetails validarAutorizacaoRequisicao() {
+    public UserDetailsImpl validarAutorizacaoRequisicao() {
 
-        UsuarioDetails usuarioDetails = autenticar(); // verifica se tá logado
+        UserDetailsImpl userDetailsImpl = autenticar(); // verifica se tá logado
 
-        if (!usuarioEhAdmin(requireNonNull(usuarioDetails)))
-            throw new UsuarioNaoAutorizadoException(format("usuário [%s] não possui autorização para utilizar esse método", usuarioDetails.getUsername()));
+        if (!usuarioEhAdmin(requireNonNull(userDetailsImpl)))
+            throw new UsuarioNaoAutorizadoException(format("usuário [%s] não possui autorização para utilizar esse método", userDetailsImpl.getUsername()));
 
-        log.info(format(">>> validarAutorizacaoRequisicao: usuário [%s] autorizado para realizar requisição", usuarioDetails.getUsername()));
-        return usuarioDetails;
+        log.info(format(">>> validarAutorizacaoRequisicao: usuário [%s] autorizado para realizar requisição", userDetailsImpl.getUsername()));
+        return userDetailsImpl;
     }
 
     /**
@@ -82,7 +82,7 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
      * @return usuário logado
      */
     @Override
-    public UsuarioDetails getUsuarioLogado() {
+    public UserDetailsImpl getUsuarioLogado() {
         return autenticar();
     }
 
@@ -92,9 +92,9 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
      *
      * @return usuário autenticado, caso contrário null
      */
-    private @Nullable UsuarioDetails autenticar() {
+    private @Nullable UserDetailsImpl autenticar() {
         try {
-            return (UsuarioDetails) getContext().getAuthentication().getPrincipal();
+            return (UserDetailsImpl) getContext().getAuthentication().getPrincipal();
         } catch (Exception e) {
             throw new UsuarioNaoAutorizadoException("usuário não logado");
         }
@@ -106,7 +106,7 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
      * @param userSpringSecurity usuário
      * @return boolean indicando se usuário é administrador ou não
      */
-    private boolean usuarioEhAdmin(@NotNull UsuarioDetails userSpringSecurity) {
+    private boolean usuarioEhAdmin(@NotNull UserDetailsImpl userSpringSecurity) {
         return userSpringSecurity.ehPerfil(PerfilUsuario.ADMIN);
     }
 }

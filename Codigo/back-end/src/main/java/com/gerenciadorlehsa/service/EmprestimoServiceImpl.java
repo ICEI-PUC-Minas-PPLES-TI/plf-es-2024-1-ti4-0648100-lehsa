@@ -1,10 +1,10 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.*;
-import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.entity.enums.StatusTransacao;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.EmprestimoRepository;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
@@ -17,9 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_EMPRESTIMO_EM_ANALISE;
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_SERVICE;
 import static com.gerenciadorlehsa.util.DataHoraUtil.dataValidaEmprestimo;
 import static java.lang.String.format;
@@ -48,7 +47,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
 
     @Override
     public Emprestimo encontrarPorId (UUID id) {
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         Emprestimo obj = emprestimoRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(
                 format("Emprestimo não encontrado, id: %s", id)));
 
@@ -71,7 +70,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
         verificarConflitosDeEmprestimo(dataHoraInicio, dataHoraFim);
         verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitante(), obj);
 
-        obj.setStatusTransacaoItem(EM_ANALISE);
+        obj.setStatusTransacao (EM_ANALISE);
         obj.setId(null);
         obj.getLocalUso().setId(null);
         return emprestimoRepository.save(obj);
@@ -84,7 +83,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
         verificarAutorizacaoDoUsuario (emprestimoExistente);
         validarDataHoraAtt(encontrarAtributosIguais(obj, emprestimoExistente), obj);
 
-        obj.setStatusTransacaoItem(emprestimoExistente.getStatusTransacaoItem());
+        obj.setStatusTransacao (emprestimoExistente.getStatusTransacao ());
         obj.setSolicitante(emprestimoExistente.getSolicitante());
 
         if (emprestimoRepository.countEmprestimoByLocalUso(emprestimoExistente.getLocalUso()) == 1)
@@ -125,7 +124,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
 
     @Override
     public void atualizarStatus (String status, UUID id) {
-        StatusTransacaoItem statusUpperCase = getStatusUpperCase(status);
+        StatusTransacao statusUpperCase = getStatusUpperCase(status);
 
         Emprestimo emprestimo = encontrarPorId (id);
 
@@ -137,7 +136,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
 
         verificarCondicoesDeAprovacao (emprestimo, statusUpperCase);
 
-        emprestimo.setStatusTransacaoItem(statusUpperCase);
+        emprestimo.setStatusTransacao (statusUpperCase);
         emprestimoRepository.save(emprestimo);
     }
 
@@ -147,7 +146,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
     public void verificarLimiteTransacaoEmAnalise (User participante) {
         long emprestimosEmAnalise = participante.getEmprestimos ()
                 .stream ()
-                .filter(emprestimo -> emprestimo.getStatusTransacaoItem() == EM_ANALISE)
+                .filter(emprestimo -> emprestimo.getStatusTransacao () == EM_ANALISE)
                 .count();
 
         if(emprestimosEmAnalise > LIMITE_EMPRESTIMO_EM_ANALISE)
@@ -155,12 +154,12 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
     }
 
     @Override
-    public boolean ehSolicitante (Emprestimo transacao, UsuarioDetails usuarioDetails) {
-        return transacao.getSolicitante().getEmail().equals(usuarioDetails.getEmail());
+    public boolean ehSolicitante (Emprestimo transacao, UserDetailsImpl userDetailsImpl) {
+        return transacao.getSolicitante().getEmail().equals(userDetailsImpl.getEmail());
     }
 
     @Override
-    public boolean ehUsuarioAutorizado (Emprestimo transacao, UsuarioDetails usuarioLogado) {
+    public boolean ehUsuarioAutorizado (Emprestimo transacao, UserDetailsImpl usuarioLogado) {
         //ou usario eh o solicitante ou um adm para ser autorizado
         return ehSolicitante(transacao, usuarioLogado) ||
                 usuarioLogado.getPerfilUsuario().getCodigo() == 1;

@@ -3,7 +3,7 @@ package com.gerenciadorlehsa.service.interfaces;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +26,7 @@ public interface AgendamentoService {
 
     void verificarTransacaoDeMesmaDataDoProfessor(Professor professor, Agendamento agendamento);
 
-    boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado);
+    boolean ehTecnico(Agendamento agendamento, UserDetailsImpl usuarioLogado);
 
     void checkTecnicoNaoSolicita(Agendamento agendamento);
 

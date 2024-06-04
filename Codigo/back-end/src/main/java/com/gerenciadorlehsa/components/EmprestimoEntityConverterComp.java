@@ -7,7 +7,6 @@ import com.gerenciadorlehsa.dto.EnderecoDTO;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Endereco;
 import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.service.ItemServiceImpl;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
@@ -42,7 +41,7 @@ public class EmprestimoEntityConverterComp extends TransacaoEntityConverterComp<
         emprestimo.setDataHoraInicio(converterDataHora (emprestimoDTO.dataHoraInicio ()));
         emprestimo.setDataHoraFim(converterDataHora (emprestimoDTO.dataHoraFim ()));
         emprestimo.setObservacaoSolicitacao(emprestimoDTO.observacaoSolicitacao());
-        emprestimo.setStatusTransacaoItem(EM_ANALISE);
+        emprestimo.setStatusTransacao (EM_ANALISE);
         emprestimo.setSolicitante(acharSolicitante(emprestimoDTO.solicitante()));
         emprestimo.setItensQuantidade(convertMapa(emprestimoDTO.itens ()));
         emprestimo.setLocalUso(convertToEntity(emprestimoDTO.endereco()));

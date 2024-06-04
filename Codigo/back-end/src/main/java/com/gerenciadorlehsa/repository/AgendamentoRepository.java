@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public interface AgendamentoRepository extends TransacaoRepository<Agendamento> {
 
     @Query("SELECT a.dataHoraInicio, a.dataHoraFim FROM Agendamento a " +
-            "WHERE (a.statusTransacaoItem = 'APROVADO' OR a.statusTransacaoItem = 'CONFIRMADO') " +
+            "WHERE (a.statusTransacao = 'APROVADO' OR a.statusTransacao = 'CONFIRMADO') " +
             "AND a.dataHoraInicio >= CURRENT_TIMESTAMP ORDER BY a.dataHoraInicio")
     List<Object[]> findDataHoraInicioAndFim();
 }

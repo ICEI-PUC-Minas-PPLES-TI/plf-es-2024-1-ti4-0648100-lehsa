@@ -1,7 +1,7 @@
 package com.gerenciadorlehsa.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.entity.enums.StatusTransacao;
 import lombok.Builder;
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +18,6 @@ public record AgendamentoDTORes (
 
         String observacaoSolicitacao,
 
-        StatusTransacaoItem statusTransacaoItem
+        StatusTransacao statusTransacao
 ) {
 }

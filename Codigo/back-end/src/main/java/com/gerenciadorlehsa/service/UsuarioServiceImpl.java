@@ -5,7 +5,7 @@ import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.events.UsuarioEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import com.gerenciadorlehsa.service.interfaces.EventPublisher;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
@@ -198,7 +198,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     public List<Agendamento> listarAgendamentoUsuario (@NotNull UUID id) {
         User usuario = encontrarPorId(id);
         log.info(">>> listarAgendamentoUsuario: listando todos agendamentos do usuario de id: " + usuario.getId());
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
             return this.usuarioRepository.findAgendamentosRealizadosById(id);
 
@@ -209,7 +209,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     public List<Emprestimo> listarEmprestimoUsuario (@NotNull UUID id) {
         User usuario = encontrarPorId(id);
         log.info(">>> listarEmprestimoUsuario: listando todos emprestimo do usuario de id: " + usuario.getId());
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
             return this.usuarioRepository.findEmprestimosById(id);
         throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses emprestimos");

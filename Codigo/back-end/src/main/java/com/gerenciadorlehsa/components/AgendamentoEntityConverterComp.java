@@ -9,8 +9,6 @@ import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.service.ItemServiceImpl;
-import com.gerenciadorlehsa.service.interfaces.ItemService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
@@ -22,7 +20,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.AGUARDANDO_CONFIRMACAO_PROFESSOR;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.AGUARDANDO_CONFIRMACAO_PROFESSOR;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
@@ -53,7 +51,7 @@ public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp
         agendamento.setDataHoraInicio(converterDataHora (agendamentoDTO.dataHoraInicio ()));
         agendamento.setDataHoraFim(converterDataHora (agendamentoDTO.dataHoraFim ()));
         agendamento.setObservacaoSolicitacao(agendamentoDTO.observacaoSolicitacao());
-        agendamento.setStatusTransacaoItem(AGUARDANDO_CONFIRMACAO_PROFESSOR);
+        agendamento.setStatusTransacao (AGUARDANDO_CONFIRMACAO_PROFESSOR);
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
         agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens ()));
