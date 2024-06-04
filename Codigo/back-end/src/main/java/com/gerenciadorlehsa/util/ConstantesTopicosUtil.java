@@ -65,4 +65,10 @@ public class ConstantesTopicosUtil {
     public static final String DATA_HORA_UTIL = "DATA_HORA_UTIL";
 
     public static final String ESTILIZAR_EMAIL_UTIL = "ESTILIZAR_EMAIL_UTIL";
+
+    public static final String AGENDAMENTO_EVENT_LISTENER = "AGENDAMENTO_EVENT_LISTENER";
+
+    public static final String ITEM_EVENT_LISTENER = "ITEM_EVENT_LISTENER";
+
+    public static final String USUARIO_EVENT_LISTENER = "USUARIO_EVENT_LISTENER";
 }
