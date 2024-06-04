@@ -16,10 +16,7 @@ import java.util.UUID;
  * @param <I> Classe de entrada do controller
  * @param <O> Classe de saída do controller
  */
-public interface OperacoesCRUDControllerImg<I, O> {
-
-    @GetMapping("/{id}")
-    ResponseEntity<O> encontrarPorId(@PathVariable UUID id);
+public interface OperacoesCRUDControllerImg<I, O>  extends BaseCRUDController<O> {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Map<String, Object>> criar(@Valid @RequestPart I obj,
@@ -28,9 +25,8 @@ public interface OperacoesCRUDControllerImg<I, O> {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Map<String, Object>> atualizar(@PathVariable UUID id, @Valid @RequestPart I obj, @RequestPart MultipartFile img);
 
-    @DeleteMapping("/{id}")
-    ResponseEntity<Map<String, Object>> deletar(@PathVariable UUID id);
+    @GetMapping("img/{id}")
+    ResponseEntity<?> encontrarImagemPorId (@PathVariable UUID id);
 
-    @GetMapping
-    ResponseEntity<List<O>> listarTodos();
+
 }

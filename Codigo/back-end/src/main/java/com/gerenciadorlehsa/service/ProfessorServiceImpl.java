@@ -39,7 +39,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Service
 @AllArgsConstructor
 @Schema(description = "Serviço responsável por gerenciar professor encarregado do agendamento")
-public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>, ProfessorService {
+public class ProfessorServiceImpl implements OperacoesCRUDServiceImg<Professor>, ProfessorService, OperacoesImagemService {
 
     private final ProfessorRepository professorRepository;
 

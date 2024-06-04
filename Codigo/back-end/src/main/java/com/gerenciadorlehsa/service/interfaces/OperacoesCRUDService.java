@@ -9,15 +9,8 @@ import java.util.UUID;
  *
  * @param <I> Classe do service
  */
-public interface OperacoesCRUDService<I> {
-
-    I encontrarPorId(@NotNull UUID id);
-
+public interface OperacoesCRUDService<I> extends BaseCRUDService<I> {
     I criar(@NotNull I obj);
 
     I atualizar(@NotNull I obj);
-
-    void deletar(@NotNull UUID id);
-
-    List<I> listarTodos();
 }
