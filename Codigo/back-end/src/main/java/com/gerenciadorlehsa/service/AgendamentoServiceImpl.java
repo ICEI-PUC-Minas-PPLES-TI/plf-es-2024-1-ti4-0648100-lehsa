@@ -36,7 +36,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
 @Schema(description = "Contém as regras de negócio para agendar o uso do laboratório")
-public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService, EventPublisher {
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento, AgendamentoRepository> implements OperacoesCRUDService<Agendamento>, AgendamentoService, EventPublisher {
 
     private final AgendamentoRepository agendamentoRepository;
 
@@ -302,6 +302,13 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
 
 //----------------TransacaoService - INÍCIO ---------------------------
+
+    @Override
+protected AgendamentoRepository getTransacaoRepository() {
+    return agendamentoRepository;
+}
+
+
 @Override
 public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     log.info(">>> atualizarStatus: atualizando status do agendamento");
@@ -325,20 +332,8 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
             " atualizado para " + agendamento.getStatusTransacaoItem());
 }
 
-    @Override
-    public void verificarCondicoesDeAprovacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
-        if (statusUpperCase == APROVADO) {
-            if(!agendamento.getStatusTransacaoItem ().equals (EM_ANALISE))
-                throw new AtualizarStatusException ("O agendamento precisa estar EM_ANALISE para ser APROVADO");
-        }
-    }
 
-    @Override
-    public List<Agendamento> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
-        log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
-                "confirmado ou aprovado");
-        return agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
-    }
+
 
     @Override
     public void verificarLimiteTransacaoEmAnalise(User participante) {
@@ -383,51 +378,12 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
 
-    @Override
-    public int calcularQuantidadeTransacao(Item item, List<Agendamento> agendamentos) {
-        int quantidadeAgendada = 0;
-        for (Agendamento agendamento : agendamentos) {
-            Integer quantidade = agendamento.getItensQuantidade().getOrDefault(item, 0);
-            quantidadeAgendada += quantidade;
-        }
-        return quantidadeAgendada;
-    }
-
-    @Override
-    public void deletarItemAssociado(Item item) {
-        List<Agendamento> agendamentos = agendamentoRepository.findByItem(item);
-
-        if(agendamentos != null && !agendamentos.isEmpty ()) {
-            for (Agendamento agendamento : agendamentos) {
-                agendamento.getItensQuantidade().remove(item);
-                agendamentoRepository.save(agendamento);
-            }
-        }
-    }
 
     @Override
     public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(Agendamento agendamento, StatusTransacaoItem status) {
         if (!agendamentoRepository.findAprovadosOuConfirmadosConflitantes(agendamento.getDataHoraInicio(), agendamento.getDataHoraFim()).isEmpty()
                 && (status == APROVADO || status == CONFIRMADO)) {
             throw new AtualizarStatusException ("Um agendamento para essa data já foi aprovado ou confirmado.");
-        }
-    }
-
-
-    @Override
-    public void verificarCondicoesDeConfirmacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
-        if (statusUpperCase.equals(CONFIRMADO)) {
-            if (!agendamento.getStatusTransacaoItem().equals(APROVADO)) {
-                throw new AtualizarStatusException("Para confirmar o agendamento é preciso que ele esteja aprovado");
-            }
-
-            if (tempoExpirado(agendamento.getDataHoraInicio())) {
-                agendamento.setStatusTransacaoItem(NAO_COMPARECEU);
-                agendamentoRepository.save(agendamento);
-                throw new TempoExpiradoException("A confirmação deve ser feita até 24h antes da data e hora de início" +
-                        " " +
-                        "do agendamento");
-            }
         }
     }
 

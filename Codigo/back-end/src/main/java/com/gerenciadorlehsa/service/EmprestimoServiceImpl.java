@@ -27,7 +27,8 @@ import static java.lang.String.format;
 @Slf4j(topic = EMPRESTIMO_SERVICE)
 @Service
 @Schema(description = "Contém as regras de negócio para concessão de empréstimo de itens do laboratório")
-public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>, EmprestimoService{
+public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, EmprestimoRepository> implements OperacoesCRUDService<Emprestimo>,
+        EmprestimoService{
 
     private final EmprestimoRepository emprestimoRepository;
     private final EnderecoService enderecoService;
@@ -38,6 +39,11 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         super (validadorAutorizacaoRequisicaoService);
         this.emprestimoRepository = emprestimoRepository;
         this.enderecoService = enderecoService;
+    }
+
+    @Override
+    protected EmprestimoRepository getTransacaoRepository () {
+        return this.emprestimoRepository;
     }
 
     @Override
@@ -135,46 +141,6 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         emprestimoRepository.save(emprestimo);
     }
 
-    @Override
-    public void verificarCondicoesDeAprovacao(Emprestimo emprestimo, StatusTransacaoItem statusUpperCase) {
-        if (statusUpperCase == APROVADO) {
-            if(!emprestimo.getStatusTransacaoItem ().equals (EM_ANALISE))
-                throw new AtualizarStatusException ("O emprestimo precisa estar EM_ANALISE para ser APROVADO");
-        }
-    }
-
-
-    @Override
-    public void verificarCondicoesDeConfirmacao(Emprestimo emprestimo, StatusTransacaoItem statusUpperCase) {
-        if(statusUpperCase.equals (CONFIRMADO)) {
-
-            if(!emprestimo.getStatusTransacaoItem ().equals (APROVADO))
-                throw new AtualizarStatusException ("Para confirmar o emprestimo é preciso que ele esteja aprovado");
-
-            if(tempoExpirado (emprestimo.getDataHoraInicio ())) {
-                emprestimo.setStatusTransacaoItem (NAO_COMPARECEU);
-                emprestimoRepository.save(emprestimo);
-                throw new TempoExpiradoException ("O tempo para confirmação já acabou!");
-            }
-        }
-    }
-
-    @Override
-    public List<Emprestimo> transacoesAprovadasOuConfirmadasConflitantes (LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
-        return emprestimoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
-    }
-
-
-
-    @Override
-    public int calcularQuantidadeTransacao(Item item, List<Emprestimo> emprestimos) {
-        int quantidadeEmprestada = 0;
-        for (Emprestimo emprestimo : emprestimos) {
-            Integer quantidade = emprestimo.getItensQuantidade().getOrDefault(item, 0);
-            quantidadeEmprestada += quantidade;
-        }
-        return quantidadeEmprestada;
-    }
 
 
     @Override
@@ -211,25 +177,6 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     }
 
-    @Override
-    public void deletarItemAssociado (Item item) {
-        List<Emprestimo> emprestimos = emprestimoRepository.findByItem(item);
-
-        if(emprestimos != null && !emprestimos.isEmpty ()) {
-            for (Emprestimo emprestimo : emprestimos) {
-                emprestimo.getItensQuantidade().remove(item);
-                emprestimoRepository.save(emprestimo);
-            }
-        }
-    }
-
-    @Override
-    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO (Emprestimo transacao, StatusTransacaoItem status) {
-        if (!transacoesAprovadasOuConfirmadasConflitantes(transacao.getDataHoraInicio(), transacao.getDataHoraFim()).isEmpty()
-                && (status == APROVADO || status == CONFIRMADO)) {
-            throw new EmprestimoException("Um emprestimo para essa data já foi aprovado ou confirmado.");
-        }
-    }
 
 
     @Override

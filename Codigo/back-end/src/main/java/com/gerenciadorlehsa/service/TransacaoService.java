@@ -4,8 +4,11 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
+import com.gerenciadorlehsa.exceptions.lancaveis.TempoExpiradoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.UsuarioNaoAutorizadoException;
+import com.gerenciadorlehsa.repository.TransacaoRepository;
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
@@ -26,23 +29,17 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_SERVICE;
 @Service
 @Schema(description = "Superclasse abstrata que contém métodos e atributos em comum para qualquer tipo que é subtipo " +
         "de TransacaoItem")
-public abstract class TransacaoService<T extends Transacao> {
+public abstract class TransacaoService<T extends Transacao,  R extends TransacaoRepository<T>> {
 
     protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
+
 
     @Autowired
     public TransacaoService(ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
         this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
     }
 
-    public abstract int calcularQuantidadeTransacao(Item item, List<T> transacao);
-
-    public abstract void atualizarStatus (@NotNull String status, @NotNull UUID id);
-
-
-    public abstract List<T> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim);
-
-    public abstract void verificarLimiteTransacaoEmAnalise(User participante);
+    protected abstract R getTransacaoRepository();
 
 
     public abstract boolean ehSolicitante(T transacao, UsuarioDetails usuarioDetails);
@@ -52,16 +49,75 @@ public abstract class TransacaoService<T extends Transacao> {
 
     public abstract void verificarTransacaoDeMesmaDataDoUsuario(User solicitante, T transacao);
 
-    public abstract void deletarItemAssociado(Item item);
 
-    public abstract void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(T transacao, StatusTransacaoItem status);
-
-
-    public abstract void verificarCondicoesDeConfirmacao(T transacao, StatusTransacaoItem statusTransacaoItem);
+    public abstract void verificarLimiteTransacaoEmAnalise(User participante);
 
 
-    public abstract void verificarCondicoesDeAprovacao(T agendamento, StatusTransacaoItem statusUpperCase);
+    public abstract void atualizarStatus (@NotNull String status, @NotNull UUID id);
 
+
+    public int calcularQuantidadeTransacao(Item item, List<T> transacoes) {
+        int quantidadeEmprestada = 0;
+        for (T transacao : transacoes) {
+            Integer quantidade = transacao.getItensQuantidade().getOrDefault(item, 0);
+            quantidadeEmprestada += quantidade;
+        }
+        return quantidadeEmprestada;
+    }
+
+
+    public List<T> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+        return getTransacaoRepository ().findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
+    }
+
+
+    public void deletarItemAssociado(Item item) {
+        List<T> transacoes = getTransacaoRepository().findByItem(item);
+
+        if (transacoes != null && !transacoes.isEmpty()) {
+            for (T transacao : transacoes) {
+                transacao.getItensQuantidade().remove(item);
+                getTransacaoRepository().save(transacao);
+            }
+        }
+    }
+
+
+    public void verificarCondicoesDeConfirmacao(T transacao, StatusTransacaoItem statusUpperCase) {
+        if (statusUpperCase == StatusTransacaoItem.CONFIRMADO) {
+            if (!transacao.getStatusTransacaoItem ().equals (StatusTransacaoItem.APROVADO)) {
+                throw new AtualizarStatusException ("Para confirmar a transação, ela precisa estar aprovada.");
+            }
+
+            if (tempoExpirado (transacao.getDataHoraInicio ())) {
+                transacao.setStatusTransacaoItem (StatusTransacaoItem.NAO_COMPARECEU);
+                getTransacaoRepository ().save (transacao);
+                throw new TempoExpiradoException ("A confirmação deve ser feita até 24 horas antes da data e hora de início da transação.");
+            }
+        }
+    }
+
+
+    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(T transacao, StatusTransacaoItem status) {
+        R transacaoRepository = getTransacaoRepository();
+        LocalDateTime inicio = transacao.getDataHoraInicio();
+        LocalDateTime fim = transacao.getDataHoraFim();
+
+        List<T> conflitos = transacaoRepository.findAprovadosOuConfirmadosConflitantes(inicio, fim);
+
+        if (!conflitos.isEmpty() && (status == StatusTransacaoItem.APROVADO || status == StatusTransacaoItem.CONFIRMADO)) {
+            throw new AtualizarStatusException("Uma transação para essa data já foi aprovada ou confirmada.");
+        }
+    }
+
+
+
+    public void verificarCondicoesDeAprovacao(T transacao, StatusTransacaoItem statusUpperCase) {
+        if (statusUpperCase == APROVADO) {
+            if(!transacao.getStatusTransacaoItem ().equals (EM_ANALISE))
+                throw new AtualizarStatusException ("O transação precisa estar EM_ANALISE para ser APROVADO");
+        }
+    }
 
     public boolean temConflitoDeData(T transacaoExistente, T novaTransacao) {
         log.info(">>> Verificando datas conflitantes: barrando transacao solicitado em uma mesma data");

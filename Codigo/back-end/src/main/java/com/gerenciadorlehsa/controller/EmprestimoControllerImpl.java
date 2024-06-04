@@ -6,6 +6,7 @@ import com.gerenciadorlehsa.controller.interfaces.TransacaoController;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EmprestimoDTORes;
 import com.gerenciadorlehsa.entity.Emprestimo;
+import com.gerenciadorlehsa.repository.EmprestimoRepository;
 import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.TransacaoService;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,7 @@ import static org.springframework.http.HttpStatus.OK;
 @AllArgsConstructor
 public class EmprestimoControllerImpl implements OperacoesCRUDController<EmprestimoDTO, EmprestimoDTORes>, TransacaoController{
 
-    private final TransacaoService<Emprestimo> transacaoService;
+    private final TransacaoService<Emprestimo, EmprestimoRepository> transacaoService;
     private final OperacoesCRUDService<Emprestimo> operacoesCRUDService;
     private final TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> emprestimoEntityConverterComp;
     private final MapaTransacaoItemService<Emprestimo> mapaTransacaoItemService;

@@ -6,6 +6,8 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
+import com.gerenciadorlehsa.repository.AgendamentoRepository;
+import com.gerenciadorlehsa.repository.EmprestimoRepository;
 import com.gerenciadorlehsa.service.interfaces.EventPublisher;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -26,8 +28,8 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.MAPA_TRANSACAO_ITE
 @Schema(description = "Responsável por lidar com a relação entre item e transação")
 public class MapaTransacaoItemService<T extends Transacao>{
 
-    private final TransacaoService<Emprestimo> transacaoEmprestimoService;
-    private final TransacaoService<Agendamento> transacaoAgendamentoService;
+    private final TransacaoService<Emprestimo, EmprestimoRepository> transacaoEmprestimoService;
+    private final TransacaoService<Agendamento, AgendamentoRepository> transacaoAgendamentoService;
 
     public void validarMapa(T transacao) {
         log.info(">>> Validando Mapa para criação de Transacao");

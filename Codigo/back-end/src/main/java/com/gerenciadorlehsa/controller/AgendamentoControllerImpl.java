@@ -6,6 +6,7 @@ import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.AgendamentoDTORes;
 import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.repository.AgendamentoRepository;
 import com.gerenciadorlehsa.service.MapaTransacaoItemService;
 import com.gerenciadorlehsa.service.TransacaoService;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
@@ -42,7 +43,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Tag(name = "Agendamento", description = "APIs relacionadas a operações de agendamento")
 public class AgendamentoControllerImpl implements OperacoesCRUDController<AgendamentoDTO, AgendamentoDTORes>, AgendamentoController {
 
-    private final TransacaoService<Agendamento> transacaoService;
+    private final TransacaoService<Agendamento, AgendamentoRepository> transacaoService;
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
     private final AgendamentoService agendamentoService;
     private final TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> agendamentoEntityConverterComp;
