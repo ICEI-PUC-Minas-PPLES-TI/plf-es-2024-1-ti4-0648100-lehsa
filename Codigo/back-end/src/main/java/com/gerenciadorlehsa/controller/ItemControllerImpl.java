@@ -5,7 +5,6 @@ import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDControllerImg;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesImagemController;
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.service.ItemServiceImpl;
 import com.gerenciadorlehsa.service.interfaces.ItemService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
@@ -18,12 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.*;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ITEM_CONTROLLER;
 import static com.gerenciadorlehsa.util.ConstrutorRespostaJsonUtil.construirRespostaJSON;
@@ -96,9 +93,10 @@ public class ItemControllerImpl implements ItemController, OperacoesCRUDControll
 
     @Override
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> criar (@Valid @RequestPart("item") Item item,
-                                                      @NotNull @RequestPart("imagem") MultipartFile img){
-        log.info(">>> criar: recebendo requisição para criar item");    
+    public ResponseEntity<Map<String, Object>> criar (@Valid @RequestPart("item") Item item, @RequestPart(
+            "imagem") @NotNull MultipartFile img){
+
+        log.info(">>> criar: recebendo requisição para criar item");
         Item novoItem = operacoesCRUDServiceImg.criar(item, img);
 
         return ResponseEntity.created (URI.create("/item/" + novoItem.getId())).body (construirRespostaJSON(CHAVES_ITEM_CONTROLLER, asList(CREATED.value(), MSG_ITEM_CRIADO, novoItem.getId())));
