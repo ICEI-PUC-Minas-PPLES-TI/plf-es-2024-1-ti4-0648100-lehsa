@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public interface ItemService extends OperacoesImagemService{
+public interface ItemService {
 
     List<Item> encontrarPorTipo (@NotNull String tipo);
 
