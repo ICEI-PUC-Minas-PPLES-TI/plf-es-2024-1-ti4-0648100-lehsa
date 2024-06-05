@@ -1,17 +1,11 @@
 package com.gerenciadorlehsa.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerenciadorlehsa.entity.enums.StatusTransacao;
 import jakarta.persistence.*;
 import lombok.*;
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.UUID;
-
-
 
 @MappedSuperclass
 @Data
