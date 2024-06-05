@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-@Schema(description = "Serviço responsável pelo envio e recebimento de e-mail")
+@Schema(description = "Serviço responsável pelo envio de e-mail")
 public class MensagemEmailService {
 
     private final JavaMailSender javaMailSender;
