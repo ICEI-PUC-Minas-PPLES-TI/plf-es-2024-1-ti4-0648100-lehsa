@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components.abstracts;
+package com.gerenciadorlehsa.components;
 
 
 import com.gerenciadorlehsa.dto.ItemDTO;
@@ -16,7 +16,7 @@ public abstract class TransacaoDTOValidadadorComp<DTO> {
         if(solicitante == null)
             throw new TransacaoException ("A transação não pode ter solicitante nulo");
         if (solicitante.email () == null)
-            throw new TransacaoException ("Um solicitante tem id nulo");
+            throw new TransacaoException ("Um solicitante tem e-mail nulo");
     }
 
 

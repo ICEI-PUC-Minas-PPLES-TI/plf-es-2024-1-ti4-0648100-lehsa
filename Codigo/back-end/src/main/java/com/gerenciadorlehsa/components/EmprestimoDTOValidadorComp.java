@@ -1,6 +1,5 @@
 package com.gerenciadorlehsa.components;
 
-import com.gerenciadorlehsa.components.abstracts.TransacaoDTOValidadadorComp;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EnderecoDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.EmprestimoException;

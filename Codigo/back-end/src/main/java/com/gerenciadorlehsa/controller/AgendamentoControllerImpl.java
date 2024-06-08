@@ -1,6 +1,6 @@
 package com.gerenciadorlehsa.controller;
 
-import com.gerenciadorlehsa.components.abstracts.TransacaoEntityConverterComp;
+import com.gerenciadorlehsa.components.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.controller.interfaces.AgendamentoController;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;

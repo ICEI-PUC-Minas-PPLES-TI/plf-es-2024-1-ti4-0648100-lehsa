@@ -16,8 +16,8 @@ import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
@@ -43,11 +43,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
 
     private ApplicationEventPublisher eventPublisher;
 
-
-    @Autowired
-    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
-                                   AgendamentoRepository agendamentoRepository,
-                                   MensagemEmailService mensagemEmailService) {
+    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, AgendamentoRepository agendamentoRepository, MensagemEmailService mensagemEmailService) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
@@ -101,7 +97,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
 
         obj.setId (null);
 
-        return agendamentoRepository.save (obj);
+        return saveAgendamento (obj);
     }
 
     @Override
@@ -122,7 +118,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
 
         //agendamentoAtt.setStatusTransacaoItem (CONFIRMADO);
 
-        return agendamentoRepository.save(agendamentoAtt);
+        return saveAgendamento (agendamentoAtt);
     }
 
 
@@ -190,7 +186,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
         Agendamento agendamento = encontrarPorId (id);
         log.info(">>> professorConfirmaAgendamento: professor confirma agendamento");
         agendamento.setStatusTransacao (EM_ANALISE);
-        return agendamentoRepository.save (agendamento);
+        return saveAgendamento  (agendamento);
     }
 
 
@@ -202,7 +198,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         verificarPerfilTecnico(tecnico);
         agendamento.setTecnico(tecnico);
-        this.agendamentoRepository.save(agendamento);
+        this.saveAgendamento (agendamento);
     }
 
     @Override
@@ -303,33 +299,34 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento, Agenda
 //----------------TransacaoService - INÍCIO ---------------------------
 
     @Override
-protected AgendamentoRepository getTransacaoRepository() {
-    return agendamentoRepository;
-}
+    protected AgendamentoRepository getTransacaoRepository() {
+
+        return agendamentoRepository;
+    }
 
 
-@Override
-public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
-    log.info(">>> atualizarStatus: atualizando status do agendamento");
+    @Override
+    public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
+        log.info(">>> atualizarStatus: atualizando status do agendamento");
 
-    StatusTransacao statusUpperCase = getStatusUpperCase(status);
+        StatusTransacao statusUpperCase = getStatusUpperCase(status);
 
-    Agendamento agendamento = encontrarPorId(id);
+        Agendamento agendamento = encontrarPorId(id);
 
-    verificarAutorizacaoDoUsuario(agendamento, statusUpperCase);
+        verificarAutorizacaoDoUsuario(agendamento, statusUpperCase);
 
-    verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(agendamento, statusUpperCase);
+        verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(agendamento, statusUpperCase);
 
-    verificarCondicoesDeConfirmacao(agendamento, statusUpperCase);
+        verificarCondicoesDeConfirmacao(agendamento, statusUpperCase);
 
-    verificarCondicoesDeAprovacao(agendamento, statusUpperCase);
+        verificarCondicoesDeAprovacao(agendamento, statusUpperCase);
 
-    agendamento.setStatusTransacao (statusUpperCase);
-    agendamentoRepository.save(agendamento);
+        agendamento.setStatusTransacao (statusUpperCase);
+        saveAgendamento (agendamento);
 
-    log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
-            " atualizado para " + agendamento.getStatusTransacao ());
-}
+        log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
+                " atualizado para " + agendamento.getStatusTransacao ());
+    }
 
 
 
@@ -454,6 +451,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
         copyProperties(source, target, propriedadesIgnoradas);
     }
+
 
 
 

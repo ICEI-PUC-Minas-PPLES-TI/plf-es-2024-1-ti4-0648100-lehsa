@@ -14,6 +14,8 @@ import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoSer
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,17 +29,12 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.TRANSACAO_SERVICE;
 
 @Slf4j(topic = TRANSACAO_SERVICE)
 @Service
+@AllArgsConstructor
 @Schema(description = "Superclasse abstrata que contém métodos e atributos em comum para qualquer tipo que é subtipo " +
         "de TransacaoItem")
 public abstract class TransacaoService<T extends Transacao,  R extends TransacaoRepository<T>> {
 
     protected final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
-
-
-    @Autowired
-    public TransacaoService(ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService) {
-        this.validadorAutorizacaoRequisicaoService = validadorAutorizacaoRequisicaoService;
-    }
 
     protected abstract R getTransacaoRepository();
 
@@ -57,12 +54,12 @@ public abstract class TransacaoService<T extends Transacao,  R extends Transacao
 
 
     public int calcularQuantidadeTransacao(Item item, List<T> transacoes) {
-        int quantidadeEmprestada = 0;
+        int quantidadeItens = 0;
         for (T transacao : transacoes) {
             Integer quantidade = transacao.getItensQuantidade().getOrDefault(item, 0);
-            quantidadeEmprestada += quantidade;
+            quantidadeItens += quantidade;
         }
-        return quantidadeEmprestada;
+        return quantidadeItens;
     }
 
 

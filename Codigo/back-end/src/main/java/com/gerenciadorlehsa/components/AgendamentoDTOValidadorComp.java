@@ -1,6 +1,5 @@
 package com.gerenciadorlehsa.components;
 
-import com.gerenciadorlehsa.components.abstracts.TransacaoDTOValidadadorComp;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;

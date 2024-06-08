@@ -11,7 +11,6 @@ import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoSer
 import com.gerenciadorlehsa.util.DataHoraUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,13 +31,12 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
     private final EmprestimoRepository emprestimoRepository;
     private final EnderecoService enderecoService;
 
-    @Autowired
-    public EmprestimoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, EmprestimoRepository emprestimoRepository,
-                                  EnderecoService enderecoService) {
+    public EmprestimoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, EmprestimoRepository emprestimoRepository, EnderecoService enderecoService) {
         super (validadorAutorizacaoRequisicaoService);
         this.emprestimoRepository = emprestimoRepository;
         this.enderecoService = enderecoService;
     }
+
 
     @Override
     protected EmprestimoRepository getTransacaoRepository () {

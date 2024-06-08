@@ -1,7 +1,5 @@
 package com.gerenciadorlehsa.components;
 
-import com.gerenciadorlehsa.components.abstracts.TransacaoDTOValidadadorComp;
-import com.gerenciadorlehsa.components.abstracts.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EnderecoDTO;
 import com.gerenciadorlehsa.entity.Emprestimo;
@@ -10,6 +8,7 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,17 +19,11 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
 @Slf4j(topic = EMPRESTIMO_ENTITY_CONVERTER_COMP)
 @Component
+@AllArgsConstructor
 @Schema(description = "Responsável por converter DTO de empréstimo em entidade empréstimo")
 public class EmprestimoEntityConverterComp extends TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> {
 
-    TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp;
-
-    @Autowired
-    public EmprestimoEntityConverterComp (UsuarioService usuarioService,
-                                          TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp, OperacoesCRUDServiceImg<Item> operacoesCRUDServiceImg) {
-        super (usuarioService, operacoesCRUDServiceImg);
-        this.emprestimoDTOValidadadorComp = emprestimoDTOValidadadorComp;
-    }
+    private final TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp;
 
     @Override
     public Emprestimo convertToEntity(EmprestimoDTO emprestimoDTO) {

@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components.abstracts;
+package com.gerenciadorlehsa.components;
 
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
@@ -11,6 +11,8 @@ import com.gerenciadorlehsa.service.interfaces.ItemService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +21,15 @@ import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
+@NoArgsConstructor
 public abstract class TransacaoEntityConverterComp<T extends Transacao,DTO> {
 
-    protected final UsuarioService usuarioService;
-    private final OperacoesCRUDServiceImg<Item> operacoesCRUDServiceImg;
+    @Autowired
+    protected UsuarioService usuarioService;
+
+    @Autowired
+    private OperacoesCRUDServiceImg<Item> operacoesCRUDServiceImg;
+
 
     public abstract T convertToEntity(DTO dto);
 
