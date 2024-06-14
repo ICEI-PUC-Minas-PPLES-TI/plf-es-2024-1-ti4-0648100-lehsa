@@ -7,10 +7,7 @@ import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
 import com.gerenciadorlehsa.repository.ItemRepository;
-import com.gerenciadorlehsa.service.interfaces.EventPublisher;
-import com.gerenciadorlehsa.service.interfaces.ItemService;
-import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
-import com.gerenciadorlehsa.service.interfaces.OperacoesImagemService;
+import com.gerenciadorlehsa.service.interfaces.*;
 import com.gerenciadorlehsa.util.ConstantesImgUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
@@ -42,6 +39,7 @@ public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemServi
     private final ItemRepository itemRepository;
     private ApplicationEventPublisher eventPublisher;
 
+    private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
     // --------------- CRUD - INICIO ---------------------------------------
 
@@ -74,7 +72,7 @@ public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemServi
     @Transactional
     public Item criar (@NotNull Item item, MultipartFile img) {
         log.info(">>> criar: criando item");
-
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         try {
             String nomeImagem = saveImageToStorage(img);
             item.setNomeImg(nomeImagem);
@@ -92,6 +90,7 @@ public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemServi
     @Transactional
     public Item atualizar(Item item, MultipartFile img) {
         log.info(">>> atualizar: atualizando item");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         Item itemExistente = encontrarPorId(item.getId());
         List<String> propriedadesNulas = new ArrayList<>();
         processarImagem(itemExistente, img, propriedadesNulas);
@@ -107,6 +106,7 @@ public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemServi
     @Transactional
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         Item item = encontrarPorId(id);
         publishEvent (new ItemEvents.DeletarItemEmTransacoesEvent (this, item));
         try {
