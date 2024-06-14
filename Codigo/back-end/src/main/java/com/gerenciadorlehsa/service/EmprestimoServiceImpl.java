@@ -21,6 +21,7 @@ import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_EMPRESTIMO_EM_A
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_SERVICE;
 import static com.gerenciadorlehsa.util.DataHoraUtil.dataValidaEmprestimo;
 import static java.lang.String.format;
+import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = EMPRESTIMO_SERVICE)
 @Service
@@ -70,7 +71,13 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
 
         obj.setStatusTransacao (EM_ANALISE);
         obj.setId(null);
-        obj.getLocalUso().setId(null);
+
+        Endereco existente = enderecoService.enderecoExiste(obj.getLocalUso());
+        if (existente == null)
+            obj.getLocalUso().setId(null);
+        else
+            obj.setLocalUso(existente);
+
         return emprestimoRepository.save(obj);
     }
 
@@ -82,23 +89,31 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
         validarDataHoraAtt(encontrarAtributosIguais(obj, emprestimoExistente), obj);
 
         obj.setStatusTransacao (emprestimoExistente.getStatusTransacao ());
-        obj.setSolicitante(emprestimoExistente.getSolicitante());
+        emprestimoExistente.setSolicitante(obj.getSolicitante());
+        emprestimoExistente.setDataHoraInicio(obj.getDataHoraInicio());
+        emprestimoExistente.setObservacaoSolicitacao(obj.getObservacaoSolicitacao());
+        emprestimoExistente.setItensQuantidade(obj.getItensQuantidade());
+        Endereco enderecoAntigo = emprestimoExistente.getLocalUso();
+        atualizarEndereco(obj, emprestimoExistente);
+        Emprestimo emprestimoSalvo = emprestimoRepository.save(emprestimoExistente);
+        deletarEndereco(enderecoAntigo);
 
-        if (emprestimoRepository.countEmprestimoByLocalUso(emprestimoExistente.getLocalUso()) == 1)
-            obj.getLocalUso().setId(emprestimoExistente.getLocalUso().getId());
-
-        return emprestimoRepository.save(obj);
+        return emprestimoSalvo;
     }
 
-   /* public void atualizarEndereco(Emprestimo newEmprestimo, Emprestimo emprestimoAtt) {
-        Endereco enderecoNewEmprestimo = newEmprestimo.getLocalUso ();
-        if(!enderecoService.enderecoExiste (enderecoNewEmprestimo)) {
-            enderecoNewEmprestimo = enderecoService.criar (enderecoNewEmprestimo);
-            emprestimoAtt.setLocalUso (enderecoNewEmprestimo);
-        } else if (emprestimoAtt.getLocalUso () != enderecoNewEmprestimo) {
-            emprestimoAtt.setLocalUso (enderecoNewEmprestimo);
+    private void atualizarEndereco(Emprestimo obj, Emprestimo emprestimoExistente) {
+        Endereco existente = enderecoService.enderecoExiste(obj.getLocalUso());
+        if (existente == null) {
+            System.out.println("Nao existe");
+            if (emprestimoRepository.countEmprestimoByLocalUso(emprestimoExistente.getLocalUso()) == 1)
+                copyProperties(obj.getLocalUso(), emprestimoExistente.getLocalUso(), "id");//troca atributos do endereco existente que so tinha um empresitmo
+            else
+                emprestimoExistente.setLocalUso(obj.getLocalUso()); //criar novo endereco
         }
-    }*/
+        else {
+            emprestimoExistente.setLocalUso(existente); //colocar o endereco existente
+        }
+    }
 
 
     @Override
@@ -208,8 +223,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, Empresti
     @Override
     public void deletarEndereco (Endereco endereco) {
         int nEmprestimosComEndereco = emprestimoRepository.countEmprestimoByLocalUso(endereco);
-
-        if (nEmprestimosComEndereco == 1 || nEmprestimosComEndereco == 0) {
+        if (nEmprestimosComEndereco < 1) {
             enderecoService.deletar(endereco.getId());
         }
     }
