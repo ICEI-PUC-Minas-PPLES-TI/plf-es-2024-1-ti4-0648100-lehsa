@@ -11,7 +11,6 @@ import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.OperacoesImagemService;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
-import com.gerenciadorlehsa.util.ConstantesImgUtil;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
