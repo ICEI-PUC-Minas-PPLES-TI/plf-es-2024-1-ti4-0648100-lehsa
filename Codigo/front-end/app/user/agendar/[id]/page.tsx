@@ -324,7 +324,7 @@ const Agendar = ({ params }: { params: { id: string } }) => {
                 </div>
               </div>
               {solicitantes.map((mail) => (
-                <div className="flex space-x-2 items-center">
+                <div className="flex space-x-2 items-center" key={mail}>
                   <span className="text-[14px]">{mail}</span>
                   <X
                     className="cursor-pointer w-5"
@@ -359,6 +359,7 @@ const Agendar = ({ params }: { params: { id: string } }) => {
                             )
                           }
                           className="cursor-pointer"
+                          key={item.id}
                         >
                           <SimplifiedItem
                             id={item.id}
