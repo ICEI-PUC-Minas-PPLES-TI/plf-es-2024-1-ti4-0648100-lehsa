@@ -30,7 +30,7 @@ const EditarItem = ({ params }: { params: { id: string } }) => {
       try {
         const token = Cookie.get("token");
         const response = await fetch(
-          `http://localhost:8080/item/${params.id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/item/${params.id}`,
           {
             method: "GET",
             headers: {
@@ -65,7 +65,7 @@ const EditarItem = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     const token = Cookie.get("token");
     if (token) {
-      fetch(`http://localhost:8080/item/img/${params.id}`, {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/item/img/${params.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -77,7 +77,7 @@ const EditarItem = ({ params }: { params: { id: string } }) => {
         })
         .catch((error) => console.error("Erro carregar imagem:", error));
     }
-  }, [`http://localhost:8080/item/img/${params.id}`]);
+  }, [`${process.env.NEXT_PUBLIC_API_URL}/item/img/${params.id}`]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -116,13 +116,16 @@ const EditarItem = ({ params }: { params: { id: string } }) => {
 
     const token = Cookie.get("token");
     try {
-      const response = await fetch(`http://localhost:8080/item/${params.id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/item/${params.id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
       if (!response.ok) {
         throw new Error("Falha ao enviar o formulário");
       }

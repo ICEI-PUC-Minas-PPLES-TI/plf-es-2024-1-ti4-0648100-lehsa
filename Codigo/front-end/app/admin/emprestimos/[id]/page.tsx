@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
@@ -47,13 +47,16 @@ type Emprestimo = {
 const fetchItem = async (id: string | string[]) => {
   try {
     const token = Cookie.get("token");
-    const response = await fetch(`http://localhost:8080/emprestimo/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/emprestimo/${id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch item");
@@ -73,7 +76,7 @@ const DetalhesEmprestimo = () => {
     try {
       const token = Cookie.get("token");
       const response = await fetch(
-        `http://localhost:8080/emprestimo/${emprestimo?.id}/${status}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/emprestimo/${emprestimo?.id}/${status}`,
         {
           method: "PATCH",
           headers: {
@@ -82,7 +85,7 @@ const DetalhesEmprestimo = () => {
           },
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to update status");
       }
@@ -91,7 +94,6 @@ const DetalhesEmprestimo = () => {
         ...emprestimo!,
         statusTransacaoItem: status,
       });
-
     } catch (error) {
       console.error("Error updating status:", error);
     }
@@ -100,8 +102,8 @@ const DetalhesEmprestimo = () => {
   useEffect(() => {
     const fetchItemData = async () => {
       const router = window.location.pathname;
-      const id = router.split('/')[3];
-      const status = router.split('/')[4];
+      const id = router.split("/")[3];
+      const status = router.split("/")[4];
 
       if (!id) return;
 
@@ -112,10 +114,10 @@ const DetalhesEmprestimo = () => {
         handleAcao(status);
       }
 
-      console.log(data)
-  };
+      console.log(data);
+    };
 
-  fetchItemData();
+    fetchItemData();
   }, []);
 
   return (
@@ -140,13 +142,18 @@ const DetalhesEmprestimo = () => {
                     </li>
                     <li className="flex space-x-2">
                       <h2 className="font-bold">Status:</h2>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            emprestimo?.statusTransacaoItem === 'APROVADO' ? "bg-green-100 text-green-800" :
-                            emprestimo?.statusTransacaoItem === 'EM_ANALISE' ? "bg-yellow-100 text-yellow-800" :
-                            emprestimo?.statusTransacaoItem === 'RECUSADO' ? "bg-red-100 text-red-800" :
-                            'bg-gray-500 text-white'
-                          }`}>
-                       {translateStatus(emprestimo?.statusTransacaoItem || '')}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          emprestimo?.statusTransacaoItem === "APROVADO"
+                            ? "bg-green-100 text-green-800"
+                            : emprestimo?.statusTransacaoItem === "EM_ANALISE"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : emprestimo?.statusTransacaoItem === "RECUSADO"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-500 text-white"
+                        }`}
+                      >
+                        {translateStatus(emprestimo?.statusTransacaoItem || "")}
                       </span>
                     </li>
                     <li className="flex space-x-2">
@@ -176,25 +183,27 @@ const DetalhesEmprestimo = () => {
             <Separator />
             <div className="grid grid-cols-3 gap-4 mt-4 ml-5 mb-10">
               {emprestimo?.itens.map((item, id) => (
-              <div key={id}>
-                <h3 className="text-lg font-bold mb-2">Item</h3>
-                <ul className="text-gray-500 dark:text-gray-400">
-                  <li className="flex space-x-2">
-                    <h2 className="font-bold">Nome do item:</h2>
-                    <p>{item.nome}</p>
-                  </li>
+                <div key={id}>
+                  <h3 className="text-lg font-bold mb-2">Item</h3>
+                  <ul className="text-gray-500 dark:text-gray-400">
+                    <li className="flex space-x-2">
+                      <h2 className="font-bold">Nome do item:</h2>
+                      <p>{item.nome}</p>
+                    </li>
 
-                  <li className="flex space-x-2">
-                    <h2 className="font-bold">Categoria:</h2>
-                    <p>{item.tipo_item}</p>
-                  </li>
+                    <li className="flex space-x-2">
+                      <h2 className="font-bold">Categoria:</h2>
+                      <p>{item.tipo_item}</p>
+                    </li>
 
-                  <li className="flex space-x-2">
-                    <h2 className="font-bold">Quantidade para o empréstimo:</h2>
-                    <p>{item.quantidade}</p>
-                  </li>
-                </ul>
-              </div>
+                    <li className="flex space-x-2">
+                      <h2 className="font-bold">
+                        Quantidade para o empréstimo:
+                      </h2>
+                      <p>{item.quantidade}</p>
+                    </li>
+                  </ul>
+                </div>
               ))}
               <div>
                 <h3 className="text-lg font-bold mb-2">
@@ -220,19 +229,19 @@ const DetalhesEmprestimo = () => {
               <div>
                 <h3 className="text-lg font-bold mb-2">Local de uso</h3>
                 <ul className="text-gray-500 dark:text-gray-400">
-                <li className="flex space-x-2">
+                  <li className="flex space-x-2">
                     <h2 className="font-bold">CEP:</h2>
                     <p>{emprestimo?.endereco.cep}</p>
                   </li>
-                <li className="flex space-x-2">
+                  <li className="flex space-x-2">
                     <h2 className="font-bold">UF:</h2>
                     <p>{emprestimo?.endereco.uf}</p>
                   </li>
-                <li className="flex space-x-2">
+                  <li className="flex space-x-2">
                     <h2 className="font-bold">Cidade:</h2>
                     <p>{emprestimo?.endereco.cidade}</p>
                   </li>
-                <li className="flex space-x-2">
+                  <li className="flex space-x-2">
                     <h2 className="font-bold">Bairro:</h2>
                     <p>{emprestimo?.endereco.bairro}</p>
                   </li>

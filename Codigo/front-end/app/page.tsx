@@ -10,7 +10,6 @@ import Link from "next/link";
 
 export default function Home() {
   const router = useRouter();
-
   const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -20,7 +19,7 @@ export default function Home() {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    const response = await fetch("http://localhost:8080/login", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

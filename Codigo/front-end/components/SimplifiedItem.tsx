@@ -12,7 +12,7 @@ const SimplifiedItem = ({ id, nome, quantidade }: Props) => {
   return (
     <div className="flex items-center space-x-5">
       <ImageComp
-        src={`http://localhost:8080/item/img/${id}`}
+        src={`${process.env.NEXT_PUBLIC_API_URL}/item/img/${id}`}
         alt="item picture"
         width={120}
         height={0}

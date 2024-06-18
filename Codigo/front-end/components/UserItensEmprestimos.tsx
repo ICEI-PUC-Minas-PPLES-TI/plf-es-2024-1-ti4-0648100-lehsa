@@ -28,7 +28,7 @@ const UserItensEmprestimo = () => {
   }
 
   useEffect(() => {
-    fetch("http://localhost:8080/item/emprestaveis", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/item/emprestaveis`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

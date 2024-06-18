@@ -20,7 +20,7 @@ const SingleItemCard = ({ id, nome, tipo_item, quantidade, emprestavel }: Props)
     <div>
       <Card className="rounded-lg overflow-hidden shadow-lg mx-auto my-6 hover:shadow-xl transition-all duration-200 w-70">
         <ImageComp
-          src={`http://localhost:8080/item/img/${id}`}
+          src={`${process.env.NEXT_PUBLIC_API_URL}/item/img/${id}`}
           alt="item picture"
           width={400}
           height={60}

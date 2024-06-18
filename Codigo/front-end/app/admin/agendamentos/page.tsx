@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Cookie from "js-cookie";
-import { Agendamento as AgendamentoType, Tecnico } from "@/components/types"; // Assuming Tecnico type is imported here
+import { Agendamento as AgendamentoType} from "@/components/types";
 import Agendamento from "@/components/Agendamento";
 import Link from "next/link";
 
@@ -11,7 +11,7 @@ const Agendamentos = () => {
 
   useEffect(() => {
     const authToken = Cookie.get("token") ?? "";
-    fetch("http://localhost:8080/agendamento", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/agendamento`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -20,7 +20,7 @@ const Agendamentos = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("API response:", data); // Log the data to see its structure
+        console.log("API response:", data);
         setAgendamentos(data);
       })
       .catch((error) => {

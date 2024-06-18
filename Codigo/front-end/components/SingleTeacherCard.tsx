@@ -59,7 +59,7 @@ const SingleTeacherCard = ({
               alt="foto do professor"
               className="h-16 w-16 rounded-full object-cover bg-slate-200"
               height={64}
-              src={`http://localhost:8080/professor/img/${id}`}
+              src={`${process.env.NEXT_PUBLIC_API_URL}/professor/img/${id}`}
               width={64}
             />
             <div className="text-center sm:text-left">

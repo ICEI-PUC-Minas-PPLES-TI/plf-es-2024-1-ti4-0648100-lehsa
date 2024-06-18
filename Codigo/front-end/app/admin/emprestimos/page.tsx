@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Cookie from "js-cookie";
-import { Emprestimo as EmprestimoType } from "@/components/types"; // Assuming Tecnico type is imported here
+import { Emprestimo as EmprestimoType } from "@/components/types"; 
 import Emprestimo from "@/components/Emprestimo";
 import Link from "next/link";
 
@@ -12,7 +12,7 @@ const Emprestimos = () => {
 
   useEffect(() => {
     const authToken = Cookie.get("token") ?? "";
-    fetch("http://localhost:8080/emprestimo", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/emprestimo`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -26,7 +26,7 @@ const Emprestimos = () => {
         return response.json();
       })
       .then((data) => {
-        console.log("API response:", data); // Log the data to see its structure
+        console.log("API response:", data); 
         if (Array.isArray(data)) {
           setEmprestimos(data);
         } else {

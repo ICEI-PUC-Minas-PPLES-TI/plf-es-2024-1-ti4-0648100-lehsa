@@ -30,7 +30,7 @@ const TeacherCard = () => {
       }, [token]);
 
     const handleDelete = (id: string) => {
-        setTeacher(teacher.filter(teacher => teacher.id !== id)); // Remover o professor da lista
+        setTeacher(teacher.filter(teacher => teacher.id !== id));
       };
 
     return (

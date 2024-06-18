@@ -11,7 +11,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -20,7 +19,7 @@ import SearchBar from "@/components/SearchBar";
 import { useRouter } from "next/navigation";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, X, Plus, ArrowLeftToLine } from "lucide-react";
+import { CalendarIcon, X, ArrowLeftToLine } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -122,7 +121,7 @@ const Emprestimo = ({ params }: { params: { id: string } }) => {
 
   const getItem = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/item/${params.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/item/${params.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -148,7 +147,7 @@ const Emprestimo = ({ params }: { params: { id: string } }) => {
 
   const getAllItens = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/item`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/item`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -244,7 +243,7 @@ const Emprestimo = ({ params }: { params: { id: string } }) => {
     const dataHoraInicio = `${dateInicioFormat} ${timeInicio}:00`;
     const dataHoraFim = `${dateFimFormat} ${timeFim}:00`;
     try {
-      const response = await fetch("http://localhost:8080/emprestimo", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/emprestimo`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

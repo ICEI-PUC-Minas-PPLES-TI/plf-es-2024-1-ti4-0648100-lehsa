@@ -15,7 +15,6 @@ const UserItensAgendamento = () => {
       <div className="flex flex-1 justify-between my-5">
         <SearchBar onChange={(e) => setSearchTerm(e.target.value)} />
         <div className="flex justify-items-end space-x-5">
-          {/* <FilterSelect /> */}
         </div>
       </div>
       <ItensDisplay searchTerm={searchTerm} />

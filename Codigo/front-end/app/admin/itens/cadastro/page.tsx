@@ -37,7 +37,7 @@ const CadastroItem = () => {
 
     const token = Cookie.get("token");
     try {
-      const response = await fetch('http://localhost:8080/item', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/item`, {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${token}`

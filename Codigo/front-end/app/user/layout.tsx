@@ -1,5 +1,4 @@
 import React, { ReactNode } from "react";
-import TopMenu from "@/components/topMenu";
 
 interface Props {
   children: ReactNode;
