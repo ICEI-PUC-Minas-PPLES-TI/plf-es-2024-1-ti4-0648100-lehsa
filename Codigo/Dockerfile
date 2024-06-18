@@ -12,8 +12,8 @@ ENV LC_ALL pt_BR.UTF-8
 # Copiar o código-fonte
 COPY back-end .
 
-# Construir a aplicação com Maven
-RUN mvn clean install
+# Construir a aplicação com Maven e forçar codificação UTF-8
+RUN mvn clean install -Dfile.encoding=UTF-8 -e -X
 
 FROM openjdk:17-jdk-slim
 
