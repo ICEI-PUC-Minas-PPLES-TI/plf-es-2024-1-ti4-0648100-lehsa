@@ -75,7 +75,7 @@ const Agendar = ({ params }: { params: { id: string } }) => {
 
   const getItem = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/item/${params.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/item/${params.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -101,7 +101,7 @@ const Agendar = ({ params }: { params: { id: string } }) => {
 
   const getAllItens = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/item`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/item`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -207,7 +207,7 @@ const Agendar = ({ params }: { params: { id: string } }) => {
     const dataHoraFim = `${dateFormat} ${timeFim}:00`;
     const observacaoSolicitacao = obs;
     try {
-      const response = await fetch("http://localhost:8080/agendamento", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agendamento`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

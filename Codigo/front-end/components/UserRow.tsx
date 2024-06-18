@@ -24,7 +24,7 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
   const loggedInUserId = decoded.userId;
 
   useEffect(() => {
-    fetch(`http://localhost:8080/usuario`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -55,7 +55,7 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
   const deleteUser = (id: number) => {
     const confirmDelete = window.confirm("Quer mesmo deletar este usuário?");
     if (confirmDelete) {
-      fetch(`http://localhost:8080/usuario/${id}`, {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${authToken}`,

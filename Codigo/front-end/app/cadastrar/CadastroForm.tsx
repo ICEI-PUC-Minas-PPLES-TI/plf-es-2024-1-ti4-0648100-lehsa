@@ -62,7 +62,7 @@ const CadastroForm = () => {
     password: any;
   }) => {
     try {
-      const response = await fetch(`http://localhost:8080/usuario`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const CadastroForm = () => {
       if (response.ok) {
         console.log("User created successfully");
 
-        const loginResponse = await fetch("http://localhost:8080/login", {
+        const loginResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

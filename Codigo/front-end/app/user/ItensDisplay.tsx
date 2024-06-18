@@ -29,7 +29,7 @@ const ItensDisplay = ({ searchTerm }: ItensCardProps) => {
   }
 
   useEffect(() => {
-    fetch("http://localhost:8080/item", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/item`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

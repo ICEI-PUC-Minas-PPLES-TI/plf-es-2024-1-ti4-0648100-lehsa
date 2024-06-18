@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import { EditIcon, TrashIcon, ArrowLeft } from "lucide-react";
+import { EditIcon, TrashIcon} from "lucide-react";
 import Link from "next/link";
 import Cookie from "js-cookie";
 import ImageComp from "@/components/ImageComp";
@@ -29,7 +29,7 @@ type Props = {
 const fetchItem = async (id: string | string[]) => {
     try {
         const token = Cookie.get("token");
-        const response = await fetch(`http://localhost:8080/item/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/item/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const deleteItem = async (id: string | string[]) => {
             throw new Error("Usuário não autenticado");
         }
 
-        const response = await fetch(`http://localhost:8080/item/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/item/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -111,7 +111,7 @@ export default function ItemDetails() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
         <div className="flex justify-center">
             <ImageComp
-                src={`http://localhost:8080/item/img/${item.id}`}
+                src={`${process.env.NEXT_PUBLIC_API_URL}/item/img/${item.id}`}
                 alt="item picture"
                 width={200}
                 height={200}

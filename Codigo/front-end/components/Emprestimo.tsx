@@ -119,7 +119,7 @@ const Emprestimo: React.FC<EmprestimoProps> = ({
             {items.map((item) => (
               <div key={item.id}>
                 <ImageComp
-                  src={`http://localhost:8080/item/img/${item.id}`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/item/img/${item.id}`}
                   alt="item picture"
                   width={400}
                   height={400}

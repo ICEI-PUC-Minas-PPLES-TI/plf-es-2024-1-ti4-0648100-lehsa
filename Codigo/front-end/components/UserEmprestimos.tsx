@@ -25,7 +25,7 @@ const UserEmprestimos = () => {
   }, [decoded.userId]);
 
   const fetchEmprestimo = () => {
-    fetch(`http://localhost:8080/usuario/${decoded.userId}/emprestimos`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario/${decoded.userId}/emprestimos`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

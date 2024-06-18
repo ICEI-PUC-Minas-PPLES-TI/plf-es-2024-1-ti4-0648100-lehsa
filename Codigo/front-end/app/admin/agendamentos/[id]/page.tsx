@@ -59,7 +59,7 @@ type AgendamentoProps = {
 const fetchItem = async (id: string | string[]) => {
   try {
     const token = Cookie.get("token");
-    const response = await fetch(`http://localhost:8080/agendamento/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/agendamento/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -86,7 +86,7 @@ const ValidarAgendamento = () => {
     try {
       const token = Cookie.get("token");
       const response = await fetch(
-        `http://localhost:8080/agendamento/${agendamento?.id}/${status}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/agendamento/${agendamento?.id}/${status}`,
         {
           method: "PATCH",
           headers: {
@@ -113,7 +113,7 @@ const ValidarAgendamento = () => {
     try {
       const token = Cookie.get("token");
       const response = await fetch(
-        `http://localhost:8080/agendamento/${agendamento?.id}/tecnico/${tecnicoEmail}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/agendamento/${agendamento?.id}/tecnico/${tecnicoEmail}`,
         {
           method: "PATCH",
           headers: {

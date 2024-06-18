@@ -25,7 +25,7 @@ const UserAgendamentos = () => {
   }, [decoded.userId]);
 
   const fetchAgendamento = () => {
-    fetch(`http://localhost:8080/usuario/${decoded.userId}/agendamentos`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuario/${decoded.userId}/agendamentos`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

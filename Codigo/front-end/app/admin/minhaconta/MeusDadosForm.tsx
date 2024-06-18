@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Cookie from "js-cookie";
 import { useRouter } from "next/navigation";
-import ValidationMessage from "./ValidationMessage"; // Import the new component
+import ValidationMessage from "./ValidationMessage";
 
 interface User {
   id: string;
@@ -14,7 +14,7 @@ interface User {
   password: string;
   cpf: string;
   perfil_usuario: number;
-  [key: string]: string | number; // Index signature to allow any string as key
+  [key: string]: string | number;
 }
 
 const fieldErrorMessages: { [key: string]: string } = {
@@ -37,39 +37,38 @@ const MeusDadosForm = () => {
   const [validationMessages, setValidationMessages] = useState<{
     [key: string]: string;
   }>({});
-  const [successMessage, setSuccessMessage] = useState<string>(""); // State for success message
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
     const authToken = Cookie.get("token");
 
     if (!authToken) {
-      // No token found, redirect to login
       router.push("/login");
       return;
     }
 
-    // Decode token to get userId
     const decodedToken = decodeToken(authToken);
     if (!decodedToken || !decodedToken.userId) {
-      // Token is invalid or doesn't contain userId, redirect to login
       router.push("/login");
       return;
     }
 
-    // Fetch user data using userId from the decoded token
     fetchUserData(decodedToken.userId, authToken);
-  }, []); // Empty dependency array means this runs once on component mount
+  }, []);
 
   const fetchUserData = async (userId: string, authToken: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/usuario/${userId}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/usuario/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Error fetching user data");
@@ -79,7 +78,6 @@ const MeusDadosForm = () => {
       setUserData(data);
     } catch (error) {
       console.error("Error fetching user data:", error);
-      // Optionally, handle user feedback or redirection here
     }
   };
 
@@ -98,16 +96,14 @@ const MeusDadosForm = () => {
 
     const authToken = Cookie.get("token");
     if (!authToken) {
-      // No token found, redirect to login
       router.push("/login");
       return;
     }
 
-    const fieldsToValidate = ["nome", "email", "telefone", "password"]; // List of required fields
+    const fieldsToValidate = ["nome", "email", "telefone", "password"];
 
-    const newValidationMessages: { [key: string]: string } = {}; // Object to store validation messages
+    const newValidationMessages: { [key: string]: string } = {};
 
-    // Check if all required fields are filled
     fieldsToValidate.forEach((field) => {
       if (!userData[field]) {
         newValidationMessages[field] = fieldErrorMessages[field];
@@ -115,7 +111,6 @@ const MeusDadosForm = () => {
     });
 
     if (Object.keys(newValidationMessages).length > 0) {
-      // If there are validation messages, set them and return
       setValidationMessages(newValidationMessages);
       return;
     }
@@ -124,14 +119,14 @@ const MeusDadosForm = () => {
       const userDataToSend = {
         nome: userData.nome,
         email: userData.email,
-        password: userData.password, // assuming you have a password field in userData
+        password: userData.password,
         telefone: userData.telefone,
         cpf: userData.cpf,
         perfil_usuario: userData.perfil_usuario,
       };
 
       const response = await fetch(
-        `http://localhost:8080/usuario/${userData.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/usuario/${userData.id}`,
         {
           method: "PUT",
           headers: {
@@ -146,11 +141,10 @@ const MeusDadosForm = () => {
         throw new Error("Error updating user data");
       }
 
-      setSuccessMessage("Dados atualizados com sucesso!"); // Set success message
+      setSuccessMessage("Dados atualizados com sucesso!");
       console.log("User data updated successfully");
     } catch (error) {
       console.error("Error updating user data:", error);
-      // Optionally, handle user feedback or redirection here
     }
   };
 
@@ -161,7 +155,6 @@ const MeusDadosForm = () => {
       [id]: value,
     });
 
-    // Remove validation message for the field being typed in
     setValidationMessages((prevMessages) => {
       const newMessages = { ...prevMessages };
       delete newMessages[id];
