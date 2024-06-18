@@ -413,6 +413,7 @@ const Emprestimo = ({ params }: { params: { id: string } }) => {
                             )
                           }
                           className="cursor-pointer"
+                          key={item.id}
                         >
                           <SimplifiedItem
                             id={item.id}
@@ -479,7 +480,7 @@ const Emprestimo = ({ params }: { params: { id: string } }) => {
                   </SelectTrigger>
                   <SelectContent>
                     {estados.map((estado) => (
-                      <SelectItem value={estado.valor}>
+                      <SelectItem value={estado.valor} key={estado.valor}>
                         {estado.nome}
                       </SelectItem>
                     ))}
