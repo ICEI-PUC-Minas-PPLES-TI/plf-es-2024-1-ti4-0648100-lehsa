@@ -7,7 +7,7 @@ RUN apt-get install -y openjdk-17-jdk -y
 COPY back-end .
 
 RUN apt-get install maven -y
-RUN mvn clean install
+RUN mvn clean install -Dfile.encoding=UTF-8 -e -X
 
 FROM openjdk:17-jdk-slim
 
