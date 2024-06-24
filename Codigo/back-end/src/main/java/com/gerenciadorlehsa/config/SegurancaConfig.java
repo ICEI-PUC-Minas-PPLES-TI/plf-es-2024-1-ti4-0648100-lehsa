@@ -62,7 +62,7 @@ public class SegurancaConfig {
     CorsConfigurationSource corsConfigurationSource() {
         log.info(">>> corsConfigurationSource: iniciando configuração de Cors");
         final CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("https://plf-es-2024-01-ti4-0648100-lehsa.onrender.com"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowCredentials(true); // Permitir credenciais
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
