@@ -4,23 +4,18 @@ import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.ProfessorDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.gerenciadorlehsa.entity.enums.StatusTransacao.AGUARDANDO_CONFIRMACAO_PROFESSOR;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
@@ -43,7 +38,7 @@ public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp
         agendamento.setDataHoraInicio(converterDataHora (agendamentoDTO.dataHoraInicio ()));
         agendamento.setDataHoraFim(converterDataHora (agendamentoDTO.dataHoraFim ()));
         agendamento.setObservacaoSolicitacao(agendamentoDTO.observacaoSolicitacao());
-        agendamento.setStatusTransacao (AGUARDANDO_CONFIRMACAO_PROFESSOR);
+        agendamento.setStatusTransacao (EM_ANALISE);
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
         agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens ()));
