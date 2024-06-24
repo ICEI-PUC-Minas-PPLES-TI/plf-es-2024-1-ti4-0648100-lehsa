@@ -62,12 +62,11 @@ public class SegurancaConfig {
     CorsConfigurationSource corsConfigurationSource() {
         log.info(">>> corsConfigurationSource: iniciando configuração de Cors");
         final CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowCredentials(true); // Permitir credenciais
+        configuration.setAllowCredentials(true);
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Aplica a configuração para todas as rotas
-
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }
