@@ -13,3 +13,11 @@ Este diretório mantém os artefatos do projeto com os seguintes diretórios e e
 
  * `/prototipos-telas`
    	* *prototipos-telas-sprint2*: Protótipos de tela da sprint 2.
+ * `/atas`
+   	* *ata-de-reuniao-sprint2*: Ata da reunião realizada com o cliente na sprint 2.
+ * `/models`
+   	* Modelos de documentos
+* `/relatorios`
+   	* *relatorio-sprint1*: Relatório da sprint 1.
+* `/planejamentos`
+   	* *planejamento-sprint1*: Planejamento das atividades a serem feitas na sprint 1.
