@@ -1,4 +1,4 @@
-# LEHSA
+# LEHSA - Gerenciador de Laboratórios
 
 O sistema LEHSA é destinado
 ao gerenciamento do Laboratório de Estudos em Hidráulica e Saneamento Ambiental
