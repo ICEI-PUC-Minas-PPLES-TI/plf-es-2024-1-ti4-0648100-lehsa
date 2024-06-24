@@ -48,10 +48,10 @@ const ItensCard = ({ searchTerm }: ItensCardProps) => {
     const filteredItems = items.filter(item =>
         item.nome.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+   
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="flex flex-wrap gap-4">
             {filteredItems.map((item: Props) => (
                 <Link key={item.id} href={`/admin/itens/${item.id}`}>
                     <SingleItemCard id={item.id} nome={item.nome} tipo_item={item.tipo_item} quantidade={item.quantidade} emprestavel={item.emprestavel}/>                    

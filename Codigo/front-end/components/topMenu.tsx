@@ -28,12 +28,12 @@ const TopMenu = ({ title }: Props) => {
     <div className="flex w-full justify-between items-center">
       <h1 className="text-black text-3xl font-semibold">{title}</h1>
       <div className="flex gap-5">
-        <Image
+        {/* <Image
           src="/icons/notification.svg"
           width={46}
           height={0}
           alt="notification"
-        ></Image>
+        ></Image> */}
         {/* <Image
           src="/icons/setting.svg"
           width={46}

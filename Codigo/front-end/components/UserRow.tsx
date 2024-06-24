@@ -77,7 +77,7 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
 
   return (
     <div className="mt-10 flex justify-center">
-      <div className="table w-[80%] rounded-xl bg-white">
+      <div className="table w-[80%] rounded-xl bg-white pt-2">
         <div className="table-header-group">
           <div className="table-row h-[2rem]">
             <div className="table-cell text-left pl-5">Nome</div>
