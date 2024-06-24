@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import Image from "next/image";
 import Cookie from "js-cookie";
@@ -33,19 +34,19 @@ const TopMenu = ({ title }: Props) => {
           height={0}
           alt="notification"
         ></Image>
-        <Image
+        {/* <Image
           src="/icons/setting.svg"
           width={46}
           height={0}
           alt="setting"
-        ></Image>
-        <div className="text-center">
+        ></Image> */}
+        {/* <div className="text-center">
           <p className="text-sm">
             <span className="font-semibold text-base">Ruth</span>
             <br />
             admin
           </p>
-        </div>
+        </div> */}
 
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -65,7 +66,7 @@ const TopMenu = ({ title }: Props) => {
               className="text-red-700 font-medium"
               onClick={LogOut}
             >
-              Log Out
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

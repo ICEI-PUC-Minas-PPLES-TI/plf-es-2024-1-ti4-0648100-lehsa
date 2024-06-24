@@ -12,8 +12,6 @@ public class ConstantesErroValidadorUtil {
 
     public static final String MSG_ERRO_VALIDACAO = "erro de validação, verifique o log para detalhes";
 
-    public static final String MSG_ERRO_RG = "formato esperado: 00.000-000";
-
     public static final String MSG_ERRO_CPF = "formato esperado: 000.000.000-00";
 
     public static final String MSG_ERRO_EMAIL = "formato esperado: usuario@email.com.br ou usuario@email.com";

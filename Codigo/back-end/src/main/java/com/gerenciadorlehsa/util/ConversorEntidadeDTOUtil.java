@@ -1,24 +1,17 @@
 package com.gerenciadorlehsa.util;
 
-import com.gerenciadorlehsa.dto.ItemDTO;
-import com.gerenciadorlehsa.dto.ItemDTOResponse;
-import com.gerenciadorlehsa.entity.Item;
-import com.gerenciadorlehsa.entity.enums.TipoItem;
+import com.gerenciadorlehsa.dto.*;
+import com.gerenciadorlehsa.entity.*;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import com.gerenciadorlehsa.controller.UsuarioControllerImpl;
-import com.gerenciadorlehsa.dto.UsuarioDTO;
-import com.gerenciadorlehsa.entity.User;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.CONVERSOR_ENTIDADE_DTO_UTIL;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @UtilityClass
 @Slf4j(topic = CONVERSOR_ENTIDADE_DTO_UTIL)
@@ -38,16 +31,37 @@ public class ConversorEntidadeDTOUtil {
                 .nome(usuario.getNome ())
                 .cpf(usuario.getCpf())
                 .telefone (usuario.getTelefone ())
+                .tipoCurso (usuario.getTipoCurso () != null ? usuario.getTipoCurso ().toString () : null)
+                .statusCurso (usuario.getStatusCurso () != null ? usuario.getStatusCurso ().toString () : null)
+                .nota (usuario.getNota ())
+                .curso (usuario.getCurso ())
                 .email(usuario.getEmail())
-                .links(singletonList(linkTo(UsuarioControllerImpl.class).slash(usuario.getId()).withSelfRel()))
                 .build();
     }
 
+
+    public static ProfessorDTO converterParaDTO(@NotNull Professor professor) {
+        log.info(format(">>> converterParaDTO: convertendo Professor (id: %s) para DTO", professor.getId()));
+        return ProfessorDTO.builder()
+                .campus (professor.getCampus ())
+                .areaAtuacao (professor.getAreaAtuacao ())
+                .confirmaCadastro (professor.getConfirmaCadastro () ? "Cadastro confirmado" : "Cadastro sem " +
+                        "confirmação")
+                .lotacao (professor.getLotacao ())
+                .matricula (professor.getMatricula ())
+                .nome (professor.getNome ())
+                .id (professor.getId ())
+                .laboratorio (professor.getLaboratorio ())
+                .email (professor.getEmail ())
+                .dataHoraCadastro (converterDataHora (professor.getDataHoraCriacao ()))
+                .build();
+    }
+
+
     /**
-     * Converte uma entidade do tipo Endereco para EnderecoDTO
-     *
-     * @param endereco entidade do tipo Endereco
-     * @return novo EnderecoDTO
+     * Converter uma entidade Item para ItemDTO
+     * @param item
+     * @return
      */
 
     public static ItemDTO converterParaDTO(@NotNull Item item) {
@@ -62,48 +76,105 @@ public class ConversorEntidadeDTOUtil {
                 .build();
     }
 
-    private byte[] getImage(String imageDirectory, String imageName) throws IOException {
-        Path imagePath = Path.of(imageDirectory, imageName);
+    public static AgendamentoDTORes converterParaDtoRes(@NotNull Agendamento agendamento) {
+        log.info(format(">>> converterParaDTORes: convertendo Agendamento (id: %s) para DTORes", agendamento.getId()));
 
-        if (Files.exists(imagePath)) {
-            byte[] imageBytes = Files.readAllBytes(imagePath);
-            return imageBytes;
-        } else {
-            return null; // Handle missing images
-        }
+
+        List<UsuarioShortDTORes> solicitantesDTO = agendamento.getSolicitantes() != null ?
+                agendamento.getSolicitantes().stream()
+                        .map(ConversorEntidadeDTOUtil::converterUsuarioParaShortDTORes)
+                        .collect(Collectors.toList()) :
+                null;
+
+        List<ItemDTORes> itensDTO = agendamento.getItensQuantidade() != null ?
+                agendamento.getItensQuantidade().entrySet().stream()
+                        .map(entry -> {
+                            Item item = entry.getKey();
+                            Integer quantidade = entry.getValue();
+                            ItemDTORes itemDTO = ConversorEntidadeDTOUtil.converterItemParaDTORes(item, quantidade);
+                            return itemDTO;
+                        })
+                        .collect(Collectors.toList()) :
+                null;
+
+
+        UsuarioShortDTORes tecnicoDTO = agendamento.getTecnico() != null ?
+                converterUsuarioParaShortDTORes(agendamento.getTecnico()) :
+                null;
+
+        return AgendamentoDTORes.builder()
+                .id(agendamento.getId())
+                .dataHoraInicio(converterDataHora(agendamento.getDataHoraInicio()))
+                .dataHoraFim(converterDataHora(agendamento.getDataHoraFim()))
+                .observacaoSolicitacao(agendamento.getObservacaoSolicitacao())
+                .statusTransacaoItem(agendamento.getStatusTransacaoItem())
+                .solicitantes(solicitantesDTO)
+                .itens(itensDTO)
+                .tecnico(tecnicoDTO)
+                .build();
     }
 
+    public static EmprestimoDTORes converterParaDtoRes(@NotNull Emprestimo emprestimo) {
+        log.info(format(">>> converterParaDTORes: convertendo Emprestimo (id: %s) para DTORes", emprestimo.getId()));
 
-/*
-    public static Item converterParaItem(@NotNull ItemDTO itemDTO){
-        log.info(">>> converterParaItem: convertendo DTO para Item");
+        UsuarioShortDTORes solicitanteDTO = emprestimo.getSolicitante() != null ?
+                converterUsuarioParaShortDTORes(emprestimo.getSolicitante()) :
+                null;
 
-        Item novoItem = new Item();
-        novoItem.setId(null);
-        novoItem.setTipoItem(TipoItem.valueOf(itemDTO.tipoItem()));
-        novoItem.setNome(itemDTO.nome());
-        novoItem.setValorUnitario(itemDTO.valorUnitario());
-        novoItem.setEmprestavel(itemDTO.emprestavel());
-        novoItem.setQuantidade(itemDTO.quantidade());
+        List<ItemDTORes> itensDTO = emprestimo.getItensQuantidade() != null ?
+                emprestimo.getItensQuantidade().entrySet().stream()
+                        .map(entry -> {
+                            Item item = entry.getKey();
+                            Integer quantidade = entry.getValue();
+                            return ConversorEntidadeDTOUtil.converterItemParaDTORes(item, quantidade);
+                        })
+                        .collect(Collectors.toList()) :
+                null;
 
-        return novoItem;
+        EnderecoDTORes enderecoDTORes = emprestimo.getLocalUso() != null ?
+                converterEnderecoParaEnderecoDTORes(emprestimo.getLocalUso()) :
+                null;
+
+        return EmprestimoDTORes.builder()
+                .id(emprestimo.getId())
+                .dataHoraInicio(converterDataHora(emprestimo.getDataHoraInicio()))
+                .dataHoraFim(converterDataHora(emprestimo.getDataHoraFim()))
+                .observacaoSolicitacao(emprestimo.getObservacaoSolicitacao())
+                .statusTransacaoItem(emprestimo.getStatusTransacaoItem())
+                .solicitante(solicitanteDTO)
+                .itens(itensDTO)
+                .endereco(enderecoDTORes)
+                .build();
     }
-    public static ItemDTOResponse converterParaDTOResponse(@NotNull Item item) {
-        log.info(format(">>> converterParaDTO: convertendo Item (id: %s) para DTO", item.getId()));
-        try {
-            return ItemDTOResponse.builder()
-                    .id(item.getId())
-                    .tipoItem(item.getTipoItem().name())
-                    .nome(item.getNome())
-                    .valorUnitario(item.getValorUnitario())
-                    .emprestavel(item.getEmprestavel())
-                    .quantidade(item.getQuantidade())
-                    .bytesImagem(getImage("Codigo/back-end/src/main/java/com/gerenciadorlehsa/util/imgs",
-                            item.getNomeImg()))
-                    .build();
-        } catch (IOException e){
-            throw new RuntimeException(e.getMessage());
-        }
+
+    private EnderecoDTORes converterEnderecoParaEnderecoDTORes (@NotNull Endereco endereco) {
+        return EnderecoDTORes.builder()
+                .id (endereco.getId())
+                .cep (endereco.getCep())
+                .uf (endereco.getUf())
+                .cidade (endereco.getCidade())
+                .bairro (endereco.getBairro())
+                .rua (endereco.getRua())
+                .numero (endereco.getNumero())
+                .complemento (endereco.getComplemento())
+                .build();
     }
-*/
+    public static UsuarioShortDTORes converterUsuarioParaShortDTORes (@NotNull User usuario){
+        return UsuarioShortDTORes.builder ()
+                .nome (usuario.getNome ())
+                .email (usuario.getEmail())
+                .telefone (usuario.getTelefone())
+                .curso (usuario.getCurso ())
+                .build ();
+    }
+
+    public static ItemDTORes converterItemParaDTORes (@NotNull Item item, Integer qtd) {
+        return ItemDTORes.builder ()
+                .id (item.getId ())
+                .nome (item.getNome ())
+                .tipoItem (item.getTipoItem () != null ? String.valueOf (item.getTipoItem ()) : null)
+                .quantidade (qtd)
+                .build ();
+    }
+
 }

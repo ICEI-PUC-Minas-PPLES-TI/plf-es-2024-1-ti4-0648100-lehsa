@@ -7,15 +7,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.gerenciadorlehsa.components.JWTComp;
+import com.gerenciadorlehsa.components.security.JWTComp;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
 import java.io.IOException;
-
 import static java.util.Objects.nonNull;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.HEADER_AUTORIZACAO;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.TIPO_TOKEN;

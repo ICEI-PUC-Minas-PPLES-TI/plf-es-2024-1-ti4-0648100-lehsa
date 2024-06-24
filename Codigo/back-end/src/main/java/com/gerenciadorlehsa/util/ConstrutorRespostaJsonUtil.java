@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.exceptions.lancaveis.ConstrutorRespostaJsonException;
 import java.util.List;
 import java.util.Map;
-
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 

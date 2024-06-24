@@ -1,6 +1,5 @@
 package com.gerenciadorlehsa.service.interfaces;
 
-
 import com.gerenciadorlehsa.security.UsuarioDetails;
 import java.util.UUID;
 

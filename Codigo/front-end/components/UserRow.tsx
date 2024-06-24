@@ -2,6 +2,7 @@
 import Cookie from "js-cookie";
 import React, { useState, useEffect } from "react";
 import { TrashIcon } from "lucide-react";
+import { jwtDecode } from "jwt-decode";
 
 interface User {
   id: number;
@@ -14,12 +15,15 @@ interface User {
 
 function UserRow({ searchTerm }: { searchTerm: string }) {
   const [users, setUsers] = useState<User[]>([]);
-  const [token, setToken] = useState<string>("");
+
+  const authToken = Cookie.get("token");
+  let decoded: any = {};
+  if (authToken) {
+    decoded = jwtDecode(authToken);
+  }
+  const loggedInUserId = decoded.userId;
 
   useEffect(() => {
-    const authToken = Cookie.get("token") ?? "";
-    setToken(authToken);
-
     fetch(`http://localhost:8080/usuario`, {
       method: "GET",
       headers: {
@@ -41,6 +45,8 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
       return "ADM";
     } else if (perfil_usuario === 2) {
       return "Usuário";
+    } else if (perfil_usuario === 3) {
+      return "Técnico";
     } else {
       return "Erro";
     }
@@ -52,7 +58,7 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
       fetch(`http://localhost:8080/usuario/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
         },
       })
@@ -107,12 +113,14 @@ function UserRow({ searchTerm }: { searchTerm: string }) {
               <p>{renderProfileType(user.perfil_usuario)}</p>
             </li>
             <li className="table-cell text-left h-[3rem] align-middle pl-5 ">
-              <button
-                className="transition ease-out hover:text-red-500 rounded-xl px-2"
-                onClick={() => deleteUser(user.id)}
-              >
-                <TrashIcon className="h-4 w-4"/>
-              </button>
+              {loggedInUserId !== user.id && (
+                <button
+                  className="transition ease-out hover:text-red-500 rounded-xl px-2"
+                  onClick={() => deleteUser(user.id)}
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </button>
+              )}
             </li>
           </ul>
         ))}

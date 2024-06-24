@@ -1,7 +1,12 @@
 package com.gerenciadorlehsa.controller;
 
-import com.gerenciadorlehsa.components.JWTComp;
+import com.gerenciadorlehsa.components.security.JWTComp;
+import com.gerenciadorlehsa.dto.AgendamentoDTORes;
+import com.gerenciadorlehsa.dto.EmprestimoDTORes;
+import com.gerenciadorlehsa.entity.Agendamento;
+import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +18,9 @@ import com.gerenciadorlehsa.dto.SenhaDTO;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +38,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_USUARIO)
 @AllArgsConstructor
-public class UsuarioControllerImpl implements OperacoesCRUDController<User, UsuarioDTO>, UsuarioController {
+public class UsuarioControllerImpl implements OperacoesCRUDController<User, UsuarioDTO>, UsuarioController{
 
     private final OperacoesCRUDService<User> operacoesCRUDService;
     private final UsuarioService usuarioService;
@@ -49,24 +52,13 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
      */
     @Override
     @GetMapping("/{id}")
+    @Operation(summary = "Obter usuário por Id", description = "O usuário deve existir")
     public ResponseEntity<UsuarioDTO> encontrarPorId(@PathVariable UUID id) {
         log.info(">>> encontrarPorId: recebendo requisição para encontrar usuário por id");
         User usuario = operacoesCRUDService.encontrarPorId(id);
         return ResponseEntity.ok().body(converterParaDTO(usuario));
     }
 
-    /**
-     * Lista todos os usuários cadastrados
-     *
-     * @return lista de usuários cadastrados
-     */
-    @Override
-    @GetMapping
-    public ResponseEntity<List<UsuarioDTO>> listarTodos() {
-        log.info(">>> listarTodos: recebendo requisição para listar todos usuários");
-        List<User> usuarios = operacoesCRUDService.listarTodos();
-        return ResponseEntity.ok().body(usuarios.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
-    }
 
     /**
      * Cria um novo usuário
@@ -130,11 +122,13 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
     }
 
 
+
     /**
      * Verifica se o token é válido
      * @param token objeto String passado como parâmetro da requisição
      * @return mensagem de validação ou bad request caso o token seja inválido
      */
+    @Override
     @GetMapping("/verificar-token")
     public ResponseEntity<?> verificarToken(@RequestParam("token") String token) {
         log.info("Verificando se o token é de um usuário cadastrado");
@@ -149,4 +143,65 @@ public class UsuarioControllerImpl implements OperacoesCRUDController<User, Usua
     }
 
 
+    /**
+     * Lista todos os usuários cadastrados
+     *
+     * @return lista de usuários cadastrados
+     */
+    @Override
+    @GetMapping
+    public ResponseEntity<List<UsuarioDTO>> listarTodos() {
+        log.info(">>> listarTodos: recebendo requisição para listar todos usuários");
+        List<User> usuarios = operacoesCRUDService.listarTodos();
+        // List<User> usuarios = operacoesCrudService.listarTodos()
+        return ResponseEntity.ok().body(usuarios.stream().map(ConversorEntidadeDTOUtil::converterParaDTO).toList());
+    }
+
+
+    /**
+     * Atualiza o perfil de um usuário
+     * @param id id do usuário
+     * @param codigoPerfil código referente ao perfil do usuário
+     * @return id do usuário cujo perfil foi atualizado
+     */
+    @Override
+    @PutMapping("/perfil/{id}")
+    public ResponseEntity<Map<String, Object>> atualizarPerfil(
+            @PathVariable("id") UUID id,
+            @RequestParam("codigoPerfil") Integer codigoPerfil) {
+        log.info(">>> atualizarStatus:  recebendo requisição para atualizar status de usuário");
+
+        usuarioService.atualizarPerfil(id, codigoPerfil);
+
+        return ResponseEntity.ok().body(construirRespostaJSON(CHAVES_USUARIO_CONTROLLER, asList(OK.value(),
+                MSG_PERFIL_ATUALIZADO, id)));
+
+    }
+
+    @GetMapping("/{id}/agendamentos")
+    public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoUsuario (@PathVariable UUID id) {
+        log.info(">>> listarAgendamentoUsuario: recebendo requisição para listar todos agendamentos de um usuario");
+        List<Agendamento> agendamentos =
+                this.usuarioService.listarAgendamentoUsuario(id);
+
+        return ResponseEntity.ok().body(agendamentos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
+    }
+
+    @GetMapping("/{id}/emprestimos")
+    public ResponseEntity<List<EmprestimoDTORes>> listarEmprestimoUsuario (@PathVariable UUID id) {
+        log.info(">>> listarEmprestimoUsuario: recebendo requisição para listar todos emprestimos de um usuario");
+        List<Emprestimo> emprestimos =
+                this.usuarioService.listarEmprestimoUsuario(id);
+
+        return ResponseEntity.ok().body(emprestimos.stream().map(ConversorEntidadeDTOUtil::converterParaDtoRes).toList());
+    }
+
+    @GetMapping("/emails")
+    public ResponseEntity<List<String>> listarEmails () {
+        log.info(">>> listarEmails: recebendo requisição para listar todos emails de usuarios");
+        List<String> emails =
+                this.usuarioService.listarEmailUsuarios();
+
+        return ResponseEntity.ok().body(emails);
+    }
 }

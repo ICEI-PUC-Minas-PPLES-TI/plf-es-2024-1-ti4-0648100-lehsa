@@ -41,7 +41,7 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
     @Override
     public UsuarioDetails validarAutorizacaoRequisicao(UUID id, String topico) {
 
-        UsuarioDetails usuarioDetails = autenticar();
+        UsuarioDetails usuarioDetails = autenticar(); //usuário logado
 
         boolean usuarioAutorizado = validadores.stream().
                 filter(validador -> validador.getTopico().equals(topico))
@@ -65,7 +65,7 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
     @Override
     public UsuarioDetails validarAutorizacaoRequisicao() {
 
-        UsuarioDetails usuarioDetails = autenticar();
+        UsuarioDetails usuarioDetails = autenticar(); // verifica se tá logado
 
         if (!usuarioEhAdmin(requireNonNull(usuarioDetails)))
             throw new UsuarioNaoAutorizadoException(format("usuário [%s] não possui autorização para utilizar esse método", usuarioDetails.getUsername()));
@@ -73,6 +73,17 @@ public class ValidadorAutorizacaoServiceImpl implements ValidadorAutorizacaoRequ
         log.info(format(">>> validarAutorizacaoRequisicao: usuário [%s] autorizado para realizar requisição", usuarioDetails.getUsername()));
         return usuarioDetails;
     }
+
+    /**
+     * Retorna o usuário logado
+     *
+     * @return usuário logado
+     */
+    @Override
+    public UsuarioDetails getUsuarioLogado() {
+        return autenticar();
+    }
+
 
     /**
      * Autentica usuário
