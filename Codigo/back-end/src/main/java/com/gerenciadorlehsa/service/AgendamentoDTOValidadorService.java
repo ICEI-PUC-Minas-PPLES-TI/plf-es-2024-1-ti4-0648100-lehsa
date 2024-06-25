@@ -6,12 +6,13 @@ import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_DTO_VALIDADOR_COMP;
 
 @Slf4j(topic = AGENDAMENTO_DTO_VALIDADOR_COMP)
-@Component
+@Service
 @AllArgsConstructor
 @Schema(description = "validações relacionadas ao agendamento")
 public class AgendamentoDTOValidadorService extends TransacaoDTOValidadadorService<AgendamentoDTO> {

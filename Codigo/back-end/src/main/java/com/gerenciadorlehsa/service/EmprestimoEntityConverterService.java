@@ -8,13 +8,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import static com.gerenciadorlehsa.entity.enums.StatusTransacao.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
 @Slf4j(topic = EMPRESTIMO_ENTITY_CONVERTER_COMP)
-@Component
+@Service
 @AllArgsConstructor
 @Schema(description = "Responsável por converter DTO de empréstimo em entidade empréstimo")
 public class EmprestimoEntityConverterService extends TransacaoEntityConverterService<Emprestimo, EmprestimoDTO> {

@@ -12,12 +12,14 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class TransacaoEntityConverterService<T extends Transacao,DTO> {

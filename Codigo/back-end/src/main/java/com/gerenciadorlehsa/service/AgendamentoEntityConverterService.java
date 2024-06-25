@@ -10,7 +10,7 @@ import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +20,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
 @Slf4j(topic = AGENDAMENTO_ENTITY_CONVERTER_COMP)
-@Component
+@Service
 @AllArgsConstructor
 @Schema(description = "Responsável por converter DTO para objeto agendamento")
 public class AgendamentoEntityConverterService extends TransacaoEntityConverterService<Agendamento,AgendamentoDTO> {
