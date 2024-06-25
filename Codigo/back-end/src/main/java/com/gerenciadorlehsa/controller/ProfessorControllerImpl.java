@@ -9,10 +9,8 @@ import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -52,8 +50,8 @@ public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Profe
 
     @Override
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> criar (@Valid @RequestPart("professor") Professor professor,
-                                                      @NotNull @RequestPart("imagem")MultipartFile img) {
+    public ResponseEntity<Map<String, Object>> criar (@RequestPart("professor") Professor professor,
+                                                      @RequestPart("imagem")MultipartFile img) {
         log.info(">>> criar: recebendo requisição para criar professor");
         Professor professorCriado = operacoesCRUDService.criar(professor, img);
 
@@ -64,7 +62,7 @@ public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Profe
     @Override
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
-                                                          @Valid @RequestPart("professor") @NotNull Professor professor,
+                                                          @RequestPart("professor")  Professor professor,
                                                           @RequestPart("imagem") MultipartFile img) {
         log.info(">>> atualizar: recebendo requisição para atualizar professor");
 
