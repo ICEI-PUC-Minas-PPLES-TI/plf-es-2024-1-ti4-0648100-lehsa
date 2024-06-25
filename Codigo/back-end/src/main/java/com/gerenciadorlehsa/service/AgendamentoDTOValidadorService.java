@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components;
+package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
@@ -14,7 +14,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_DTO_VA
 @Component
 @AllArgsConstructor
 @Schema(description = "validações relacionadas ao agendamento")
-public class AgendamentoDTOValidadorComp extends TransacaoDTOValidadadorComp<AgendamentoDTO> {
+public class AgendamentoDTOValidadorService extends TransacaoDTOValidadadorService<AgendamentoDTO> {
 
     @Override
     public void validate(AgendamentoDTO agendamentoDTO) {

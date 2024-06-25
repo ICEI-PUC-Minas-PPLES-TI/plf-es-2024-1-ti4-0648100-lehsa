@@ -1,6 +1,6 @@
 package com.gerenciadorlehsa.controller;
 
-import com.gerenciadorlehsa.components.TransacaoEntityConverterComp;
+import com.gerenciadorlehsa.service.TransacaoEntityConverterService;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.controller.interfaces.TransacaoController;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
@@ -39,7 +39,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
 
     private final TransacaoService<Emprestimo, EmprestimoRepository> transacaoService;
     private final OperacoesCRUDService<Emprestimo> operacoesCRUDService;
-    private final TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> emprestimoEntityConverterComp;
+    private final TransacaoEntityConverterService<Emprestimo, EmprestimoDTO> emprestimoEntityConverterService;
     private final MapaTransacaoItemService<Emprestimo> mapaTransacaoItemService;
 
 
@@ -56,7 +56,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody EmprestimoDTO obj) {
         log.info(">>> Criar: recebendo requisição para criar emprestimo");
 
-        Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
+        Emprestimo emprestimo = emprestimoEntityConverterService.convertToEntity(obj);
 
         emprestimo.setId (null);
         mapaTransacaoItemService.validarMapa (emprestimo);
@@ -71,7 +71,7 @@ public class EmprestimoControllerImpl implements OperacoesCRUDController<Emprest
                                                           @Valid @RequestBody EmprestimoDTO obj) {
         log.info(">>> atualizar: recebendo requisição para atualizar emprestimo");
 
-        Emprestimo emprestimo = emprestimoEntityConverterComp.convertToEntity(obj);
+        Emprestimo emprestimo = emprestimoEntityConverterService.convertToEntity(obj);
 
         emprestimo.setId(id);
         mapaTransacaoItemService.validarMapa (id, emprestimo);

@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components;
+package com.gerenciadorlehsa.service;
 
 
 import com.gerenciadorlehsa.dto.ItemDTO;
@@ -6,7 +6,7 @@ import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
 import java.util.List;
 
-public abstract class TransacaoDTOValidadadorComp<DTO> {
+public abstract class TransacaoDTOValidadadorService<DTO> {
 
 
     public abstract void validate (DTO dto);

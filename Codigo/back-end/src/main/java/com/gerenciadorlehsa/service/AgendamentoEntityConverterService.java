@@ -1,22 +1,17 @@
-package com.gerenciadorlehsa.components;
+package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.ProfessorDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +23,9 @@ import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 @Component
 @AllArgsConstructor
 @Schema(description = "Responsável por converter DTO para objeto agendamento")
-public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> {
+public class AgendamentoEntityConverterService extends TransacaoEntityConverterService<Agendamento,AgendamentoDTO> {
 
-    private final TransacaoDTOValidadadorComp<AgendamentoDTO> agendamentoDTOValidadadorComp;
+    private final TransacaoDTOValidadadorService<AgendamentoDTO> agendamentoDTOValidadadorComp;
     private final ProfessorService professorService;
 
     @Override

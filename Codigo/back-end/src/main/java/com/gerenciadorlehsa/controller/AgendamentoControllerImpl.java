@@ -1,6 +1,6 @@
 package com.gerenciadorlehsa.controller;
 
-import com.gerenciadorlehsa.components.TransacaoEntityConverterComp;
+import com.gerenciadorlehsa.service.TransacaoEntityConverterService;
 import com.gerenciadorlehsa.controller.interfaces.AgendamentoController;
 import com.gerenciadorlehsa.controller.interfaces.OperacoesCRUDController;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
@@ -46,7 +46,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     private final TransacaoService<Agendamento, AgendamentoRepository> transacaoService;
     private final OperacoesCRUDService<Agendamento> operacoesCRUDService;
     private final AgendamentoService agendamentoService;
-    private final TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> agendamentoEntityConverterComp;
+    private final TransacaoEntityConverterService<Agendamento,AgendamentoDTO> agendamentoEntityConverterService;
     private final MapaTransacaoItemService<Agendamento> mapaTransacaoItemService;
 
 
@@ -66,7 +66,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     public ResponseEntity<Map<String, Object>> criar (@Valid @RequestBody AgendamentoDTO agendamentoDTO) {
         log.info(">>> Criar: recebendo requisição para criar agendamento");
 
-        Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity(agendamentoDTO);
+        Agendamento agendamento = agendamentoEntityConverterService.convertToEntity(agendamentoDTO);
 
         agendamento.setId (null);
         mapaTransacaoItemService.validarMapa (agendamento);
@@ -82,7 +82,7 @@ public class AgendamentoControllerImpl implements OperacoesCRUDController<Agenda
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
                                                           @Valid @RequestBody AgendamentoDTO obj) {
         log.info(">>> atualizar: recebendo requisição para atualizar agendamento");
-        Agendamento agendamento = agendamentoEntityConverterComp.convertToEntity (obj);
+        Agendamento agendamento = agendamentoEntityConverterService.convertToEntity (obj);
 
         agendamento.setId (id);
         mapaTransacaoItemService.validarMapa (id, agendamento);

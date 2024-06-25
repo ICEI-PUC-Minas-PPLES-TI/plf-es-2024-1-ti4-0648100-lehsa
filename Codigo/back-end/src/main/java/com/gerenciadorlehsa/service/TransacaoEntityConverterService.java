@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components;
+package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
@@ -6,8 +6,6 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
-import com.gerenciadorlehsa.service.ItemServiceImpl;
-import com.gerenciadorlehsa.service.interfaces.ItemService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import lombok.AllArgsConstructor;
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
 @Component
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class TransacaoEntityConverterComp<T extends Transacao,DTO> {
+public abstract class TransacaoEntityConverterService<T extends Transacao,DTO> {
 
     @Autowired
     protected UsuarioService usuarioService;

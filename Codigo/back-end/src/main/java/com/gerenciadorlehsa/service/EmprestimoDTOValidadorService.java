@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components;
+package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EnderecoDTO;
@@ -15,7 +15,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_DTO_VAL
 @Component
 @AllArgsConstructor
 @Schema(description = "validações relacionadas ao empréstimo")
-public class EmprestimoDTOValidadorComp extends TransacaoDTOValidadadorComp<EmprestimoDTO> {
+public class EmprestimoDTOValidadorService extends TransacaoDTOValidadadorService<EmprestimoDTO> {
     @Override
     public void validate(EmprestimoDTO emprestimoDTO) {
         validarItens(emprestimoDTO.itens());
