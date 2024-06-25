@@ -3,7 +3,7 @@ import Cookie from "js-cookie";
 // Função para buscar os dados de um professor pelo ID
 export const getTeacherData = async (id: string) => {
   const token = Cookie.get("token");
-  const response = await fetch(`http://localhost:8080/professor/${id}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/professor/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -19,7 +19,7 @@ export const getTeacherData = async (id: string) => {
 // Função para atualizar os dados de um professor
 export const updateTeacherData = async (id: string, formData: FormData) => {
   const token = Cookie.get("token");
-  const response = await fetch(`http://localhost:8080/professor/${id}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/professor/${id}`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ export const deleteTeacherData = async (id: string | string[]) => {
           throw new Error("Usuário não autenticado");
         }
     
-        const response = await fetch(`http://localhost:8080/professor/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/professor/${id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const deleteTeacherData = async (id: string | string[]) => {
   };
 
   export const fetchTeachers = async (token: string) => {
-    const response = await fetch("http://localhost:8080/professor", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/professor`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
