@@ -1,4 +1,4 @@
 # Divulgação: Vídeo do Projeto
 
-Nesta pasta inclua arquivos de vídeo produzidos para divulgação do projeto e seus resutados.
+videoFerramenta.mp4 é o video onde um de nossos integrantes, Lucca Oliveira, mostra um pouco do sistema desenvolvido em uso.
 
