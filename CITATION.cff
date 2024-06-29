@@ -1,31 +1,29 @@
 cff-version: 1.0.1
 message: Please cite this software using these metadata.
-title: 
+title: LEHSA - Gerenciador de Laboratórios
 authors:
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names:
+  - family-names: Cabral Soares
+    given-names: Lucas
+  - family-names: Hemétrio Teixeira
+    given-names: Lucas
+  - family-names: Oliveira Vasconcelos de Faria
+    given-names: Lucca
+  - family-names: Amaral Muniz
+    given-names: Maria Eduarda
+  - family-names: Lagares Stahlberg
+    given-names: Vítor
   - name-suffix: Professor
     affiliation: PUC Minas
-    family-names: 
-    given-names: 
+    family-names: Ishitani
+    given-names: Lucila
   - name-suffix: Professor
     affiliation: PUC Minas
-    family-names: 
-    given-names: 
+    family-names: Lúcia da Silva
+    given-names: Soraia
 keywords:
-  - 
-  - 
+  - software
+  - gerenciador
 repository-code: 
 license: CC-BY-4.0
 version: 1.0.0
-date-released: 2022-07-14
+date-released: 2024-06-26
