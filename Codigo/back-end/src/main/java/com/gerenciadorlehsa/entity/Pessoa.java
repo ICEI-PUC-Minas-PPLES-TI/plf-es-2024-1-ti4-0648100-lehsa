@@ -1,6 +1,7 @@
 package com.gerenciadorlehsa.entity;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -13,6 +14,7 @@ import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.*;
 @MappedSuperclass
 @Getter
 @Setter
+@Schema(description = "Superclasse para entidades Pessoa")
 public abstract class Pessoa implements Serializable {
 
     @Serial
