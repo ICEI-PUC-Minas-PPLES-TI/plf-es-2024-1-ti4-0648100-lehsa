@@ -33,6 +33,6 @@ build/
 .vscode/
 
 ## Ignore all files and subfolders in the resources folder
-src/main/resources/**
+src/main/resources/envi/mail.properties
 
 
