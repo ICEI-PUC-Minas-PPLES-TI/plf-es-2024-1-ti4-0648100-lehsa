@@ -1,4 +1,4 @@
 # Divulgação: Apresentação do Projeto
 
-Nesta pasta inclua arquivos de slides que foram produzidos para apresentações do projeto e de seus resultados.
+O arquivo nesta pasta é a apresentação, em PowerPoint, usada pelo grupo para falar sobre o desenvolvimento para o parceiros, professoras e outros grupos que participaram da disciplina. 
 
