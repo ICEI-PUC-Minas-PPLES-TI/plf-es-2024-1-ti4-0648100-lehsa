@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.3</version> <!-- Versão do Spring Boot-->
+		<version>3.2.3</version>
 		<relativePath/>
 	</parent>
 	<groupId>com.gerenciador.lehsa</groupId>
 	<artifactId>gerenciador-lehsa</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>gerenciador-lehsa</name> <!-- nome da aplicação -->
+	<name>gerenciador-lehsa</name>
 	<description>Projeto LEHSA com Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
@@ -86,7 +86,7 @@
 			<version>2.3.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.postgresql</groupId> <!-- Conexão ao banco postgreeSQL -->
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
