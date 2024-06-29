@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+## Ignore all files and subfolders in the resources folder
+src/main/resources/**
+
+
