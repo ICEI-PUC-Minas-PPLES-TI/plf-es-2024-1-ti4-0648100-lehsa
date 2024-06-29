@@ -2,20 +2,22 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.enums.TipoItem;
+import com.gerenciadorlehsa.events.ItemEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EnumNaoEncontradoException;
 import com.gerenciadorlehsa.repository.ItemRepository;
-import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
-import com.gerenciadorlehsa.service.interfaces.OperacoesImagemService;
+import com.gerenciadorlehsa.service.interfaces.*;
 import com.gerenciadorlehsa.util.ConstantesImgUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.beans.PropertyDescriptor;
@@ -29,13 +31,15 @@ import static java.lang.String.format;
 
 @Service
 @Slf4j(topic = ITEM_SERVICE)
-@AllArgsConstructor
-public class ItemService implements OperacoesCRUDServiceImg<Item>, OperacoesImagemService {
+@RequiredArgsConstructor
+@Schema(description = "Contém as regras de negócio para os itens do laboratório")
+public class ItemServiceImpl implements OperacoesCRUDServiceImg<Item>, ItemService, EventPublisher, OperacoesImagemService {
 
 
     private final ItemRepository itemRepository;
-    private final MapaTransacaoItemService<?> mapaTransacaoItemService;
+    private ApplicationEventPublisher eventPublisher;
 
+    private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
 
     // --------------- CRUD - INICIO ---------------------------------------
 
@@ -68,7 +72,7 @@ public class ItemService implements OperacoesCRUDServiceImg<Item>, OperacoesImag
     @Transactional
     public Item criar (@NotNull Item item, MultipartFile img) {
         log.info(">>> criar: criando item");
-
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         try {
             String nomeImagem = saveImageToStorage(img);
             item.setNomeImg(nomeImagem);
@@ -86,6 +90,7 @@ public class ItemService implements OperacoesCRUDServiceImg<Item>, OperacoesImag
     @Transactional
     public Item atualizar(Item item, MultipartFile img) {
         log.info(">>> atualizar: atualizando item");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         Item itemExistente = encontrarPorId(item.getId());
         List<String> propriedadesNulas = new ArrayList<>();
         processarImagem(itemExistente, img, propriedadesNulas);
@@ -101,8 +106,9 @@ public class ItemService implements OperacoesCRUDServiceImg<Item>, OperacoesImag
     @Transactional
     public void deletar (@NotNull UUID id) {
         log.info(">>> deletar: deletando item");
+        validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao ();
         Item item = encontrarPorId(id);
-        mapaTransacaoItemService.deletarItensAssociados (item);
+        publishEvent (new ItemEvents.DeletarItemEmTransacoesEvent (this, item));
         try {
             deleteImage(item.getNomeImg());
             this.itemRepository.deleteById(id);
@@ -168,49 +174,7 @@ public class ItemService implements OperacoesCRUDServiceImg<Item>, OperacoesImag
         }
     }
 
-
-
-// --------------- OperacoesImagemService - FIM -----------------------------
-
-
-    private List<String> getNullPropertyNames(Object source) {
-        final BeanWrapper src = new BeanWrapperImpl(source);
-        PropertyDescriptor[] pds = src.getPropertyDescriptors();
-        Set<String> emptyNames = new HashSet<>();
-        for (PropertyDescriptor pd : pds) {
-            Object srcValue = src.getPropertyValue(pd.getName());
-            if (srcValue == null) emptyNames.add(pd.getName());
-
-        }
-
-        return emptyNames.stream().toList();
-    }
-
-
-
-    public List<Item> encontrarPorTipo (@NotNull String tipo) {
-        log.info(">>> encontrarPorTipo: encontrando itens com o tipo especificado");
-        tipo = tipo.toUpperCase();
-        try {
-            TipoItem enumTipo = Enum.valueOf(TipoItem.class, tipo);
-            return this.itemRepository.findByTipoItem(enumTipo);
-        } catch (IllegalArgumentException e) {
-            throw  new EnumNaoEncontradoException(format("não existe o tipo passado: " + tipo));
-        }
-    }
-
-    public List<Item> listarEmprestaveis () {
-        log.info(">>> listarEmprestaveis: listando itens que são emprestaveis");
-        return itemRepository.findEmprestaveis();
-    }
-
-    public List<Item> encontrarPorNome (@NotNull String nome) {
-        log.info(">>> encontrarPorNome: encontrando itens com o nome especificado");
-        return this.itemRepository.findByNome(nome);
-    }
-
-
-
+    // Colocar na interface
     private void processarImagem(Item itemExistente, MultipartFile img, List<String> propriedadesNulas) {
         log.info("img é null?" + (img.getContentType()));
         if (img.getContentType() == null) {
@@ -226,12 +190,81 @@ public class ItemService implements OperacoesCRUDServiceImg<Item>, OperacoesImag
         }
     }
 
+
+
+// --------------- OperacoesImagemService - FIM -----------------------------
+
+
+
+
+
+// --------------- ItemService - Inicio -----------------------------
+
+    @Override
+    public List<Item> encontrarPorTipo (@NotNull String tipo) {
+        log.info(">>> encontrarPorTipo: encontrando itens com o tipo especificado");
+        tipo = tipo.toUpperCase();
+        try {
+            TipoItem enumTipo = Enum.valueOf(TipoItem.class, tipo);
+            return this.itemRepository.findByTipoItem(enumTipo);
+        } catch (IllegalArgumentException e) {
+            throw  new EnumNaoEncontradoException(format("não existe o tipo passado: " + tipo));
+        }
+    }
+
+    @Override
+    public List<Item> listarEmprestaveis () {
+        log.info(">>> listarEmprestaveis: listando itens que são emprestaveis");
+        return itemRepository.findEmprestaveis();
+    }
+
+    @Override
+    public List<Item> encontrarPorNome (@NotNull String nome) {
+        log.info(">>> encontrarPorNome: encontrando itens com o nome especificado");
+        return this.itemRepository.findByNome(nome);
+    }
+
+
+    // --------------- ItemService - FIM -----------------------------
+
+
+
+    // --------------- EventPublish - INICIO -----------------------------
+
+    @Override
+    public ApplicationEventPublisher getEventPublisher () {
+        return this.eventPublisher;
+    }
+
+
+    @Override
+    public void setApplicationEventPublisher (@org.jetbrains.annotations.NotNull ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+
+// --------------- EventPublish - FIM -----------------------------
+
+
     private void atualizarPropriedadesNulas(Item item, Item itemExistente, List<String> propriedadesNulas) {
         propriedadesNulas.addAll(getNullPropertyNames(item));
         String[] arrayS = new String[propriedadesNulas.size()];
         BeanUtils.copyProperties(item, itemExistente, propriedadesNulas.toArray(arrayS));
     }
 
+
+    private List<String> getNullPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+
+        }
+
+        return emptyNames.stream().toList();
+    }
 
 
 }

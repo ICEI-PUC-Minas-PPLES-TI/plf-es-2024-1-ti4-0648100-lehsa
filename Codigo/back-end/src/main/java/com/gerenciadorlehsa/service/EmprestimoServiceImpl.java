@@ -1,46 +1,51 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.*;
-import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.entity.enums.StatusTransacao;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.EmprestimoRepository;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import com.gerenciadorlehsa.service.interfaces.EmprestimoService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.DataHoraUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_EMPRESTIMO_EM_ANALISE;
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_SERVICE;
 import static com.gerenciadorlehsa.util.DataHoraUtil.dataValidaEmprestimo;
 import static java.lang.String.format;
 
 @Slf4j(topic = EMPRESTIMO_SERVICE)
 @Service
-public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implements OperacoesCRUDService<Emprestimo>, EmprestimoService{
+@Schema(description = "Contém as regras de negócio para concessão de empréstimo de itens do laboratório")
+public class EmprestimoServiceImpl extends TransacaoService<Emprestimo, EmprestimoRepository> implements OperacoesCRUDService<Emprestimo>,
+        EmprestimoService{
 
     private final EmprestimoRepository emprestimoRepository;
     private final EnderecoService enderecoService;
 
-    @Autowired
-    public EmprestimoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, EmprestimoRepository emprestimoRepository,
-                                  EnderecoService enderecoService) {
+    public EmprestimoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, EmprestimoRepository emprestimoRepository, EnderecoService enderecoService) {
         super (validadorAutorizacaoRequisicaoService);
         this.emprestimoRepository = emprestimoRepository;
         this.enderecoService = enderecoService;
     }
 
+
+    @Override
+    protected EmprestimoRepository getTransacaoRepository () {
+        return this.emprestimoRepository;
+    }
+
     @Override
     public Emprestimo encontrarPorId (UUID id) {
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         Emprestimo obj = emprestimoRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(
                 format("Emprestimo não encontrado, id: %s", id)));
 
@@ -63,7 +68,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         verificarConflitosDeEmprestimo(dataHoraInicio, dataHoraFim);
         verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitante(), obj);
 
-        obj.setStatusTransacaoItem(EM_ANALISE);
+        obj.setStatusTransacao (EM_ANALISE);
         obj.setId(null);
         obj.getLocalUso().setId(null);
         return emprestimoRepository.save(obj);
@@ -73,18 +78,28 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     public Emprestimo atualizar (Emprestimo obj) {
         Emprestimo emprestimoExistente = encontrarPorId(obj.getId());
 
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
-        if (!ehSolicitante(emprestimoExistente, usuarioLogado))
-            throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para atualizar a transação");
+        verificarAutorizacaoDoUsuario (emprestimoExistente);
         validarDataHoraAtt(encontrarAtributosIguais(obj, emprestimoExistente), obj);
 
-
-        obj.setStatusTransacaoItem(emprestimoExistente.getStatusTransacaoItem());
+        obj.setStatusTransacao (emprestimoExistente.getStatusTransacao ());
         obj.setSolicitante(emprestimoExistente.getSolicitante());
+
         if (emprestimoRepository.countEmprestimoByLocalUso(emprestimoExistente.getLocalUso()) == 1)
             obj.getLocalUso().setId(emprestimoExistente.getLocalUso().getId());
+
         return emprestimoRepository.save(obj);
     }
+
+   /* public void atualizarEndereco(Emprestimo newEmprestimo, Emprestimo emprestimoAtt) {
+        Endereco enderecoNewEmprestimo = newEmprestimo.getLocalUso ();
+        if(!enderecoService.enderecoExiste (enderecoNewEmprestimo)) {
+            enderecoNewEmprestimo = enderecoService.criar (enderecoNewEmprestimo);
+            emprestimoAtt.setLocalUso (enderecoNewEmprestimo);
+        } else if (emprestimoAtt.getLocalUso () != enderecoNewEmprestimo) {
+            emprestimoAtt.setLocalUso (enderecoNewEmprestimo);
+        }
+    }*/
+
 
     @Override
     public void deletar (UUID id) {
@@ -107,7 +122,7 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     @Override
     public void atualizarStatus (String status, UUID id) {
-        StatusTransacaoItem statusUpperCase = getStatusUpperCase(status);
+        StatusTransacao statusUpperCase = getStatusUpperCase(status);
 
         Emprestimo emprestimo = encontrarPorId (id);
 
@@ -119,56 +134,17 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
         verificarCondicoesDeAprovacao (emprestimo, statusUpperCase);
 
-        emprestimo.setStatusTransacaoItem(statusUpperCase);
+        emprestimo.setStatusTransacao (statusUpperCase);
         emprestimoRepository.save(emprestimo);
     }
 
-    @Override
-    public void verificarCondicoesDeAprovacao(Emprestimo emprestimo, StatusTransacaoItem statusUpperCase) {
-        if (statusUpperCase == APROVADO) {
-            if(!emprestimo.getStatusTransacaoItem ().equals (EM_ANALISE))
-                throw new AtualizarStatusException ("O emprestimo precisa estar EM_ANALISE para ser APROVADO");
-        }
-    }
-
-    @Override
-    public void verificarCondicoesDeConfirmacao(Emprestimo emprestimo, StatusTransacaoItem statusUpperCase) {
-        if(statusUpperCase.equals (CONFIRMADO)) {
-
-            if(!emprestimo.getStatusTransacaoItem ().equals (APROVADO))
-                throw new AtualizarStatusException ("Para confirmar o emprestimo é preciso que ele esteja aprovado");
-
-            if(tempoExpirado (emprestimo.getDataHoraInicio ())) {
-                emprestimo.setStatusTransacaoItem (NAO_COMPARECEU);
-                emprestimoRepository.save(emprestimo);
-                throw new TempoExpiradoException ("O tempo para confirmação já acabou!");
-            }
-        }
-    }
-
-    @Override
-    public List<Emprestimo> transacoesAprovadasOuConfirmadasConflitantes (LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
-        return emprestimoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
-    }
-
-
-
-    @Override
-    public int calcularQuantidadeTransacao(Item item, List<Emprestimo> emprestimos) {
-        int quantidadeEmprestada = 0;
-        for (Emprestimo emprestimo : emprestimos) {
-            Integer quantidade = emprestimo.getItensQuantidade().getOrDefault(item, 0);
-            quantidadeEmprestada += quantidade;
-        }
-        return quantidadeEmprestada;
-    }
 
 
     @Override
     public void verificarLimiteTransacaoEmAnalise (User participante) {
         long emprestimosEmAnalise = participante.getEmprestimos ()
                 .stream ()
-                .filter(emprestimo -> emprestimo.getStatusTransacaoItem() == EM_ANALISE)
+                .filter(emprestimo -> emprestimo.getStatusTransacao () == EM_ANALISE)
                 .count();
 
         if(emprestimosEmAnalise > LIMITE_EMPRESTIMO_EM_ANALISE)
@@ -176,12 +152,12 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
     }
 
     @Override
-    public boolean ehSolicitante (Emprestimo transacao, UsuarioDetails usuarioDetails) {
-        return transacao.getSolicitante().getEmail().equals(usuarioDetails.getEmail());
+    public boolean ehSolicitante (Emprestimo transacao, UserDetailsImpl userDetailsImpl) {
+        return transacao.getSolicitante().getEmail().equals(userDetailsImpl.getEmail());
     }
 
     @Override
-    public boolean ehUsuarioAutorizado (Emprestimo transacao, UsuarioDetails usuarioLogado) {
+    public boolean ehUsuarioAutorizado (Emprestimo transacao, UserDetailsImpl usuarioLogado) {
         //ou usario eh o solicitante ou um adm para ser autorizado
         return ehSolicitante(transacao, usuarioLogado) ||
                 usuarioLogado.getPerfilUsuario().getCodigo() == 1;
@@ -198,43 +174,23 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
 
     }
 
-    @Override
-    public void deletarItensAssociados (Item item) {
-        List<Emprestimo> emprestimos = emprestimoRepository.findByItem(item);
 
-        if(emprestimos != null && !emprestimos.isEmpty ()) {
-            for (Emprestimo emprestimo : emprestimos) {
-                emprestimo.getItensQuantidade().remove(item);
-                emprestimoRepository.save(emprestimo);
-            }
-        }
-    }
 
     @Override
-    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO (Emprestimo transacao, StatusTransacaoItem status) {
-        if (!transacoesAprovadasOuConfirmadasConflitantes(transacao.getDataHoraInicio(), transacao.getDataHoraFim()).isEmpty()
-                && (status == APROVADO || status == CONFIRMADO)) {
-            throw new EmprestimoException("Um emprestimo para essa data já foi aprovado ou confirmado.");
-        }
-    }
-
-    @Override
-    public void copiarAtributosRelevantes (Agendamento source, Agendamento target, List<String> atributosIguais) {
-
-    }
-
-    private void deletarEmprestimoDaListaDoUsuario(Emprestimo emprestimo) {
+    public void deletarEmprestimoDaListaDoUsuario(Emprestimo emprestimo) {
         if(emprestimo.getSolicitante () != null)
             emprestimo.getSolicitante().getEmprestimos().remove (emprestimo);
     }
 
-    private void verificarConflitosDeEmprestimo(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
+    @Override
+    public void verificarConflitosDeEmprestimo(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
         if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty()) {
             throw new EmprestimoException("Já existe emprestimo ou agendamento aprovado pelo administrador ou confirmado pelo usuário para essa data");
         }
     }
 
-    private void validarDataHoraAtt(List<String> atributosIguais, Emprestimo obj){
+    @Override
+    public void validarDataHoraAtt(List<String> atributosIguais, Emprestimo obj){
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
         if (!atributosIguais.contains("dataHoraInicio") || !atributosIguais.contains("dataHoraFim")) {
@@ -249,7 +205,8 @@ public class EmprestimoServiceImpl extends TransacaoService<Emprestimo> implemen
         }
     }
 
-    private void deletarEndereco (Endereco endereco) {
+    @Override
+    public void deletarEndereco (Endereco endereco) {
         int nEmprestimosComEndereco = emprestimoRepository.countEmprestimoByLocalUso(endereco);
 
         if (nEmprestimosComEndereco == 1 || nEmprestimosComEndereco == 0) {

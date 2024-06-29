@@ -2,12 +2,14 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Emprestimo;
+import com.gerenciadorlehsa.events.UsuarioEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.AtualizarStatusException;
-import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
+import com.gerenciadorlehsa.service.interfaces.EventPublisher;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import com.gerenciadorlehsa.dto.SenhaDTO;
@@ -17,7 +19,7 @@ import com.gerenciadorlehsa.repository.UsuarioRepository;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import static com.gerenciadorlehsa.util.ConstantesRequisicaoUtil.PROPRIEDADES_IGNORADAS;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.USUARIO_SERVICE;
@@ -29,16 +31,17 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = USUARIO_SERVICE)
 @Service
-@AllArgsConstructor
-public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService{
+@RequiredArgsConstructor // Gera construtor para aqueles atributos final ou @NonNull
+@Schema(description = "Serviço responsável pelo gerenciamento dos usuários")
+public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioService, EventPublisher {
 
     private final ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService;
-
-    private final AgendamentoService agendamentoService;
 
     private final UsuarioRepository usuarioRepository;
 
     private final PasswordEncoderServiceImpl passwordEncoder;
+    private ApplicationEventPublisher eventPublisher;
+
 
     /**
      * Encontra um usuário a partir do seu id
@@ -150,7 +153,6 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
             throw new AtualizarSenhaException(format("senha original incorreta, id do usuário: %s", id));
     }
 
-
     /**
      * Lista todos os usuários criados
      *
@@ -176,22 +178,16 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
         usuarioRepository.save (usuarioAtulizado);
     }
 
+    @Override
     public void removerUsuarioDaListaDeAgendamentos(User user) {
         List<Agendamento> agendamentos = user.getAgendamentosRealizados();
 
-        if(agendamentos != null && !agendamentos.isEmpty ()) {
-
+        if (agendamentos != null && !agendamentos.isEmpty()) {
             for (Agendamento agendamento : agendamentos) {
-
-                agendamento.getSolicitantes().remove(user);
-
-                if (agendamento.getSolicitantes().isEmpty()) {
-                    agendamentoService.deletarAgendamentoSeVazio (agendamento.getId ());
-                }
+                removerUsuarioDoAgendamento(agendamento, user);
             }
         }
     }
-
     @Override
     public List<String> listarEmailUsuarios () {
         log.info(">>> listarEmailUsuarios: listando email de usuarios");
@@ -202,7 +198,7 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     public List<Agendamento> listarAgendamentoUsuario (@NotNull UUID id) {
         User usuario = encontrarPorId(id);
         log.info(">>> listarAgendamentoUsuario: listando todos agendamentos do usuario de id: " + usuario.getId());
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
             return this.usuarioRepository.findAgendamentosRealizadosById(id);
 
@@ -213,9 +209,49 @@ public class UsuarioServiceImpl implements OperacoesCRUDService<User>, UsuarioSe
     public List<Emprestimo> listarEmprestimoUsuario (@NotNull UUID id) {
         User usuario = encontrarPorId(id);
         log.info(">>> listarEmprestimoUsuario: listando todos emprestimo do usuario de id: " + usuario.getId());
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
         if (usuarioLogado.getId().compareTo(usuario.getId()) == 0 || usuarioLogado.getPerfilUsuario().getCodigo() == 1)
             return this.usuarioRepository.findEmprestimosById(id);
         throw new UsuarioNaoAutorizadoException("O usuário não possui permissão para ver esses emprestimos");
     }
+
+// --------------- EventPublish - INICIO -----------------------------
+
+    @Override
+    public ApplicationEventPublisher getEventPublisher () {
+        return this.eventPublisher;
+    }
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull  ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+// --------------- EventPublish - FIM -----------------------------
+
+
+    private void removerUsuarioDoAgendamento(Agendamento agendamento, User user) {
+        agendamento.getSolicitantes().remove(user);
+        verificarCondicoesAposRemocao(agendamento, user);
+    }
+
+    private void verificarCondicoesAposRemocao(Agendamento agendamento, User user) {
+        verificarAgendamentoSemSolicitantes(agendamento);
+        verificarAgendamentoSemTecnico(agendamento, user);
+    }
+
+    private void verificarAgendamentoSemSolicitantes(Agendamento agendamento) {
+        if (agendamento.getSolicitantes().isEmpty()) {
+            publishEvent(new UsuarioEvents.AgendamentoSemSolicitantesEvent(this, agendamento));
+        }
+    }
+
+    private void verificarAgendamentoSemTecnico(Agendamento agendamento, User user) {
+        if (agendamento.getTecnico() != null && agendamento.getTecnico().getId().equals(user.getId())) {
+            publishEvent(new UsuarioEvents.AgendamentoSemTecnicoEvent(this, agendamento));
+        }
+    }
+
+
+
 }

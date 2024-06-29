@@ -2,7 +2,7 @@ package com.gerenciadorlehsa.config;
 
 import com.gerenciadorlehsa.security.JWTFiltroAutenticacao;
 import com.gerenciadorlehsa.security.JWTFiltroAutorizacao;
-import com.gerenciadorlehsa.security.UsuarioDetailsService;
+import com.gerenciadorlehsa.security.UserDetailsServiceImpl;
 import com.gerenciadorlehsa.service.PasswordEncoderServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,14 +34,14 @@ import static org.springframework.http.HttpMethod.POST;
 @AllArgsConstructor
 public class SegurancaConfig {
 
-    private final UsuarioDetailsService usuarioDetailsService;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final JWTComp jwtComp;
 
     @Bean
     public SecurityFilterChain filterChain(@NotNull HttpSecurity httpSecurity) throws Exception {
         log.info(">>> filterChain: iniciando camada de segurança Filter Chain");
         AuthenticationManagerBuilder authenticationManagerBuilder = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(usuarioDetailsService).passwordEncoder(new PasswordEncoderServiceImpl ());
+        authenticationManagerBuilder.userDetailsService(userDetailsServiceImpl).passwordEncoder(new PasswordEncoderServiceImpl ());
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
@@ -49,7 +49,7 @@ public class SegurancaConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationManager(authenticationManager)
                 .addFilter(new JWTFiltroAutenticacao(authenticationManager, this.jwtComp))
-                .addFilter(new JWTFiltroAutorizacao(authenticationManager, this.jwtComp, this.usuarioDetailsService))
+                .addFilter(new JWTFiltroAutorizacao(authenticationManager, this.jwtComp, this.userDetailsServiceImpl))
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(CAMINHOS_PUBLICOS).permitAll();
                     request.requestMatchers(POST, CAMINHOS_PUBLICOS_POST).permitAll();

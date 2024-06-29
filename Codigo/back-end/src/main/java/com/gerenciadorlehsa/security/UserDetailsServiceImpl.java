@@ -16,7 +16,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.USUARIO_SPRING_SEC
 @Slf4j(topic = USUARIO_SPRING_SECURITY_SERVICE)
 @Service
 @AllArgsConstructor
-public class UsuarioDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private UsuarioService usuarioService;
 
@@ -32,7 +32,7 @@ public class UsuarioDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) {
         log.info(">>> loadUserByUsername: carregando informações do usuário");
         User usuario = usuarioService.encontrarPorEmail(email);
-        return UsuarioDetails.builder()
+        return UserDetailsImpl.builder()
                 .id(usuario.getId())
                 .email(usuario.getEmail())
                 .senha(usuario.getPassword ())

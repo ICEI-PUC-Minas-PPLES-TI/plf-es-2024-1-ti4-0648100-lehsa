@@ -1,5 +1,6 @@
 package com.gerenciadorlehsa.service;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,6 +11,7 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.ENCRIPTADOR_SENHA_
 @Slf4j(topic = ENCRIPTADOR_SENHA_SERVICE)
 @Service
 @AllArgsConstructor
+@Schema(description = "Serviço responsável por encriptação de senha do usuário")
 public class PasswordEncoderServiceImpl implements PasswordEncoder {
 
     private final BCryptPasswordEncoder encoder;

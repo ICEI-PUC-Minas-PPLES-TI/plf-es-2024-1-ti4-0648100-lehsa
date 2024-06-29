@@ -23,13 +23,13 @@ import static org.springframework.util.StringUtils.trimAllWhitespace;
 @Slf4j(topic = JWT_FILTRO_AUTORIZACAO)
 public class JWTFiltroAutorizacao extends BasicAuthenticationFilter {
 
-    private final UsuarioDetailsService usuarioDetailsService;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final JWTComp jwtComp;
 
-    public JWTFiltroAutorizacao(AuthenticationManager authenticationManager, JWTComp jwtComp, UsuarioDetailsService usuarioDetailsService) {
+    public JWTFiltroAutorizacao(AuthenticationManager authenticationManager, JWTComp jwtComp, UserDetailsServiceImpl userDetailsServiceImpl) {
         super(authenticationManager);
         this.jwtComp = jwtComp;
-        this.usuarioDetailsService = usuarioDetailsService;
+        this.userDetailsServiceImpl = userDetailsServiceImpl;
     }
 
     /**
@@ -63,7 +63,7 @@ public class JWTFiltroAutorizacao extends BasicAuthenticationFilter {
         log.info(">>> getAutenticacao: obtendo autenticação do usuário");
         if (this.jwtComp.tokenValido(token)) {
             String emailUsuario = this.jwtComp.getEmailUsuario(token);
-            UserDetails usuario = this.usuarioDetailsService.loadUserByUsername(emailUsuario);
+            UserDetails usuario = this.userDetailsServiceImpl.loadUserByUsername(emailUsuario);
             return new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         }
         return null;

@@ -11,9 +11,8 @@ import java.util.UUID;
 /**
  * Entidade com os métodos específicos do UsuarioService
  */
-public interface UsuarioService{
+public interface UsuarioService extends PessoaService<User>{
 
-    User encontrarPorEmail(@NotNull String email);
     void atualizarSenha(@NotNull UUID id, @NotNull SenhaDTO senhaDTO);
 
     boolean existEmail(String email);
@@ -23,6 +22,8 @@ public interface UsuarioService{
     List<Agendamento> listarAgendamentoUsuario(@NotNull UUID id);
 
     List<Emprestimo> listarEmprestimoUsuario(@NotNull UUID id);
+
+    void removerUsuarioDaListaDeAgendamentos(User user);
 
     List<String> listarEmailUsuarios();
 }

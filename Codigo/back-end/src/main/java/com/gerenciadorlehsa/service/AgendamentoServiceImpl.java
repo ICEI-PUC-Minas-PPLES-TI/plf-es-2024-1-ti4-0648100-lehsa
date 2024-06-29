@@ -1,53 +1,54 @@
 package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.Agendamento;
-import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.entity.enums.StatusTransacaoItem;
+import com.gerenciadorlehsa.entity.enums.StatusTransacao;
+import com.gerenciadorlehsa.events.AgendamentoEvents;
 import com.gerenciadorlehsa.exceptions.lancaveis.*;
 import com.gerenciadorlehsa.repository.AgendamentoRepository;
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import com.gerenciadorlehsa.service.interfaces.AgendamentoService;
+import com.gerenciadorlehsa.service.interfaces.EventPublisher;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import com.gerenciadorlehsa.service.interfaces.ValidadorAutorizacaoRequisicaoService;
 import com.gerenciadorlehsa.util.EstilizacaoEmailUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.*;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.*;
 import static com.gerenciadorlehsa.util.ConstantesNumUtil.LIMITE_AGENDAMENTOS_EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_SERVICE;
-import static com.gerenciadorlehsa.util.DataHoraUtil.dataValida;
+import static com.gerenciadorlehsa.util.DataHoraUtil.dataValidaAgendamento;
 import static java.lang.String.format;
 import static org.springframework.beans.BeanUtils.copyProperties;
 
 @Slf4j(topic = AGENDAMENTO_SERVICE)
 @Service
-public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implements OperacoesCRUDService<Agendamento>, AgendamentoService {
+@Schema(description = "Contém as regras de negócio para agendar o uso do laboratório")
+public class AgendamentoServiceImpl extends TransacaoService<Agendamento, AgendamentoRepository> implements OperacoesCRUDService<Agendamento>, AgendamentoService, EventPublisher {
 
     private final AgendamentoRepository agendamentoRepository;
 
     private final MensagemEmailService mensagemEmailService;
 
+    private ApplicationEventPublisher eventPublisher;
 
-
-    @Autowired
-    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService,
-                                   AgendamentoRepository agendamentoRepository,
-                                   MensagemEmailService mensagemEmailService) {
+    public AgendamentoServiceImpl (ValidadorAutorizacaoRequisicaoService validadorAutorizacaoRequisicaoService, AgendamentoRepository agendamentoRepository, MensagemEmailService mensagemEmailService) {
         super (validadorAutorizacaoRequisicaoService);
         this.agendamentoRepository = agendamentoRepository;
         this.mensagemEmailService = mensagemEmailService;
     }
+
 
 //----------------CRUD - INÍCIO---------------------------------------
 
@@ -55,7 +56,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     public Agendamento encontrarPorId(UUID id) {
         log.info(">>> encontrarPorId: encontrando agendamento por id");
 
-        UsuarioDetails usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
+        UserDetailsImpl usuarioLogado = validadorAutorizacaoRequisicaoService.getUsuarioLogado();
 
         Agendamento agendamento = agendamentoRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException(
@@ -84,7 +85,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         checkTecnicoNaoSolicita (obj);
 
-        dataValida (obj.getDataHoraInicio (), obj.getDataHoraFim ());
+        dataValidaAgendamento (obj.getDataHoraInicio (), obj.getDataHoraFim ());
 
         verificarConflitosDeAgendamento(obj.getDataHoraInicio (), obj.getDataHoraFim ());
 
@@ -96,7 +97,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         obj.setId (null);
 
-        return agendamentoRepository.save (obj);
+        return saveAgendamento (obj);
     }
 
     @Override
@@ -117,7 +118,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 
         //agendamentoAtt.setStatusTransacaoItem (CONFIRMADO);
 
-        return agendamentoRepository.save(agendamentoAtt);
+        return saveAgendamento (agendamentoAtt);
     }
 
 
@@ -149,6 +150,12 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
 //----------------AgendamentoService - INÍCIO ---------------------------
 
 
+    @Override
+    @Operation(description = "Retorna verdadeiro se o agendamento existir")
+    public boolean agendamentoExiste(UUID id) {
+        return agendamentoRepository.existsById(id);
+    }
+
 
     @Override
     public void verificarConfirmacaoCadastroProfessor(Agendamento agendamento) {
@@ -178,20 +185,27 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     public Agendamento professorConfirmaAgendamento(UUID id) {
         Agendamento agendamento = encontrarPorId (id);
         log.info(">>> professorConfirmaAgendamento: professor confirma agendamento");
-        agendamento.setStatusTransacaoItem (EM_ANALISE);
-        return agendamentoRepository.save (agendamento);
+        agendamento.setStatusTransacao (EM_ANALISE);
+        return saveAgendamento  (agendamento);
     }
 
 
     @Override
-    public void atualizarTecnico(User tecnico, @NotNull UUID id) {
+    public void atualizarTecnico(String email, @NotNull UUID id) {
         log.info(">>> atualizarTecnico: atualizando tecnico do agendamento");
-        //User tecnico = usuarioService.encontrarPorEmail(email);
+        User tecnico = obterTecnico (email);
         Agendamento agendamento = encontrarPorId(id);
         validadorAutorizacaoRequisicaoService.validarAutorizacaoRequisicao();
         verificarPerfilTecnico(tecnico);
         agendamento.setTecnico(tecnico);
-        this.agendamentoRepository.save(agendamento);
+        this.saveAgendamento (agendamento);
+    }
+
+    @Override
+    public User obterTecnico(String email) {
+        AgendamentoEvents.ObterTecnicoPorEmailEvent event = new AgendamentoEvents.ObterTecnicoPorEmailEvent(this, email);
+        publishEvent (event);
+        return event.getUser();
     }
 
     @Override
@@ -213,7 +227,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     }
 
     @Override
-    public boolean ehTecnico(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+    public boolean ehTecnico(Agendamento agendamento, UserDetailsImpl usuarioLogado) {
         log.info(">>> ehTecnico: Verificando se o usuário logado é o técnico do agendamento");
         if (agendamento.getTecnico() == null)
             return false;
@@ -243,7 +257,7 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
     public Agendamento verificarNovoProfessor(Agendamento novoAgedamento, Agendamento velhoAgendamento) {
         if(novoAgedamento.getProfessor () != velhoAgendamento.getProfessor ()) {
             verificarMudancaProfessor (novoAgedamento);
-            velhoAgendamento.setStatusTransacaoItem (AGUARDANDO_CONFIRMACAO_PROFESSOR);
+            velhoAgendamento.setStatusTransacao (AGUARDANDO_CONFIRMACAO_PROFESSOR);
             //enviarEmailParaProfessor (velhoAgendamento);
         }
         return velhoAgendamento;
@@ -265,54 +279,63 @@ public class AgendamentoServiceImpl extends TransacaoService<Agendamento> implem
         }
     }
 
+    @Override
+    public Agendamento saveAgendamento(Agendamento agendamento) {
+        return agendamentoRepository.save (agendamento);
+    }
+
+    @Override
+    public void verificarMudancaProfessor(Agendamento agendamento) {
+        StatusTransacao statusTransacao = agendamento.getStatusTransacao ();
+        if(!statusTransacao.equals (EM_ANALISE) && !statusTransacao.equals (APROVADO) && !statusTransacao.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
+            throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
+                    "aprovada, confirmada ou em análise");
+
+    }
+
 //----------------AgendamentoService - FIM ---------------------------
 
 
 //----------------TransacaoService - INÍCIO ---------------------------
-@Override
-public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
-    log.info(">>> atualizarStatus: atualizando status do agendamento");
-
-    StatusTransacaoItem statusUpperCase = getStatusUpperCase(status);
-
-    Agendamento agendamento = encontrarPorId(id);
-
-    verificarAutorizacaoDoUsuario(agendamento, statusUpperCase);
-
-    verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(agendamento, statusUpperCase);
-
-    verificarCondicoesDeConfirmacao(agendamento, statusUpperCase);
-
-    verificarCondicoesDeAprovacao(agendamento, statusUpperCase);
-
-    agendamento.setStatusTransacaoItem(statusUpperCase);
-    agendamentoRepository.save(agendamento);
-
-    log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
-            " atualizado para " + agendamento.getStatusTransacaoItem());
-}
 
     @Override
-    public void verificarCondicoesDeAprovacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
-        if (statusUpperCase == APROVADO) {
-            if(!agendamento.getStatusTransacaoItem ().equals (EM_ANALISE))
-                throw new AtualizarStatusException ("O agendamento precisa estar EM_ANALISE para ser APROVADO");
-        }
+    protected AgendamentoRepository getTransacaoRepository() {
+
+        return agendamentoRepository;
     }
 
 
     @Override
-    public List<Agendamento> transacoesAprovadasOuConfirmadasConflitantes(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim) {
-        log.info(">>> Verificar conflito de data: barrando agendamento solicitados em uma mesma data de agendamento " +
-                "confirmado ou aprovado");
-        return agendamentoRepository.findAprovadosOuConfirmadosConflitantes (dataHoraInicio, dataHoraFim);
+    public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
+        log.info(">>> atualizarStatus: atualizando status do agendamento");
+
+        StatusTransacao statusUpperCase = getStatusUpperCase(status);
+
+        Agendamento agendamento = encontrarPorId(id);
+
+        verificarAutorizacaoDoUsuario(agendamento, statusUpperCase);
+
+        verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(agendamento, statusUpperCase);
+
+        verificarCondicoesDeConfirmacao(agendamento, statusUpperCase);
+
+        verificarCondicoesDeAprovacao(agendamento, statusUpperCase);
+
+        agendamento.setStatusTransacao (statusUpperCase);
+        saveAgendamento (agendamento);
+
+        log.info(">>> atualizarStatus: status do agendamento " + agendamento.getId() +
+                " atualizado para " + agendamento.getStatusTransacao ());
     }
+
+
+
 
     @Override
     public void verificarLimiteTransacaoEmAnalise(User participante) {
         long agendamentosEmAnalise = participante.getAgendamentosRealizados ()
                 .stream ()
-                .filter(agendamento -> agendamento.getStatusTransacaoItem() == EM_ANALISE)
+                .filter(agendamento -> agendamento.getStatusTransacao () == EM_ANALISE)
                 .count();
         if(agendamentosEmAnalise > LIMITE_AGENDAMENTOS_EM_ANALISE)
             throw new AgendamentoException ("O usuário atingiu o limite de agendamentos em análise");
@@ -335,7 +358,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
 
 
     @Override
-    public boolean ehUsuarioAutorizado(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+    public boolean ehUsuarioAutorizado(Agendamento agendamento, UserDetailsImpl usuarioLogado) {
         log.info(">>> Verificar autorização do usuário: Verificando se usuário é o técnico, adm ou solicitante do " +
                 "agendamento");
         return ehSolicitante(agendamento, usuarioLogado) ||
@@ -344,72 +367,38 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
     @Override
-    public boolean ehSolicitante(Agendamento agendamento, UsuarioDetails usuarioLogado) {
+    public boolean ehSolicitante(Agendamento agendamento, UserDetailsImpl usuarioLogado) {
         log.info(">>> ehSolicitante: Verificando se o usuário logado é o solicitante do agendamento procurado");
         return agendamento.getSolicitantes().stream()
                 .anyMatch(solicitante -> Objects.equals(solicitante.getEmail(), usuarioLogado.getEmail()));
     }
 
 
-    @Override
-    public int calcularQuantidadeTransacao(Item item, List<Agendamento> agendamentos) {
-        int quantidadeAgendada = 0;
-        for (Agendamento agendamento : agendamentos) {
-            Integer quantidade = agendamento.getItensQuantidade().getOrDefault(item, 0);
-            quantidadeAgendada += quantidade;
-        }
-        return quantidadeAgendada;
-    }
 
     @Override
-    public void deletarItensAssociados(Item item) {
-        List<Agendamento> agendamentos = agendamentoRepository.findByItem(item);
-
-        if(agendamentos != null && !agendamentos.isEmpty ()) {
-            for (Agendamento agendamento : agendamentos) {
-                agendamento.getItensQuantidade().remove(item);
-                agendamentoRepository.save(agendamento);
-            }
-        }
-    }
-
-    @Override
-    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(Agendamento agendamento, StatusTransacaoItem status) {
+    public void verificarConflitosDeTransacaoAPROVADOeCONFIRMADO(Agendamento agendamento, StatusTransacao status) {
         if (!agendamentoRepository.findAprovadosOuConfirmadosConflitantes(agendamento.getDataHoraInicio(), agendamento.getDataHoraFim()).isEmpty()
                 && (status == APROVADO || status == CONFIRMADO)) {
             throw new AtualizarStatusException ("Um agendamento para essa data já foi aprovado ou confirmado.");
         }
     }
 
-    @Override
-    public void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
-        atributosIguais.add("tecnico");
-        atributosIguais.add("statusTransacaoItem");
-        atributosIguais.add("id");
-        String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
-        copyProperties(source, target, propriedadesIgnoradas);
-    }
-
-    @Override
-    public void verificarCondicoesDeConfirmacao(Agendamento agendamento, StatusTransacaoItem statusUpperCase) {
-        if (statusUpperCase.equals(CONFIRMADO)) {
-            if (!agendamento.getStatusTransacaoItem().equals(APROVADO)) {
-                throw new AtualizarStatusException("Para confirmar o agendamento é preciso que ele esteja aprovado");
-            }
-
-            if (tempoExpirado(agendamento.getDataHoraInicio())) {
-                agendamento.setStatusTransacaoItem(NAO_COMPARECEU);
-                agendamentoRepository.save(agendamento);
-                throw new TempoExpiradoException("A confirmação deve ser feita até 24h antes da data e hora de início" +
-                        " " +
-                        "do agendamento");
-            }
-        }
-    }
-
 
 //----------------TransacaoService - FIM ---------------------------
 
+
+// --------------- EventPublish - INICIO ------------------------------------
+    @Override
+    public ApplicationEventPublisher getEventPublisher () {
+        return this.eventPublisher;
+    }
+
+    @Override
+    public void setApplicationEventPublisher (@NotNull ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+// --------------- EventPublish - FIM ------------------------------------
 
 
     private void verificarTransacaoDeMesmaDataDoUsuario(List<User> solicitantes, Agendamento agendamento) {
@@ -428,7 +417,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
     }
 
 
-    public void deletarAgendamentoDaListaDosUsuarios(Agendamento agendamento) {
+    private void deletarAgendamentoDaListaDosUsuarios(Agendamento agendamento) {
 
         if(agendamento.getSolicitantes () != null && !agendamento.getSolicitantes ().isEmpty ())
             for (User solicitante : agendamento.getSolicitantes()) {
@@ -441,7 +430,7 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         LocalDateTime dataHoraInicio = obj.getDataHoraInicio ();
         LocalDateTime dataHoraFim = obj.getDataHoraFim ();
         if (!atributosIguais.contains("dataHoraInicio") || !atributosIguais.contains("dataHoraFim")) {
-            dataValida(dataHoraInicio, dataHoraFim);
+            dataValidaAgendamento(dataHoraInicio, dataHoraFim);
             if (!transacoesAprovadasOuConfirmadasConflitantes(dataHoraInicio, dataHoraFim).isEmpty())
                 throw new AgendamentoException("Já existe agendamento para essa data");
             verificarTransacaoDeMesmaDataDoUsuario(obj.getSolicitantes(), obj);
@@ -455,12 +444,15 @@ public void atualizarStatus(@NotNull String status, @NotNull UUID id) {
         }
     }
 
-    private void verificarMudancaProfessor(Agendamento agendamento) {
-        StatusTransacaoItem statusTransacaoItem = agendamento.getStatusTransacaoItem ();
-        if(!statusTransacaoItem.equals (EM_ANALISE) && !statusTransacaoItem.equals (APROVADO) && !statusTransacaoItem.equals (AGUARDANDO_CONFIRMACAO_PROFESSOR))
-            throw new AtualizarAgendamentoException ("Mudança de professor somente se o status da transação for " +
-                    "aprovada, confirmada ou em análise");
-
+    private void copiarAtributosRelevantes(Agendamento source, Agendamento target, List<String> atributosIguais) {
+        atributosIguais.add("tecnico");
+        atributosIguais.add("statusTransacaoItem");
+        atributosIguais.add("id");
+        String[] propriedadesIgnoradas = atributosIguais.toArray(new String[0]);
+        copyProperties(source, target, propriedadesIgnoradas);
     }
+
+
+
 
 }

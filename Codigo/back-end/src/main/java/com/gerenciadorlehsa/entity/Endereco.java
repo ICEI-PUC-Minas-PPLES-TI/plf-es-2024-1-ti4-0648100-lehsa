@@ -11,6 +11,8 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_CEP;
@@ -20,15 +22,8 @@ import static com.gerenciadorlehsa.util.ConstantesErroValidadorUtil.MSG_ERRO_CEP
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Endereco implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID", unique = true, nullable = false, updatable = false)
-    private UUID id;
+@EqualsAndHashCode(callSuper = true)
+public class Endereco extends BaseEntity {
 
     @Column(name = "rua", length = 45, nullable = false)
     @NotBlank
@@ -57,6 +52,5 @@ public class Endereco implements Serializable {
     @NotBlank(message = "CEP não pode estar em branco")
     @Pattern(regexp = "\\d{5}-\\d{3}", message = MSG_ERRO_CEP)
     private String cep;
-
 
 }

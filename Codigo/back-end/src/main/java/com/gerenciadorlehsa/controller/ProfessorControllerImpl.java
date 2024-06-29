@@ -9,7 +9,6 @@ import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
 import com.gerenciadorlehsa.util.ConversorEntidadeDTOUtil;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +35,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @RequestMapping(ENDPOINT_PROFESSOR)
 @AllArgsConstructor
-public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Professor, ProfessorDTO>, ProfessorController {
+public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Professor, ProfessorDTO>, ProfessorController{
 
     OperacoesCRUDServiceImg<Professor> operacoesCRUDService;
 
@@ -53,8 +51,8 @@ public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Profe
 
     @Override
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> criar (@Valid @RequestPart("professor") Professor professor,
-                                                      @NotNull @RequestPart("imagem")MultipartFile img) {
+    public ResponseEntity<Map<String, Object>> criar (@RequestPart("professor") Professor professor,
+                                                      @RequestPart("imagem")MultipartFile img) {
         log.info(">>> criar: recebendo requisição para criar professor");
         Professor professorCriado = operacoesCRUDService.criar(professor, img);
 
@@ -65,7 +63,7 @@ public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Profe
     @Override
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> atualizar (@PathVariable UUID id,
-                                                          @Valid @RequestPart("professor") @NotNull Professor professor,
+                                                          @RequestPart("professor") @NotNull Professor professor,
                                                           @RequestPart("imagem") MultipartFile img) {
         log.info(">>> atualizar: recebendo requisição para atualizar professor");
 
@@ -104,6 +102,7 @@ public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Profe
     }
 
 
+    @Override
     @GetMapping("/{id}/agendamentos")
     public ResponseEntity<List<AgendamentoDTORes>> listarAgendamentoProfessor(@PathVariable UUID id) {
         log.info(">>> listarAgendamento: recebendo requisição para listar todos agendamentos de um professor");
@@ -115,6 +114,7 @@ public class ProfessorControllerImpl implements OperacoesCRUDControllerImg<Profe
     }
 
 
+    @Override
     @GetMapping("img/{id}")
     public ResponseEntity<?> encontrarImagemPorId (@PathVariable UUID id) {
         byte [] img = this.operacoesCRUDService.encontrarImagemPorId(id);

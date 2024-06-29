@@ -1,43 +1,32 @@
-package com.gerenciadorlehsa.components;
+package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.components.abstracts.TransacaoDTOValidadadorComp;
-import com.gerenciadorlehsa.components.abstracts.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.dto.AgendamentoDTO;
 import com.gerenciadorlehsa.dto.ProfessorDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.entity.Agendamento;
 import com.gerenciadorlehsa.entity.Professor;
 import com.gerenciadorlehsa.entity.User;
-import com.gerenciadorlehsa.service.ItemService;
 import com.gerenciadorlehsa.service.interfaces.ProfessorService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.AGUARDANDO_CONFIRMACAO_PROFESSOR;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.AGUARDANDO_CONFIRMACAO_PROFESSOR;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
 @Slf4j(topic = AGENDAMENTO_ENTITY_CONVERTER_COMP)
-@Component
+@Service
+@AllArgsConstructor
 @Schema(description = "Responsável por converter DTO para objeto agendamento")
-public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp<Agendamento,AgendamentoDTO> {
+public class AgendamentoEntityConverterService extends TransacaoEntityConverterService<Agendamento,AgendamentoDTO> {
 
-    TransacaoDTOValidadadorComp<AgendamentoDTO> agendamentoDTOValidadadorComp;
-    ProfessorService professorService;
-
-
-    @Autowired
-    public AgendamentoEntityConverterComp (UsuarioService usuarioService, ItemService itemService, ProfessorService professorService,TransacaoDTOValidadadorComp<AgendamentoDTO> agendamentoDTOValidadadorComp) {
-        super (usuarioService, itemService);
-        this.professorService = professorService;
-        this.agendamentoDTOValidadadorComp = agendamentoDTOValidadadorComp;
-    }
+    private final TransacaoDTOValidadadorService<AgendamentoDTO> agendamentoDTOValidadadorComp;
+    private final ProfessorService professorService;
 
     @Override
     public Agendamento convertToEntity(AgendamentoDTO agendamentoDTO) {
@@ -49,7 +38,7 @@ public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp
         agendamento.setDataHoraInicio(converterDataHora (agendamentoDTO.dataHoraInicio ()));
         agendamento.setDataHoraFim(converterDataHora (agendamentoDTO.dataHoraFim ()));
         agendamento.setObservacaoSolicitacao(agendamentoDTO.observacaoSolicitacao());
-        agendamento.setStatusTransacaoItem(AGUARDANDO_CONFIRMACAO_PROFESSOR);
+        agendamento.setStatusTransacao (AGUARDANDO_CONFIRMACAO_PROFESSOR);
         agendamento.setTecnico(null);
         agendamento.setSolicitantes(acharSolicitantes(agendamentoDTO.solicitantes()));
         agendamento.setItensQuantidade (convertMapa (agendamentoDTO.itens ()));
@@ -59,11 +48,9 @@ public class AgendamentoEntityConverterComp extends TransacaoEntityConverterComp
 
 
     private List<User> acharSolicitantes(List<UsuarioDTO> solicitantesDTO) {
-        List<User> usuarios = new ArrayList<> ();
-        for (UsuarioDTO usuarioDTO : solicitantesDTO) {
-            usuarios.add (acharSolicitante (usuarioDTO));
-        }
-        return usuarios;
+        return solicitantesDTO.stream()
+                .map(this::acharSolicitante)
+                .collect(Collectors.toList());
     }
 
     private Professor acharProfessor(ProfessorDTO professorDTO) {

@@ -1,7 +1,7 @@
 package com.gerenciadorlehsa.service.interfaces;
 
 
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import java.util.UUID;
 
 /**
@@ -9,9 +9,9 @@ import java.util.UUID;
  */
 public interface ValidadorAutorizacaoRequisicaoService {
 
-    UsuarioDetails validarAutorizacaoRequisicao(UUID id, String topico);
+    UserDetailsImpl validarAutorizacaoRequisicao(UUID id, String topico);
 
-    UsuarioDetails getUsuarioLogado();
+    UserDetailsImpl getUsuarioLogado();
 
-    UsuarioDetails validarAutorizacaoRequisicao();
+    UserDetailsImpl validarAutorizacaoRequisicao();
 }

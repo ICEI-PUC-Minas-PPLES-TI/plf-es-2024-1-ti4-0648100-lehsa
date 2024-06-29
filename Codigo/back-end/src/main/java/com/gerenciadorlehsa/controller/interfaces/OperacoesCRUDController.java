@@ -14,10 +14,7 @@ import java.util.UUID;
  * @param <I> Classe de entrada do controller
  * @param <O> Classe de saída do controller
  */
-public interface OperacoesCRUDController<I, O> {
-
-    @GetMapping("/{id}")
-    ResponseEntity<O> encontrarPorId(@PathVariable UUID id);
+public interface OperacoesCRUDController<I, O> extends BaseCRUDController<O> {
 
     @PostMapping
     ResponseEntity<Map<String, Object>> criar(@Valid @RequestBody I obj);
@@ -25,9 +22,4 @@ public interface OperacoesCRUDController<I, O> {
     @PutMapping("/{id}")
     ResponseEntity<Map<String, Object>> atualizar(@PathVariable UUID id, @Valid @RequestBody I obj);
 
-    @DeleteMapping("/{id}")
-    ResponseEntity<Map<String, Object>> deletar(@PathVariable UUID id);
-
-    @GetMapping
-    ResponseEntity<List<O>> listarTodos();
 }

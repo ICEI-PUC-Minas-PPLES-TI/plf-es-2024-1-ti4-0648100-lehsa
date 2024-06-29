@@ -14,7 +14,6 @@ const Equipamentos = () => {
       <div className='flex flex-1 justify-between my-5'>
         <SearchBar onChange={(e) => setSearchTerm(e.target.value)} />
         <div className='flex justify-items-end space-x-5'>
-          <FilterSelect />
           <Link href='/admin/itens/cadastro'><Button>+ Novo Item</Button></Link>
         </div>
       </div>

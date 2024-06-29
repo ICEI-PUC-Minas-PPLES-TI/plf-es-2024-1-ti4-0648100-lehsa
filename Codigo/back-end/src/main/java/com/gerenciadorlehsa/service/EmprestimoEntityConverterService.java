@@ -1,35 +1,26 @@
-package com.gerenciadorlehsa.components;
+package com.gerenciadorlehsa.service;
 
-import com.gerenciadorlehsa.components.abstracts.TransacaoDTOValidadadorComp;
-import com.gerenciadorlehsa.components.abstracts.TransacaoEntityConverterComp;
 import com.gerenciadorlehsa.dto.EmprestimoDTO;
 import com.gerenciadorlehsa.dto.EnderecoDTO;
 import com.gerenciadorlehsa.entity.Emprestimo;
 import com.gerenciadorlehsa.entity.Endereco;
-import com.gerenciadorlehsa.service.ItemService;
-import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import static com.gerenciadorlehsa.entity.enums.StatusTransacaoItem.EM_ANALISE;
-import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.AGENDAMENTO_ENTITY_CONVERTER_COMP;
+import static com.gerenciadorlehsa.entity.enums.StatusTransacao.EM_ANALISE;
 import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.EMPRESTIMO_ENTITY_CONVERTER_COMP;
 import static com.gerenciadorlehsa.util.DataHoraUtil.converterDataHora;
 
 @Slf4j(topic = EMPRESTIMO_ENTITY_CONVERTER_COMP)
-@Component
+@Service
+@AllArgsConstructor
 @Schema(description = "Responsável por converter DTO de empréstimo em entidade empréstimo")
-public class EmprestimoEntityConverterComp extends TransacaoEntityConverterComp<Emprestimo, EmprestimoDTO> {
+public class EmprestimoEntityConverterService extends TransacaoEntityConverterService<Emprestimo, EmprestimoDTO> {
 
-    TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp;
-
-    @Autowired
-    public EmprestimoEntityConverterComp (UsuarioService usuarioService, ItemService itemService, TransacaoDTOValidadadorComp<EmprestimoDTO> emprestimoDTOValidadadorComp) {
-        super (usuarioService, itemService);
-        this.emprestimoDTOValidadadorComp = emprestimoDTOValidadadorComp;
-    }
+    private final TransacaoDTOValidadadorService<EmprestimoDTO> emprestimoDTOValidadadorComp;
 
     @Override
     public Emprestimo convertToEntity(EmprestimoDTO emprestimoDTO) {
@@ -40,7 +31,7 @@ public class EmprestimoEntityConverterComp extends TransacaoEntityConverterComp<
         emprestimo.setDataHoraInicio(converterDataHora (emprestimoDTO.dataHoraInicio ()));
         emprestimo.setDataHoraFim(converterDataHora (emprestimoDTO.dataHoraFim ()));
         emprestimo.setObservacaoSolicitacao(emprestimoDTO.observacaoSolicitacao());
-        emprestimo.setStatusTransacaoItem(EM_ANALISE);
+        emprestimo.setStatusTransacao (EM_ANALISE);
         emprestimo.setSolicitante(acharSolicitante(emprestimoDTO.solicitante()));
         emprestimo.setItensQuantidade(convertMapa(emprestimoDTO.itens ()));
         emprestimo.setLocalUso(convertToEntity(emprestimoDTO.endereco()));

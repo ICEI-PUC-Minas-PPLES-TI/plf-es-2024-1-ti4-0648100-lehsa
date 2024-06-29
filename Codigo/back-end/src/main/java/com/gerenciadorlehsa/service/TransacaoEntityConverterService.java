@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components.abstracts;
+package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.dto.ItemDTO;
 import com.gerenciadorlehsa.dto.UsuarioDTO;
@@ -6,21 +6,30 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.entity.User;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
-import com.gerenciadorlehsa.service.ItemService;
+import com.gerenciadorlehsa.service.interfaces.OperacoesCRUDServiceImg;
 import com.gerenciadorlehsa.service.interfaces.UsuarioService;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 @AllArgsConstructor
-public abstract class TransacaoEntityConverterComp<T extends Transacao,DTO> {
+@NoArgsConstructor
+public abstract class TransacaoEntityConverterService<T extends Transacao,DTO> {
 
-    protected final UsuarioService usuarioService;
-    protected final ItemService itemService;
+    @Autowired
+    protected UsuarioService usuarioService;
+
+    @Autowired
+    private OperacoesCRUDServiceImg<Item> operacoesCRUDServiceImg;
+
 
     public abstract T convertToEntity(DTO dto);
 
@@ -45,7 +54,7 @@ public abstract class TransacaoEntityConverterComp<T extends Transacao,DTO> {
     protected List<Item> acharItens(List<ItemDTO> itensDTO) {
 
         return itensDTO.stream()
-                .map(itemDTO -> itemService.encontrarPorId(itemDTO.id()))
+                .map(itemDTO -> operacoesCRUDServiceImg.encontrarPorId(itemDTO.id()))
                 .collect(Collectors.toList());
     }
 

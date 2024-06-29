@@ -1,4 +1,4 @@
-package com.gerenciadorlehsa.components.abstracts;
+package com.gerenciadorlehsa.service;
 
 
 import com.gerenciadorlehsa.dto.ItemDTO;
@@ -6,7 +6,7 @@ import com.gerenciadorlehsa.dto.UsuarioDTO;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
 import java.util.List;
 
-public abstract class TransacaoDTOValidadadorComp<DTO> {
+public abstract class TransacaoDTOValidadadorService<DTO> {
 
 
     public abstract void validate (DTO dto);
@@ -16,7 +16,7 @@ public abstract class TransacaoDTOValidadadorComp<DTO> {
         if(solicitante == null)
             throw new TransacaoException ("A transação não pode ter solicitante nulo");
         if (solicitante.email () == null)
-            throw new TransacaoException ("Um solicitante tem id nulo");
+            throw new TransacaoException ("Um solicitante tem e-mail nulo");
     }
 
 

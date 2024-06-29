@@ -4,10 +4,10 @@ import com.gerenciadorlehsa.entity.Endereco;
 import com.gerenciadorlehsa.exceptions.lancaveis.DeletarEntidadeException;
 import com.gerenciadorlehsa.exceptions.lancaveis.EntidadeNaoEncontradaException;
 import com.gerenciadorlehsa.repository.EnderecoRepository;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,6 +15,7 @@ import static java.lang.String.format;
 
 @Service
 @AllArgsConstructor
+@Schema(description = "Contém as regras de negócio para endereço")
 public class EnderecoService {
 
     private final EnderecoRepository enderecoRepository;
@@ -23,6 +24,11 @@ public class EnderecoService {
         return enderecoRepository.findById(id).orElseThrow(() -> new EntidadeNaoEncontradaException(
                 String.format("Endereco não encontrado, id: %s", id)));
     }
+
+    public Endereco criar(Endereco endereco) {
+        return enderecoRepository.save(endereco);
+    }
+
 
     public void deletar (UUID id) {
         encontrarPorId(id);
@@ -33,8 +39,8 @@ public class EnderecoService {
         }
     }
 
-    public List<Endereco> encontrarPorCep (String cep) {
-        return enderecoRepository.findByCep(cep);
+    public boolean enderecoExiste(Endereco endereco) {
+        return enderecoRepository.existsByEndereco(endereco);
     }
 
     public boolean saoIguais (Endereco e1, Endereco e2) {

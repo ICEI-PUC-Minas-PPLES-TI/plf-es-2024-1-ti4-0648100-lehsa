@@ -49,6 +49,9 @@ public class ConstantesRequisicaoUtil {
     public static final List<String> CHAVES_PROFESSOR_CONTROLLER = new ArrayList<>(asList("status", "mensagem",
             "id_professor"));
 
+    public static final List<String> CHAVES_ITEM_CONTROLLER = new ArrayList<>(asList("status", "mensagem",
+            "id_item"));
+
     public static final List<String> CHAVES_AGENDAMENTO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_agendamento"));
 
     public static final List<String> CHAVES_EMPRESTIMO_CONTROLLER = new ArrayList<>(asList("status", "mensagem", "id_emprestimo"));
@@ -56,6 +59,8 @@ public class ConstantesRequisicaoUtil {
     public static final String MSG_USUARIO_CRIADO = "usuario criado com sucesso";
 
     public static final String MSG_PROFESSOR_CRIADO = "Professor criado com sucesso";
+
+    public static final String MSG_ITEM_CRIADO = "Item criado com sucesso";
 
     public static final String MSG_AGENDAMENTO_CRIADO = "agendamento criado com sucesso";
 
@@ -69,11 +74,15 @@ public class ConstantesRequisicaoUtil {
 
     public static final String MSG_PROFESSOR_ATUALIZADO = "Professor atualizado com sucesso";
 
+    public static final String MSG_ITEM_ATUALIZADO = "Item atualizado com sucesso";
+
     public static final String MSG_PERFIL_ATUALIZADO = "perfil do usuário atualizado com sucesso";
 
     public static final String MSG_USUARIO_DELETADO = "usuario deletado com sucesso";
 
     public static final String MSG_PROFESSOR_DELETADO = "Professor deletado com sucesso";
+
+    public static final String MSG_ITEM_DELETADO = "Item deletado com sucesso";
 
     public static final String MSG_PROFESSOR_CONFIRMACAO_CADASTRO = "Professor confirmou cadastro";
 

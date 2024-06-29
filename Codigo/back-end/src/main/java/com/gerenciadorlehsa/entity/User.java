@@ -62,10 +62,8 @@ public class User extends Pessoa {
     @OneToMany(mappedBy = "tecnico", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Agendamento> agendamentosComoTecnico;
 
-
     @ManyToMany(mappedBy = "solicitantes", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Agendamento> agendamentosRealizados;
-
 
     @OneToMany(mappedBy = "solicitante", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Emprestimo> emprestimos;

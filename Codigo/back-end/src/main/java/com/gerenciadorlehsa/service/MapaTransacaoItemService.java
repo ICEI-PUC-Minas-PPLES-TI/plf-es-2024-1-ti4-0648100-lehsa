@@ -6,9 +6,14 @@ import com.gerenciadorlehsa.entity.Item;
 import com.gerenciadorlehsa.entity.Transacao;
 import com.gerenciadorlehsa.exceptions.lancaveis.AgendamentoException;
 import com.gerenciadorlehsa.exceptions.lancaveis.TransacaoException;
+import com.gerenciadorlehsa.repository.AgendamentoRepository;
+import com.gerenciadorlehsa.repository.EmprestimoRepository;
+import com.gerenciadorlehsa.service.interfaces.EventPublisher;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,18 +26,18 @@ import static com.gerenciadorlehsa.util.ConstantesTopicosUtil.MAPA_TRANSACAO_ITE
 @Service
 @AllArgsConstructor
 @Schema(description = "Responsável por lidar com a relação entre item e transação")
-public class MapaTransacaoItemService<T extends Transacao> {
+public class MapaTransacaoItemService<T extends Transacao>{
 
-    private final TransacaoService<Emprestimo> transacaoEmprestimoService;
-    private final TransacaoService<Agendamento> transacaoAgendamentoService;
+    private final TransacaoService<Emprestimo, EmprestimoRepository> transacaoEmprestimoService;
+    private final TransacaoService<Agendamento, AgendamentoRepository> transacaoAgendamentoService;
 
-    public void validarMapaParaCriacao(T transacao) {
+    public void validarMapa(T transacao) {
         log.info(">>> Validando Mapa para criação de Transacao");
         verificarQuantidadeDeItemInValida(transacao.getItensQuantidade());
         verificarQuantidadeSelecionada(null, transacao);
     }
 
-    public void validarMapaParaAtualizacao(UUID id, T transacao) {
+    public void validarMapa(UUID id, T transacao) {
         log.info(">>> Validando Mapa para atualização de Transacao");
         verificarQuantidadeDeItemInValida(transacao.getItensQuantidade());
         verificarQuantidadeSelecionada(id, transacao);
@@ -59,10 +64,11 @@ public class MapaTransacaoItemService<T extends Transacao> {
         List<Agendamento> agendamentosEmConflito = buscarAgendamentosEmConflito(inicio, fim);
 
         if (id != null) {
-            if (transacao instanceof Emprestimo)
-                emprestimosEmConflito.removeIf(emprestimo -> emprestimo.getId().equals(id));
-            else if (transacao instanceof Agendamento)
-                agendamentosEmConflito.removeIf(agendamento -> agendamento.getId().equals(id));
+
+            if(isSameType (transacao, emprestimosEmConflito))
+                removeIfMatchingId (id, emprestimosEmConflito);
+            else
+                removeIfMatchingId (id, agendamentosEmConflito);
         }
 
         int quantidadeEmprestada = transacaoEmprestimoService.calcularQuantidadeTransacao(item, emprestimosEmConflito);
@@ -97,10 +103,17 @@ public class MapaTransacaoItemService<T extends Transacao> {
         }
     }
 
-    public void deletarItensAssociados(Item item) {
-        transacaoAgendamentoService.deletarItensAssociados (item);
-        transacaoEmprestimoService.deletarItensAssociados (item);
+
+    public void removeIfMatchingId(UUID id, List<? extends Transacao> transacoes) {
+        transacoes.removeIf(transacao -> transacao.getId().equals(id));
     }
 
+    public boolean isSameType(Transacao o1, List<? extends Transacao> o2) {
+        if (o1 == null || o2 == null || o2.isEmpty()) {
+            return false;
+        }
+        Transacao firstElement = o2.get(0);
+        return o1.getClass().equals(firstElement.getClass());
+    }
 
 }

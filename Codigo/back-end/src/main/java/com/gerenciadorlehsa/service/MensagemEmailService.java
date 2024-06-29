@@ -2,6 +2,7 @@ package com.gerenciadorlehsa.service;
 
 import com.gerenciadorlehsa.entity.MensagemEmail;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Schema(description = "Serviço responsável pelo envio de e-mail")
 public class MensagemEmailService {
 
     private final JavaMailSender javaMailSender;

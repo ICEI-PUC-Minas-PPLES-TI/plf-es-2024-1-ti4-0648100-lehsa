@@ -35,7 +35,7 @@ public class DataHoraUtil {
     }
 
 
-    public static void dataValida(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim){
+    public static void dataValidaAgendamento(LocalDateTime dataHoraInicio, LocalDateTime dataHoraFim){
         Duration tempoEntreDatas = Duration.between(dataHoraInicio, dataHoraFim);
 
         boolean NaoEhValida = dataHoraInicio.isBefore (LocalDateTime.now ()) ||
@@ -65,4 +65,14 @@ public class DataHoraUtil {
         if(NaoEhValida)
             throw new DataException ("Data inválida!");
     }
+
+
+    public boolean tempoTransacaoExpirado(LocalDateTime dataHoraInicio) {
+        long difTempo = calcularDiferencaDeTempo(LocalDateTime.now(),
+                dataHoraInicio);
+        return difTempo < 24;
+    }
+
+
+
 }

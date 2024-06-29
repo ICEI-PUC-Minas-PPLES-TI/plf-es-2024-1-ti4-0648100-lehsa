@@ -1,6 +1,6 @@
 package com.gerenciadorlehsa.service.interfaces;
 
-import com.gerenciadorlehsa.security.UsuarioDetails;
+import com.gerenciadorlehsa.security.UserDetailsImpl;
 import java.util.UUID;
 
 /**
@@ -8,7 +8,7 @@ import java.util.UUID;
  */
 public interface Validador {
 
-    boolean validar(UUID id, UsuarioDetails usuarioDetails);
+    boolean validar(UUID id, UserDetailsImpl userDetailsImpl);
 
     String getTopico();
 }

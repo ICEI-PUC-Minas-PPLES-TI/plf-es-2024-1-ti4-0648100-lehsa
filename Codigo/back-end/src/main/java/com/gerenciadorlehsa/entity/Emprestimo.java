@@ -4,9 +4,8 @@ package com.gerenciadorlehsa.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Entity
 @Table(name = "TB_EMPRESTIMO")
@@ -42,6 +41,7 @@ public class Emprestimo extends Transacao {
     public void preRemove() {
         itensQuantidade.clear();
     }
+
 
     @Override
     public Map<Item, Integer> getItensQuantidade() {
